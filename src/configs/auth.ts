@@ -11,5 +11,5 @@ export default {
   loginEndpoint: 'http://localhost:8000/auth/login',
   registerEndpoint: '/jwt/register',
   storageTokenKeyName: 'accessToken',
-  onTokenExpiration: 'refreshToken' // logout | refreshToken
+  onTokenExpiration: 'logout' // logout | refreshToken
 }

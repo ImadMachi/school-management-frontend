@@ -17,9 +17,9 @@ export type UserDataType = {
   role: string
   email: string
   fullName: string
-  username: string
-  password: string
-  avatar?: string | null
+  // username: string
+  // password: string
+  // avatar?: string | null
 }
 
 export type AuthValuesType = {

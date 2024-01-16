@@ -25,6 +25,9 @@ import typography from './typography'
 import themeOptions from './ThemeOptions'
 import UserThemeOptions from 'src/layouts/UserThemeOptions'
 
+// ** Locales
+import { frFR } from '@mui/material/locale'
+
 // ** Global Styles
 import GlobalStyling from './globalStyles'
 
@@ -41,7 +44,7 @@ const ThemeComponent = (props: Props) => {
   const coreThemeConfig = themeOptions(settings)
 
   // ** Pass ThemeOptions to CreateTheme Function to create partial theme without component overrides
-  let theme = createTheme(coreThemeConfig)
+  let theme = createTheme(coreThemeConfig, frFR)
 
   // ** Deep Merge Component overrides of core and user
   const mergeComponentOverrides = (theme: Theme, settings: Settings) =>

@@ -16,6 +16,7 @@ import { AuthValuesType, RegisterParams, LoginParams, ErrCallbackType, UserDataT
 // ** Defaults
 const defaultProvider: AuthValuesType = {
   user: null,
+  accessToken: '',
   loading: true,
   setUser: () => null,
   setLoading: () => Boolean,
@@ -33,6 +34,7 @@ type Props = {
 const AuthProvider = ({ children }: Props) => {
   // ** States
   const [user, setUser] = useState<UserDataType | null>(defaultProvider.user)
+  const [accessToken, setAccessToken] = useState(defaultProvider.accessToken)
   const [loading, setLoading] = useState<boolean>(defaultProvider.loading)
 
   // ** Hooks
@@ -51,6 +53,7 @@ const AuthProvider = ({ children }: Props) => {
           })
           .then(async response => {
             setUser({ ...response.data })
+            setAccessToken(storedToken)
             setLoading(false)
           })
           .catch(() => {
@@ -79,6 +82,9 @@ const AuthProvider = ({ children }: Props) => {
         params.rememberMe
           ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.access_token)
           : null
+
+        setAccessToken(response.data.access_token)
+
         const returnUrl = router.query.returnUrl
 
         setUser({ ...response.data.user })
@@ -116,6 +122,7 @@ const AuthProvider = ({ children }: Props) => {
 
   const values = {
     user,
+    accessToken,
     loading,
     setUser,
     setLoading,

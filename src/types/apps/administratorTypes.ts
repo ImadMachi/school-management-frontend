@@ -5,5 +5,5 @@ export type AdministratorType = {
   firstName: string
   lastName: string
   phoneNumber: string
-  user: UserType
+  userId: number
 }

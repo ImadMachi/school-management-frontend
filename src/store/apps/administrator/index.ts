@@ -1,10 +1,11 @@
 // ** Redux Imports
 import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
+import { CreateAdministratorDto } from 'src/views/apps/administrator/list/AddAdministratorDrawer'
 
 const HOST = process.env.NEXT_PUBLIC_API_URL
 
@@ -17,31 +18,22 @@ interface Headers {
   [key: string]: string
 }
 
-interface Data {
-  params: Params
-  headers: Headers
-}
-
 interface Redux {
   getState: any
   dispatch: Dispatch<any>
 }
 
 // ** Fetch Administrators
-export const fetchData = createAsyncThunk('appAdministrators/fetchData', async ({ params, headers }: Data) => {
-  const response = await axios.get(`${HOST}/administrators`, {
-    params,
-    headers
-  })
-
+export const fetchData = createAsyncThunk('appAdministrators/fetchData', async () => {
+  const response = await axios.get(`${HOST}/administrators`)
   return response.data
 })
 
 // ** Add User
 export const addAdministrator = createAsyncThunk(
   'appAdministrators/addAdministrator',
-  async (data: { [key: string]: number | string }, { getState, dispatch }: Redux) => {
-    const response = await axios.post(`${HOST}/administrators`, data)
+  async (data: CreateAdministratorDto, { getState, dispatch }: Redux) => {
+    const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, data)
     return response.data
   }
 )
@@ -57,7 +49,6 @@ export const deleteAdministrator = createAsyncThunk(
     await axios.delete(`${HOST}/administrators/${id}`, {
       headers
     })
-
     return id
   }
 )
@@ -79,24 +70,37 @@ const initialState: AppAdministratorsState = {
 export const appAdministratorsSlice = createSlice({
   name: 'appAdministrators',
   initialState,
-  reducers: {},
+  reducers: {
+    filterData: (state, action: PayloadAction<string>) => {
+      const filterValue = action.payload.toLowerCase().trim()
+      if (filterValue === '') {
+        state.data = state.allData
+        return
+      }
+      state.data = state.allData.filter(
+        administrator =>
+          `${administrator.firstName} ${administrator.lastName}`.toLowerCase().includes(filterValue) ||
+          administrator.phoneNumber.toLowerCase().includes(filterValue)
+      )
+    }
+  },
   extraReducers: builder => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
       state.data = action.payload
-      // state.data = action.payload.data
-      // state.total = action.payload.total
-      // state.params = action.payload.params
-      // state.allData = action.payload.allData
+      state.total = action.payload.length
+      state.allData = action.payload
     })
     builder.addCase(deleteAdministrator.fulfilled, (state, action) => {
       state.data = state.data.filter(administrator => administrator.id !== action.payload)
+      state.allData = state.allData.filter(administrator => administrator.id !== action.payload)
     })
 
     builder.addCase(addAdministrator.fulfilled, (state, action) => {
       state.data.unshift(action.payload)
+      state.allData.unshift(action.payload)
     })
-    builder.addCase(addAdministrator.rejected, (state, action) => {})
   }
 })
 
+export const { filterData } = appAdministratorsSlice.actions
 export default appAdministratorsSlice.reducer

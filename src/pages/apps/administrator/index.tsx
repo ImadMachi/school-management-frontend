@@ -34,7 +34,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteAdministrator } from 'src/store/apps/administrator'
+import { fetchData, deleteAdministrator, filterData } from 'src/store/apps/administrator'
 
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
@@ -44,9 +44,20 @@ import { AdministratorType } from 'src/types/apps/administratorTypes'
 import TableHeader from 'src/views/apps/administrator/list/TableHeader'
 import AddAdministratorDrawer from 'src/views/apps/administrator/list/AddAdministratorDrawer'
 import { useAuth } from 'src/hooks/useAuth'
+import CustomChip from 'src/@core/components/mui/chip'
+import { ThemeColor } from 'src/@core/layouts/types'
 
 interface CellType {
   row: AdministratorType
+}
+
+interface AccountStatusType {
+  [key: string]: ThemeColor
+}
+
+const accountStatusObj: AccountStatusType = {
+  oui: 'success',
+  non: 'error'
 }
 
 const StyledLink = styled(Link)(({ theme }) => ({
@@ -138,7 +149,7 @@ const columns = [
     flex: 0.2,
     minWidth: 230,
     headerName: 'administrateur',
-    field: 'fullName',
+    field: 'firstName',
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row
 
@@ -157,7 +168,7 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'num tel',
+    headerName: 'Tel',
     field: 'phoneNumber',
     renderCell: ({ row }: CellType) => {
       return (
@@ -171,12 +182,17 @@ const columns = [
     flex: 0.15,
     minWidth: 120,
     headerName: 'Possède Compte',
-    field: 'hasAccount',
+    field: 'userId',
     renderCell: ({ row }: CellType) => {
+      const status = !!row.userId ? 'oui' : 'non'
       return (
-        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
-          {!!row.user ? 'Oui' : 'Non'}
-        </Typography>
+        <CustomChip
+          skin='light'
+          size='small'
+          label={status}
+          color={accountStatusObj[status]}
+          sx={{ textTransform: 'capitalize' }}
+        />
       )
     }
   },
@@ -199,25 +215,29 @@ const UserList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.administrator)
+  const administratorStore = useSelector((state: RootState) => state.administrator)
   const auth = useAuth()
 
   useEffect(() => {
-    dispatch(
-      fetchData({
-        params: {
-          q: value
-        },
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`
-        }
-      })
-    )
+    dispatch(fetchData())
+  }, [])
+
+  useEffect(() => {
+    dispatch(filterData(value))
   }, [dispatch, plan, value])
 
   const handleFilter = useCallback((val: string) => {
     setValue(val)
   }, [])
+
+  const generateCSVData = () => {
+    return administratorStore.allData.map(item => ({
+      FirstName: item.firstName,
+      LastName: item.lastName,
+      Tel: item.phoneNumber,
+      hasAccount: !!item.userId ? 'oui' : 'non'
+    }))
+  }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
 
@@ -251,10 +271,15 @@ const UserList = () => {
             </Grid>
           </CardContent> */}
           {/* <Divider /> */}
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+          <TableHeader
+            generateCSVData={generateCSVData}
+            value={value}
+            handleFilter={handleFilter}
+            toggle={toggleAddUserDrawer}
+          />
           <DataGrid
             autoHeight
-            rows={store.data}
+            rows={administratorStore.data}
             columns={columns}
             checkboxSelection
             pageSize={pageSize}

@@ -3,13 +3,10 @@ import { useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
-import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
@@ -18,7 +15,7 @@ import FormHelperText from '@mui/material/FormHelperText'
 // ** Third Party Imports
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -26,30 +23,24 @@ import Icon from 'src/@core/components/icon'
 // ** Store Imports
 import { useDispatch } from 'react-redux'
 
-// ** Actions Imports
-import { addAdministrator } from 'src/store/apps/administrator'
-
 // ** Types Imports
 import { AppDispatch } from 'src/store'
+import { Checkbox, FormControlLabel } from '@mui/material'
+import { addAdministrator } from 'src/store/apps/administrator'
 
-interface SidebarAddUserType {
+interface SidebarAddAdministratorType {
   open: boolean
   toggle: () => void
 }
 
-interface UserData {
+export interface CreateAdministratorDto {
   firstName: string
   lastName: string
   phoneNumber: string
-}
-
-const showErrors = (field: string, valueLen: number, min: number) => {
-  if (valueLen === 0) {
-    return `${field} field is required`
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
-  } else {
-    return ''
+  createAccount: boolean
+  createUserDto?: {
+    email: string
+    password: string
   }
 }
 
@@ -64,16 +55,30 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required()
+  phoneNumber: yup.string().required(),
+  createUserDto: yup.object().when('createAccount', {
+    is: true,
+    then: yup.object({
+      email: yup.string().email('Invalid email format').required('Email is required'),
+      password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
+    }),
+    otherwise: yup.object().strip()
+  }),
+  createAccount: yup.boolean().required()
 })
 
 const defaultValues = {
   firstName: '',
   lastName: '',
-  phoneNumber: ''
+  phoneNumber: '',
+  createAccount: false,
+  createUserDto: {
+    email: '',
+    password: ''
+  }
 }
 
-const SidebarAddUser = (props: SidebarAddUserType) => {
+const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
   // ** Props
   const { open, toggle } = props
 
@@ -83,6 +88,7 @@ const SidebarAddUser = (props: SidebarAddUserType) => {
     reset,
     control,
     setValue,
+    getValues,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -91,8 +97,14 @@ const SidebarAddUser = (props: SidebarAddUserType) => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = (data: UserData) => {
-    dispatch(addAdministrator({ ...data }))
+  const createAccount = useWatch({
+    control,
+    name: 'createAccount',
+    defaultValue: false
+  })
+
+  const onSubmit = (data: CreateAdministratorDto) => {
+    dispatch(addAdministrator(data))
     toggle()
     reset()
   }
@@ -163,7 +175,7 @@ const SidebarAddUser = (props: SidebarAddUserType) => {
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label='Num Tel'
+                  label='Tel'
                   onChange={onChange}
                   placeholder='+212 612-345678'
                   error={Boolean(errors.phoneNumber)}
@@ -174,6 +186,64 @@ const SidebarAddUser = (props: SidebarAddUserType) => {
               <FormHelperText sx={{ color: 'error.main' }}>{errors.phoneNumber.message}</FormHelperText>
             )}
           </FormControl>
+
+          <FormControlLabel
+            control={
+              <Controller
+                name='createAccount'
+                control={control}
+                render={({ field: { value, onChange } }) => <Checkbox checked={value} onChange={onChange} />}
+              />
+            }
+            label='Créer un compte'
+          />
+
+          {/***************** START CREATE ACCOUNT **********************/}
+          {getValues('createAccount') && (
+            <>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='createUserDto.email'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <TextField
+                      value={value}
+                      label='Email'
+                      onChange={onChange}
+                      placeholder='john.doe@example.com'
+                      error={Boolean(errors.createUserDto?.email)}
+                    />
+                  )}
+                />
+                {errors.createUserDto?.email && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.email.message}</FormHelperText>
+                )}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='createUserDto.password'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <TextField
+                      type='password'
+                      value={value}
+                      label='Mot de passe'
+                      onChange={onChange}
+                      placeholder='********'
+                      error={Boolean(errors.createUserDto?.password)}
+                    />
+                  )}
+                />
+                {errors.createUserDto?.password && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
+                )}
+              </FormControl>
+            </>
+          )}
+
+          {/**************  END CREATE ACCOUNT ***************/}
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
@@ -189,4 +259,4 @@ const SidebarAddUser = (props: SidebarAddUserType) => {
   )
 }
 
-export default SidebarAddUser
+export default SidebarAddAdministrator

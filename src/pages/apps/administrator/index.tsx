@@ -3,7 +3,6 @@ import { useState, useEffect, MouseEvent, useCallback } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
-import { GetStaticProps, InferGetStaticPropsType } from 'next/types'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -15,12 +14,6 @@ import { styled } from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
-
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -98,7 +91,7 @@ const RowOptions = ({ id }: { id: number }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteAdministrator({ id, headers: { Authorization: `Bearer ${auth.accessToken}` } }))
+    dispatch(deleteAdministrator(id))
     handleRowOptionsClose()
   }
 
@@ -181,7 +174,7 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'Possède Compte',
+    headerName: 'Compte',
     field: 'userId',
     renderCell: ({ row }: CellType) => {
       const status = !!row.userId ? 'oui' : 'non'
@@ -216,7 +209,6 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const administratorStore = useSelector((state: RootState) => state.administrator)
-  const auth = useAuth()
 
   useEffect(() => {
     dispatch(fetchData())
@@ -232,10 +224,10 @@ const UserList = () => {
 
   const generateCSVData = () => {
     return administratorStore.allData.map(item => ({
-      FirstName: item.firstName,
-      LastName: item.lastName,
+      Prénom: item.firstName,
+      Nom: item.lastName,
       Tel: item.phoneNumber,
-      hasAccount: !!item.userId ? 'oui' : 'non'
+      compte: !!item.userId ? 'oui' : 'non'
     }))
   }
 
@@ -245,32 +237,6 @@ const UserList = () => {
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          {/* <CardHeader title='Search Filters' />
-          <CardContent>
-            <Grid container spacing={6}>
-              <Grid item sm={4} xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id='plan-select'>Select Plan</InputLabel>
-                  <Select
-                    fullWidth
-                    value={plan}
-                    id='select-plan'
-                    label='Select Plan'
-                    labelId='plan-select'
-                    onChange={handlePlanChange}
-                    inputProps={{ placeholder: 'Select Plan' }}
-                  >
-                    <MenuItem value=''>Select Plan</MenuItem>
-                    <MenuItem value='basic'>Basic</MenuItem>
-                    <MenuItem value='company'>Company</MenuItem>
-                    <MenuItem value='enterprise'>Enterprise</MenuItem>
-                    <MenuItem value='team'>Team</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </CardContent> */}
-          {/* <Divider /> */}
           <TableHeader
             generateCSVData={generateCSVData}
             value={value}
@@ -294,16 +260,5 @@ const UserList = () => {
     </Grid>
   )
 }
-
-// export const getStaticProps: GetStaticProps = async () => {
-//   const res = await axios.get('/cards/statistics')
-//   const apiData: CardStatsType = res.data
-
-//   return {
-//     props: {
-//       apiData
-//     }
-//   }
-// }
 
 export default UserList

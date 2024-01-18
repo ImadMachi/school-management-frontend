@@ -1,6 +1,5 @@
 // ** Redux Imports
-import { Dispatch } from 'redux'
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs/toolkit'
 
 // ** Axios Imports
 import axios from 'axios'
@@ -45,10 +44,10 @@ interface DeleteProps {
 }
 export const deleteAdministrator = createAsyncThunk(
   'appAdministrators/deleteAdministrator',
-  async ({ id, headers }: DeleteProps, { getState, dispatch }: Redux) => {
-    await axios.delete(`${HOST}/administrators/${id}`, {
-      headers
-    })
+  async (id: number, { getState, dispatch }: Redux) => {
+    console.log(id)
+
+    await axios.delete(`${HOST}/administrators/${id}`)
     return id
   }
 )

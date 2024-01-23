@@ -42,11 +42,11 @@ interface DeleteProps {
   id: number
   headers: Headers
 }
+
 export const deleteAdministrator = createAsyncThunk(
   'appAdministrators/deleteAdministrator',
   async (id: number, { getState, dispatch }: Redux) => {
     console.log(id)
-
     await axios.delete(`${HOST}/administrators/${id}`)
     return id
   }
@@ -91,13 +91,11 @@ export const appAdministratorsSlice = createSlice({
     })
     builder.addCase(deleteAdministrator.fulfilled, (state, action) => {
       state.data = state.data.filter(administrator => administrator.id !== action.payload)
-      state.allData = state.allData.filter(administrator => administrator.id !== action.payload)
-    })
+      state.allData = state.allData.filter(administrator => administrator.id !== action.payload)    })
 
     builder.addCase(addAdministrator.fulfilled, (state, action) => {
       state.data.unshift(action.payload)
-      state.allData.unshift(action.payload)
-    })
+      state.allData.unshift(action.payload)    })
   }
 })
 

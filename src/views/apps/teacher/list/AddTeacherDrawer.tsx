@@ -31,19 +31,25 @@ import { addTeacher } from 'src/store/apps/teachers'
 
 // ** Types Imports
 import { AppDispatch } from 'src/store'
+import { Checkbox, FormControlLabel } from '@mui/material'
 
-interface SidebarAddUserType {
+interface SidebarAddTeacherType {
   open: boolean
   toggle: () => void
 }
 
-interface UserData {
+export interface CreateTeacherDto {
   firstName: string;
   lastName: string;
   phoneNumber: string;
   dateOfBirth: Date;
-  dateOfHiring: Date;
-  sexe: string;
+  dateOfEmployment: Date;
+  sex: string;
+  createAccount: boolean
+  createUserDto?: {
+    email: string
+    password: string
+  }
 }
 
 
@@ -70,20 +76,25 @@ const schema = yup.object().shape({
   lastName: yup.string().min(3).required(),
   phoneNumber: yup.string().required(),
   dateOfBirth: yup.date().required(),
-  dateOfHiring: yup.date().required(),
-  sexe: yup.string().required(),
+  dateOfEmployment: yup.date().required(),
+  sex: yup.string().required(),
 });
 
-const defaultValues: UserData = {
+const defaultValues= {
   firstName: '',
   lastName: '',
   phoneNumber: '',
   dateOfBirth: new Date(),
-  dateOfHiring: new Date(),
-  sexe: '',
+  dateOfEmployment: new Date(),
+  sex: '',
+  createAccount: false,
+  createUserDto: {
+    email: '',
+    password: ''
+  }
 };
 
-const AddTeacherDrawer = (props: SidebarAddUserType) => {
+const AddTeacherDrawer = (props: SidebarAddTeacherType) => {
   // ** Props
   const { open, toggle } = props
 
@@ -92,7 +103,7 @@ const AddTeacherDrawer = (props: SidebarAddUserType) => {
   const {
     reset,
     control,
-    setValue,
+    getValues,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -101,8 +112,9 @@ const AddTeacherDrawer = (props: SidebarAddUserType) => {
     resolver: yupResolver(schema)
   })
 
-  const onSubmit = (data: UserData) => {
-    dispatch(addTeacher({ ...data }) as any)
+  const onSubmit = (data: CreateTeacherDto) => {
+    dispatch(addTeacher(data) as any)
+    console.log(data)
     toggle()
     reset()
   }
@@ -111,7 +123,7 @@ const AddTeacherDrawer = (props: SidebarAddUserType) => {
     toggle()
     reset()
   }
-
+  
   return (
     <Drawer
       open={open}
@@ -211,7 +223,7 @@ const AddTeacherDrawer = (props: SidebarAddUserType) => {
 
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="dateOfHiring"
+              name="dateOfEmployment"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
@@ -220,33 +232,33 @@ const AddTeacherDrawer = (props: SidebarAddUserType) => {
                   value={value}
                   onChange={onChange}
                   label="Date d'embauche"
-                  error={Boolean(errors.dateOfHiring)}
+                  error={Boolean(errors.dateOfEmployment)}
                   InputLabelProps={{
                     shrink: true,
                   }}
                 />
               )}
             />
-            {errors.dateOfHiring && (
+            {errors.dateOfEmployment && (
               <FormHelperText sx={{ color: 'error.main' }}>
-                {errors.dateOfHiring.message}
+                {errors.dateOfEmployment.message}
               </FormHelperText>
             )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 6 }}>
-            <InputLabel htmlFor="sexe">Sexe</InputLabel>
+            <InputLabel htmlFor="sexe">sex</InputLabel>
             <Controller
-              name="sexe"
+              name="sex"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  id="sexe"
+                  id="sex"
                   value={value}
                   onChange={(e) => onChange(e.target.value)}
                   label="Sexe"
-                  error={Boolean(errors.sexe)}
+                  error={Boolean(errors.sex)}
                 >
                   <MenuItem value="male">Masculin</MenuItem>
                   <MenuItem value="female">Féminin</MenuItem>
@@ -254,10 +266,68 @@ const AddTeacherDrawer = (props: SidebarAddUserType) => {
                 </Select>
               )}
             />
-            {errors.sexe && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.sexe.message}</FormHelperText>
+            {errors.sex && (
+              <FormHelperText sx={{ color: 'error.main' }}>{errors.sex.message}</FormHelperText>
             )}
           </FormControl>
+
+          <FormControlLabel
+            control={
+              <Controller
+                name='createAccount'
+                control={control}
+                render={({ field: { value, onChange } }) => <Checkbox checked={value} onChange={onChange} />}
+              />
+            }
+            label='Créer un compte'
+          />
+
+          {/***************** START CREATE ACCOUNT **********************/}
+          {getValues('createAccount') && (
+            <>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='createUserDto.email'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <TextField
+                      value={value}
+                      label='Email'
+                      onChange={onChange}
+                      placeholder='john.doe@example.com'
+                      error={Boolean(errors.createUserDto?.email)}
+                    />
+                  )}
+                />
+                {errors.createUserDto?.email && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.email.message}</FormHelperText>
+                )}
+              </FormControl>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='createUserDto.password'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <TextField
+                      type='password'
+                      value={value}
+                      label='Mot de passe'
+                      onChange={onChange}
+                      placeholder='********'
+                      error={Boolean(errors.createUserDto?.password)}
+                    />
+                  )}
+                />
+                {errors.createUserDto?.password && (
+                  <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
+                )}
+              </FormControl>
+            </>
+          )}
+
+          {/**************  END CREATE ACCOUNT ***************/}
 
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>

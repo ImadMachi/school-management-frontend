@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs/toolkit'
 
 import axios from 'axios'
-import { TeachersType } from 'src/types/apps/teachers'
+import { TeachersType } from 'src/types/apps/teacherTypes' 
 import { CreateTeacherDto } from 'src/views/apps/teacher/list/AddTeacherDrawer'
 
 const HOST = process.env.NEXT_PUBLIC_API_URL
@@ -53,7 +53,7 @@ export const addTeacher = createAsyncThunk(
     async (data: CreateTeacherDto, { getState, dispatch }: Redux) => {
         try {
             console.log('Request Payload:', data); // Add this line to log the payload
-            const response = await axios.post(`${HOST}/teachers?create-account=${data.createAccount}`, data)
+            const response = await axios.post(`${HOST}/teachers?create-account=true`, data)
             return response.data;
         }
         catch (error) {
@@ -91,8 +91,10 @@ export const appTeachersSlice = createSlice({
             state.data = state.allData.filter(
                 teacher =>
                     `${teacher.firstName} ${teacher.lastName}`.toLowerCase().includes(filterValue) ||
-                    teacher.phoneNumber.toLowerCase().includes(filterValue) || teacher.sex.toLowerCase().includes(filterValue) ||
-                    `${teacher.dateOfBirth} ${teacher.dateOfEmployment}`.toLowerCase().includes(filterValue) 
+                    teacher.phoneNumber.toLowerCase().includes(filterValue) || 
+                    teacher.dateOfBirth.toString().toLowerCase().includes(filterValue) ||
+                    teacher.dateOfEmployment.toString().toLowerCase().includes(filterValue) ||
+                    teacher.sex.toLowerCase().includes(filterValue)
             )
         }
     },

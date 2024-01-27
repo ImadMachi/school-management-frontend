@@ -3,7 +3,6 @@ import { useState, useEffect, MouseEvent, useCallback } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
-import { GetStaticProps, InferGetStaticPropsType } from 'next/types'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -36,12 +35,11 @@ import { getInitials } from 'src/@core/utils/get-initials'
 import { fetchData, deleteTeacher, filterData } from 'src/store/apps/teachers'
 
 // ** Types Imports
-import { TeachersType } from 'src/types/apps/teachers'
-
+import { TeachersType } from 'src/types/apps/teacherTypes'
 // ** Custom Table Components Imports
 import { useAuth } from 'src/hooks/useAuth'
 import TableHeader from 'src/views/apps/teacher/list/TableHeader'
-import AddTeacherDrawer from 'src/views/apps/teacher/list/AddTeacherDrawer'
+import SidebarAddTeacher from 'src/views/apps/teacher/list/AddTeacherDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface CellType {
@@ -78,7 +76,6 @@ const renderClient = (row: TeachersType) => {
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const auth = useAuth()
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -163,33 +160,30 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'num tel',
+    headerName: 'Telephone',
     field: 'phoneNumber',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
-          {row.phoneNumber}
-        </Typography>
-      )
-    }
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.phoneNumber).toLocaleDateString() : '-'}</Typography>
+    ),
   },
   {
-     flex: 0.15,
-     minWidth: 120,
-     headerName: 'Date de Naissance',
-     field: 'dateOfBirth',
-     renderCell: ({ row }: CellType) => (
-       <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfBirth).toLocaleDateString() : '-'}</Typography>
-     ),
-   },
-   {
-     flex: 0.15,
-     minWidth: 120,
-     headerName: 'Date d\'Embauche',
-     field: 'dateOfEmployment',
-     renderCell: ({ row }: CellType) => (
-       <Typography noWrap>{row.dateOfEmployment ? new Date(row.dateOfEmployment).toLocaleDateString() : '-'}</Typography>
-     ),
+    flex: 0.15,
+    minWidth: 120,
+    headerName: 'Date de Naissance',
+    field: 'dateOfBirth',
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfBirth).toLocaleDateString() : '-'}</Typography>
+    ),
+  },
+  {
+
+    flex: 0.15,
+    minWidth: 120,
+    headerName: 'Date de Embauche',
+    field: 'dateofEmployment',
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfEmployment).toLocaleDateString() : '-'}</Typography>
+    ),
   },
   {
     flex: 0.1,
@@ -241,7 +235,7 @@ const UserList = () => {
 
 
   useEffect(() => {
-    dispatch(fetchData())
+    dispatch(fetchData() as any)
   }, [])
 
   useEffect(() => {
@@ -256,9 +250,9 @@ const UserList = () => {
     return teacherStore.allData.map(item => ({
       Prénom: item.firstName,
       Nom: item.lastName,
-      Tel: item.phoneNumber,
-      DateNaissance: item.dateOfBirth ,
+      DateNaissance: item.dateOfBirth,
       DateEmbauche: item.dateOfEmployment,
+      Tel: item.phoneNumber,
       Sexe: item.sex || '-',
 
       compte: !!item.userId ? 'oui' : 'non'
@@ -269,30 +263,30 @@ const UserList = () => {
 
   return (
     <Grid container spacing={6}>
-    <Grid item xs={12}>
-      <Card>
-        <TableHeader
-          generateCSVData={generateCSVData}
-          value={value}
-          handleFilter={handleFilter}
-          toggle={toggleAddUserDrawer}
-        />
-        <DataGrid
-          autoHeight
-          rows={teacherStore.data}
-          columns={columns}
-          checkboxSelection
-          pageSize={pageSize}
-          disableSelectionOnClick
-          rowsPerPageOptions={[10, 25, 50]}
-          onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
-        />
-      </Card>
-    </Grid>
+      <Grid item xs={12}>
+        <Card>
+          <TableHeader
+            generateCSVData={generateCSVData}
+            value={value}
+            handleFilter={handleFilter}
+            toggle={toggleAddUserDrawer}
+          />
+          <DataGrid
+            autoHeight
+            rows={teacherStore.data}
+            columns={columns}
+            checkboxSelection
+            pageSize={pageSize}
+            disableSelectionOnClick
+            rowsPerPageOptions={[10, 25, 50]}
+            onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
+          />
+        </Card>
+      </Grid>
 
-    <AddTeacherDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
-  </Grid>
+      <SidebarAddTeacher open={addUserOpen} toggle={toggleAddUserDrawer} />
+    </Grid>
   )
 }
 
-export default UserList
+export default UserList;

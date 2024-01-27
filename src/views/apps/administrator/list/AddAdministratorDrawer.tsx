@@ -103,7 +103,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
   })
 
   const onSubmit = (data: CreateAdministratorDto) => {
-    dispatch(addAdministrator(data))
+    dispatch(addAdministrator(data) as any)
     toggle()
     reset()
   }
@@ -258,4 +258,4 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
   )
 }
 
-export default SidebarAddAdministrator
+export default SidebarAddAdministrator;

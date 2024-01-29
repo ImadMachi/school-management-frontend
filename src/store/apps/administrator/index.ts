@@ -3,10 +3,9 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 
 // ** Axios Imports
 import axios from 'axios'
+import { HOST } from 'src/store/constants/hostname'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
-import { CreateAdministratorDto } from 'src/views/apps/administrator/list/AddAdministratorDrawer'
-
-const HOST = process.env.NEXT_PUBLIC_API_URL
+import { CreateAdministratorDto } from 'src/views/apps/administrators/list/AddAdministratorDrawer'
 
 interface Params {
   q: string
@@ -45,8 +44,6 @@ interface DeleteProps {
 export const deleteAdministrator = createAsyncThunk(
   'appAdministrators/deleteAdministrator',
   async (id: number, { getState, dispatch }: Redux) => {
-    console.log(id)
-
     await axios.delete(`${HOST}/administrators/${id}`)
     return id
   }

@@ -79,8 +79,6 @@ const AuthProvider = ({ children }: Props) => {
     axios
       .post(authConfig.loginEndpoint, params)
       .then(async response => {
-        console.log(response.data)
-
         params.rememberMe
           ? window.localStorage.setItem(authConfig.storageTokenKeyName, response.data.access_token)
           : null
@@ -97,8 +95,6 @@ const AuthProvider = ({ children }: Props) => {
         router.replace(redirectURL as string)
       })
       .catch(err => {
-        console.log(err)
-
         if (errorCallback) errorCallback(err)
       })
   }

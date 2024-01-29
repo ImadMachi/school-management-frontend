@@ -3,7 +3,6 @@ import { useState, useEffect, MouseEvent, useCallback } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
-import { GetStaticProps, InferGetStaticPropsType } from 'next/types'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -15,11 +14,8 @@ import { styled } from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
-import InputLabel from '@mui/material/InputLabel'
-import FormControl from '@mui/material/FormControl'
-import CardContent from '@mui/material/CardContent'
-import Select, { SelectChangeEvent } from '@mui/material/Select'
+import CustomChip from 'src/@core/components/mui/chip'
+
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -36,20 +32,27 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteTeacher } from 'src/store/apps/teachers'
+import { fetchData, deleteTeacher, filterData } from 'src/store/apps/teachers'
 
 // ** Types Imports
-import { TeachersType } from 'src/types/apps/teachers'
-
+import { TeachersType } from 'src/types/apps/teacherTypes'
 // ** Custom Table Components Imports
 import { useAuth } from 'src/hooks/useAuth'
 import TableHeader from 'src/views/apps/teacher/list/TableHeader'
-import AddTeacherDrawer from 'src/views/apps/teacher/list/AddTeacherDrawer'
+import SidebarAddTeacher from 'src/views/apps/teacher/list/AddTeacherDrawer'
+import { ThemeColor } from 'src/@core/layouts/types'
 
 interface CellType {
   row: TeachersType
 }
+interface AccountStatusType {
+  [key: string]: ThemeColor
+}
 
+const accountStatusObj: AccountStatusType = {
+  oui: 'success',
+  non: 'error'
+}
 const StyledLink = styled(Link)(({ theme }) => ({
   fontWeight: 600,
   fontSize: '1rem',
@@ -73,7 +76,6 @@ const renderClient = (row: TeachersType) => {
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const auth = useAuth()
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -88,7 +90,7 @@ const RowOptions = ({ id }: { id: number }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteTeacher({ id, headers: { Authorization: `Bearer ${auth.accessToken}` } }))
+    dispatch(deleteTeacher(id) as any)
     handleRowOptionsClose()
   }
 
@@ -158,15 +160,11 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'num tel',
+    headerName: 'Telephone',
     field: 'phoneNumber',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
-          {row.phoneNumber}
-        </Typography>
-      )
-    }
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.phoneNumber).toLocaleDateString() : '-'}</Typography>
+    ),
   },
   {
     flex: 0.15,
@@ -178,12 +176,13 @@ const columns = [
     ),
   },
   {
+
     flex: 0.15,
     minWidth: 120,
-    headerName: 'Date d\'Embauche',
-    field: 'dateOfHiring',
+    headerName: 'Date de Embauche',
+    field: 'dateofEmployment',
     renderCell: ({ row }: CellType) => (
-      <Typography noWrap>{row.dateOfHiring ? new Date(row.dateOfHiring).toLocaleDateString() : '-'}</Typography>
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfEmployment).toLocaleDateString() : '-'}</Typography>
     ),
   },
   {
@@ -192,18 +191,23 @@ const columns = [
     sortable: false,
     field: 'sex',
     headerName: 'Sexe',
-    renderCell: ({ row }: CellType) => <Typography noWrap>{row.sexe || '-'}</Typography>,
+    renderCell: ({ row }: CellType) => <Typography noWrap>{row.sex || '-'}</Typography>,
   },
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'Possède Compte',
-    field: 'hasAccount',
+    headerName: 'Compte',
+    field: 'userId',
     renderCell: ({ row }: CellType) => {
+      const status = !!row.userId ? 'oui' : 'non'
       return (
-        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
-          {!!row.user ? 'Oui' : 'Non'}
-        </Typography>
+        <CustomChip
+          skin='light'
+          size='small'
+          label={status}
+          color={accountStatusObj[status]}
+          sx={{ textTransform: 'capitalize' }}
+        />
       )
     }
   },
@@ -227,25 +231,33 @@ const UserList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const store = useSelector((state: RootState) => state.teachers)
-  const auth = useAuth()
+  const teacherStore = useSelector((state: RootState) => state.teachers)
+
 
   useEffect(() => {
-    dispatch(
-      fetchData({
-        params: {
-          q: value
-        },
-        headers: {
-          Authorization: `Bearer ${auth.accessToken}`
-        }
-      })
-    )
+    dispatch(fetchData() as any)
+  }, [])
+
+  useEffect(() => {
+    dispatch(filterData(value))
   }, [dispatch, plan, value])
 
   const handleFilter = useCallback((val: string) => {
     setValue(val)
   }, [])
+
+  const generateCSVData = () => {
+    return teacherStore.allData.map(item => ({
+      Prénom: item.firstName,
+      Nom: item.lastName,
+      DateNaissance: item.dateOfBirth,
+      DateEmbauche: item.dateOfEmployment,
+      Tel: item.phoneNumber,
+      Sexe: item.sex || '-',
+
+      compte: !!item.userId ? 'oui' : 'non'
+    }))
+  }
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen)
 
@@ -253,36 +265,15 @@ const UserList = () => {
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <Card>
-          {/* <CardHeader title='Search Filters' />
-          <CardContent>
-            <Grid container spacing={6}>
-              <Grid item sm={4} xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel id='plan-select'>Select Plan</InputLabel>
-                  <Select
-                    fullWidth
-                    value={plan}
-                    id='select-plan'
-                    label='Select Plan'
-                    labelId='plan-select'
-                    onChange={handlePlanChange}
-                    inputProps={{ placeholder: 'Select Plan' }}
-                  >
-                    <MenuItem value=''>Select Plan</MenuItem>
-                    <MenuItem value='basic'>Basic</MenuItem>
-                    <MenuItem value='company'>Company</MenuItem>
-                    <MenuItem value='enterprise'>Enterprise</MenuItem>
-                    <MenuItem value='team'>Team</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </CardContent> */}
-          {/* <Divider /> */}
-          <TableHeader value={value} handleFilter={handleFilter} toggle={toggleAddUserDrawer} />
+          <TableHeader
+            generateCSVData={generateCSVData}
+            value={value}
+            handleFilter={handleFilter}
+            toggle={toggleAddUserDrawer}
+          />
           <DataGrid
             autoHeight
-            rows={store.data}
+            rows={teacherStore.data}
             columns={columns}
             checkboxSelection
             pageSize={pageSize}
@@ -293,20 +284,9 @@ const UserList = () => {
         </Card>
       </Grid>
 
-      <AddTeacherDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+      <SidebarAddTeacher open={addUserOpen} toggle={toggleAddUserDrawer} />
     </Grid>
   )
 }
 
-// export const getStaticProps: GetStaticProps = async () => {
-//   const res = await axios.get('/cards/statistics')
-//   const apiData: CardStatsType = res.data
-
-//   return {
-//     props: {
-//       apiData
-//     }
-//   }
-// }
-
-export default UserList
+export default UserList;

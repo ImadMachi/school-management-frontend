@@ -41,6 +41,7 @@ interface DeleteProps {
   id: number
   headers: Headers
 }
+
 export const deleteAdministrator = createAsyncThunk(
   'appAdministrators/deleteAdministrator',
   async (id: number, { getState, dispatch }: Redux) => {

@@ -1,4 +1,3 @@
-import { UserType } from './UserType'
 
 export type TeachersType = {
   id: number
@@ -6,7 +5,7 @@ export type TeachersType = {
   lastName: string
   phoneNumber: string
   dateOfBirth: Date
-  dateOfHiring: Date
-  sexe: string
-  user: UserType
+  dateOfEmployment: Date
+  sex: string
+  userId: number
 }

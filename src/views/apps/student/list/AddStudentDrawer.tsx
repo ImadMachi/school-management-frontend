@@ -27,23 +27,20 @@ import Icon from 'src/@core/components/icon'
 import { useDispatch } from 'react-redux'
 
 // ** Actions Imports
-import { addTeacher } from 'src/store/apps/teachers'
-
+import { addStudent } from 'src/store/apps/students'
 // ** Types Imports
 import { AppDispatch } from 'src/store'
 import { Checkbox, FormControlLabel } from '@mui/material'
 
-interface SidebarAddTeacherType {
+interface SidebarAddStudentType {
   open: boolean
   toggle: () => void
 }
 
-export interface CreateTeacherDto {
+export interface CreateStudentDto {
   firstName: string;
   lastName: string;
-  phoneNumber: string;
   dateOfBirth: Date;
-  dateOfEmployment: Date;
   sex: string;
   createAccount: boolean
   createUserDto?: {
@@ -74,9 +71,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required(),
   dateOfBirth: yup.date().required(),
-  dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
   createUserDto: yup.object().when('createAccount', {
     is: true,
@@ -89,13 +84,10 @@ const schema = yup.object().shape({
   createAccount: yup.boolean().required()
 })
 
-
 const defaultValues= {
   firstName: '',
   lastName: '',
-  phoneNumber: '',
   dateOfBirth: new Date(),
-  dateOfEmployment: new Date(),
   sex: '',
   createAccount: false,
   createUserDto: {
@@ -104,7 +96,9 @@ const defaultValues= {
   }
 };
 
-const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
+
+
+const SidebarAddStudent = (props: SidebarAddStudentType) => {
   // ** Props
   const { open, toggle } = props
 
@@ -128,8 +122,8 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     defaultValue: false
   })
 
-  const onSubmit = (data: CreateTeacherDto) => {
-    dispatch(addTeacher(data) as any)
+  const onSubmit = (data: CreateStudentDto) => {
+    dispatch(addStudent(data) as any)
     console.log(data)
     toggle()
     reset()
@@ -195,25 +189,6 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name='phoneNumber'
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  value={value}
-                  label='Num Tel'
-                  onChange={onChange}
-                  placeholder='+212 612-345678'
-                  error={Boolean(errors.phoneNumber)}
-                />
-              )}
-            />
-            {errors.phoneNumber && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.phoneNumber.message}</FormHelperText>
-            )}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
               name="dateOfBirth"
               control={control}
               rules={{ required: true }}
@@ -233,31 +208,6 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
             {errors.dateOfBirth && (
               <FormHelperText sx={{ color: 'error.main' }}>
                 {errors.dateOfBirth.message}
-              </FormHelperText>
-            )}
-          </FormControl>
-
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="dateOfEmployment"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  type="date"
-                  value={value}
-                  onChange={onChange}
-                  label="Date d'embauche"
-                  error={Boolean(errors.dateOfEmployment)}
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              )}
-            />
-            {errors.dateOfEmployment && (
-              <FormHelperText sx={{ color: 'error.main' }}>
-                {errors.dateOfEmployment.message}
               </FormHelperText>
             )}
           </FormControl>
@@ -360,4 +310,4 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
   )
 }
 
-export default SidebarAddTeacher;
+export default SidebarAddStudent;

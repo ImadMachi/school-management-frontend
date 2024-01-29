@@ -3,6 +3,7 @@ import { useState, useEffect, MouseEvent, useCallback } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
+import { GetStaticProps, InferGetStaticPropsType } from 'next/types'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -14,11 +15,16 @@ import { styled } from '@mui/material/styles'
 import MenuItem from '@mui/material/MenuItem'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
+import CustomChip from 'src/@core/components/mui/chip'
+
+
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Store Imports
 import { useDispatch, useSelector } from 'react-redux'
+import { RootState, AppDispatch } from 'src/store'
+
 
 // ** Custom Components Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
@@ -27,22 +33,19 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteAdministrator, filterData } from 'src/store/apps/administrator'
-
+import { fetchData, deleteStudent, filterData } from 'src/store/apps/students'
 // ** Types Imports
-import { RootState, AppDispatch } from 'src/store'
-import { AdministratorType } from 'src/types/apps/administratorTypes'
+import { StudentsType } from 'src/types/apps/studentTypes'
 
 // ** Custom Table Components Imports
-import TableHeader from 'src/views/apps/administrators/list/TableHeader'
-import AddAdministratorDrawer from 'src/views/apps/administrators/list/AddAdministratorDrawer'
-import CustomChip from 'src/@core/components/mui/chip'
+import { useAuth } from 'src/hooks/useAuth'
+import TableHeader from 'src/views/apps/student/list/TableHeader'
+import SidebarAddStudent from 'src/views/apps/student/list/AddStudentDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface CellType {
-  row: AdministratorType
+  row: StudentsType
 }
-
 interface AccountStatusType {
   [key: string]: ThemeColor
 }
@@ -51,7 +54,6 @@ const accountStatusObj: AccountStatusType = {
   oui: 'success',
   non: 'error'
 }
-
 const StyledLink = styled(Link)(({ theme }) => ({
   fontWeight: 600,
   fontSize: '1rem',
@@ -64,7 +66,7 @@ const StyledLink = styled(Link)(({ theme }) => ({
 }))
 
 // ** renders client column
-const renderClient = (row: AdministratorType) => {
+const renderClient = (row: StudentsType) => {
   return (
     <CustomAvatar skin='light' color={'primary'} sx={{ mr: 3, width: 30, height: 30, fontSize: '.875rem' }}>
       {getInitials(`${row.firstName} ${row.lastName}`)}
@@ -75,6 +77,7 @@ const renderClient = (row: AdministratorType) => {
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
+  const auth = useAuth()
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -89,8 +92,7 @@ const RowOptions = ({ id }: { id: number }) => {
   }
 
   const handleDelete = () => {
-    // @ts-ignore
-    dispatch(deleteAdministrator(id) as any)
+    dispatch(deleteStudent(id) as any)
     handleRowOptionsClose()
   }
 
@@ -140,8 +142,8 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: 'administrateur',
-    field: 'firstName',
+    headerName: 'enseignant',
+    field: 'fullName',
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row
 
@@ -158,17 +160,21 @@ const columns = [
     }
   },
   {
-    flex: 0.15,
-    minWidth: 120,
-    headerName: 'Tel',
-    field: 'phoneNumber',
-    renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
-          {row.phoneNumber}
-        </Typography>
-      )
-    }
+     flex: 0.15,
+     minWidth: 120,
+     headerName: 'Date de Naissance',
+     field: 'dateOfBirth',
+     renderCell: ({ row }: CellType) => (
+       <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfBirth).toLocaleDateString() : '-'}</Typography>
+     ),
+   },
+  {
+    flex: 0.1,
+    minWidth: 90,
+    sortable: false,
+    field: 'sex',
+    headerName: 'Sexe',
+    renderCell: ({ row }: CellType) => <Typography noWrap>{row.sex || '-'}</Typography>,
   },
   {
     flex: 0.15,
@@ -196,7 +202,8 @@ const columns = [
     headerName: 'Actions',
     renderCell: ({ row }: CellType) => <RowOptions id={row.id} />
   }
-]
+];
+
 
 const UserList = () => {
   // ** State
@@ -207,7 +214,8 @@ const UserList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const administratorStore = useSelector((state: RootState) => state.administrator)
+  const studentStore = useSelector((state: RootState) => state.students)
+
 
   useEffect(() => {
     dispatch(fetchData() as any)
@@ -222,10 +230,12 @@ const UserList = () => {
   }, [])
 
   const generateCSVData = () => {
-    return administratorStore.allData.map(item => ({
+    return studentStore.allData.map(item => ({
       Prénom: item.firstName,
       Nom: item.lastName,
-      Tel: item.phoneNumber,
+      DateNaissance: item.dateOfBirth ,
+      Sexe: item.sex || '-',
+
       compte: !!item.userId ? 'oui' : 'non'
     }))
   }
@@ -234,30 +244,30 @@ const UserList = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={12}>
-        <Card>
-          <TableHeader
-            generateCSVData={generateCSVData}
-            value={value}
-            handleFilter={handleFilter}
-            toggle={toggleAddUserDrawer}
-          />
-          <DataGrid
-            autoHeight
-            rows={administratorStore.data}
-            columns={columns}
-            checkboxSelection
-            pageSize={pageSize}
-            disableSelectionOnClick
-            rowsPerPageOptions={[10, 25, 50]}
-            onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
-          />
-        </Card>
-      </Grid>
-
-      <AddAdministratorDrawer open={addUserOpen} toggle={toggleAddUserDrawer} />
+    <Grid item xs={12}>
+      <Card>
+        <TableHeader
+          generateCSVData={generateCSVData}
+          value={value}
+          handleFilter={handleFilter}
+          toggle={toggleAddUserDrawer}
+        />
+        <DataGrid
+          autoHeight
+          rows={studentStore.data}
+          columns={columns}
+          checkboxSelection
+          pageSize={pageSize}
+          disableSelectionOnClick
+          rowsPerPageOptions={[10, 25, 50]}
+          onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
+        />
+      </Card>
     </Grid>
+
+    <SidebarAddStudent open={addUserOpen} toggle={toggleAddUserDrawer} />
+  </Grid>
   )
 }
 
-export default UserList
+export default UserList;

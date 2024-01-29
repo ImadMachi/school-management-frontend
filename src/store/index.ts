@@ -3,12 +3,14 @@ import { configureStore } from '@reduxjs/toolkit'
 
 // ** Reducers
 import administrator from './apps/administrator'
-import teachers from './apps/teachers' 
+import teachers from './apps/teachers'
+import mail from './apps/mail'
 
 export const store = configureStore({
   reducer: {
     administrator,
-    teachers
+    teachers,
+    mail
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

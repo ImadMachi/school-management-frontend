@@ -28,6 +28,11 @@ export const fetchData = createAsyncThunk('appStudents/fetchData', async () => {
   return response.data
 })
 
+export const fetchStudent = createAsyncThunk( 'appStudents/fetchStudent', async (id: number) => {
+  const response = await axios.get(`${HOST}/students/${id}`);
+  return response.data;
+});
+
 // ** Add User
 export const addStudent = createAsyncThunk(
   'appStudents/addStudent',

@@ -5,6 +5,7 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 import axios from 'axios'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
 import { CreateAdministratorDto } from 'src/views/apps/administrator/list/AddAdministratorDrawer'
+import { UpdateAdministratorDto } from 'src/views/apps/administrator/list/EditAdministrator'
 
 const HOST = process.env.NEXT_PUBLIC_API_URL
 
@@ -27,6 +28,11 @@ export const fetchData = createAsyncThunk('appAdministrators/fetchData', async (
   const response = await axios.get(`${HOST}/administrators`)
   return response.data
 })
+
+export const fetchAdministrator = createAsyncThunk( 'appAdministrators/fetchAdministrator', async (id: number) => {
+  const response = await axios.get(`${HOST}/administrators/${id}`);
+  return response.data;
+});
 
 // ** Add User
 export const addAdministrator = createAsyncThunk(
@@ -51,6 +57,16 @@ export const deleteAdministrator = createAsyncThunk(
     return id
   }
 )
+
+export const updateAdministrator = createAsyncThunk(
+  'appAdministrators/updateAdministrator',
+  async (payload: { id: number, updateAdministratorDto: UpdateAdministratorDto }, { getState, dispatch }: Redux) => {
+    const { id, updateAdministratorDto } = payload;
+    const response = await axios.patch(`${HOST}/administrators/${id}`, updateAdministratorDto);
+    return response.data;
+  }
+);
+
 
 interface AppAdministratorsState {
   data: AdministratorType[]

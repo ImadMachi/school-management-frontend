@@ -48,6 +48,11 @@ export const fetchData = createAsyncThunk('appTeachers/fetchData', async () => {
 }
 )
 
+export const fetchTeacher = createAsyncThunk('appTeachers/fetchTeacher', async (id: number) => {
+    const response = await axios.get(`${HOST}/teachers/${id}`);
+    return response.data;
+});
+
 export const addTeacher = createAsyncThunk(
     'appTeachers/addTeachers',
     async (data: CreateTeacherDto, { getState, dispatch }: Redux) => {

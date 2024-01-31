@@ -119,7 +119,7 @@ const RowOptions = ({ id }: { id: number }) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href='/apps/user/view/overview/'
+          href={`/apps/administrator/overview/${id}`} // Include the id in the URL
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
@@ -261,4 +261,4 @@ const UserList = () => {
   )
 }
 
-export default UserList
+export default UserList;

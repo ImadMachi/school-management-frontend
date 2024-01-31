@@ -139,7 +139,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     toggle()
     reset()
   }
-  
+
   return (
     <Drawer
       open={open}

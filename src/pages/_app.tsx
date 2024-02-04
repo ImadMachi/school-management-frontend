@@ -91,7 +91,6 @@ const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
   if (guestGuard) {
     return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>
   } else if (!guestGuard && !authGuard) {
-    console.log(true)
     return <>{children}</>
   } else {
     return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>

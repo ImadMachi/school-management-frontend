@@ -16,7 +16,6 @@ type Props = {
   open: boolean
   setOpen: (val: boolean) => void
 }
-
 const UserSuspendDialog = (props: Props) => {
   // ** Props
   const { open, setOpen } = props

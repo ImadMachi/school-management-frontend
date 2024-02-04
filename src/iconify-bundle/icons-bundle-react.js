@@ -27642,7 +27642,7 @@ addCollection({
   prefix: 'custom',
   icons: {
     logo: {
-      body: '<g fill="none"><path fill="currentColor" d="M30 20.392a2 2 0 01-3.027 1.716l-3.258-1.95a2 2 0 01-.973-1.716l-.001-6.7L15 16.178l-7.742-4.434v6.7a2 2 0 01-.973 1.715l-3.258 1.95A2 2 0 010 20.392V2.585l.005-.15L0 2.572A2 2 0 013.045.866L15 8.194 26.955.866A2 2 0 0130 2.572Z"/><path fill="#000" d="m0 7.589 7.258 4.162v4.08z" opacity=".078"/><path fill="#000" d="m0 7.589 7.258 4.056v2.492zm30 0-7.258 4.153v4.212z" opacity=".078"/><path fill="#000" d="m30 7.589-7.258 4.052v2.619z" opacity=".078"/><path fill="#FFF" fill-opacity=".15" d="M3.045.866 15 8.194v7.983L0 7.587V2.571A2 2 0 013.045.865Z"/><path fill="#FFF" fill-opacity=".35" d="M26.955.866 15 8.194v7.983l15-8.59V2.571A2 2 0 0026.955.865Z"/></g>',
+      image: './largaanier.png',  // Update this with the actual path to your PNG image
       width: 30,
       height: 23
     }

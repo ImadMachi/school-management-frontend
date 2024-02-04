@@ -34,9 +34,8 @@ import { RootState, AppDispatch } from 'src/store'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
 
 // ** Custom Table Components Imports
-import TableHeader from 'src/views/apps/administrator/list/TableHeader'
-import AddAdministratorDrawer from 'src/views/apps/administrator/list/AddAdministratorDrawer'
-import { useAuth } from 'src/hooks/useAuth'
+import TableHeader from 'src/views/apps/administrators/list/TableHeader'
+import AddAdministratorDrawer from 'src/views/apps/administrators/list/AddAdministratorDrawer'
 import CustomChip from 'src/@core/components/mui/chip'
 import { ThemeColor } from 'src/@core/layouts/types'
 
@@ -76,7 +75,6 @@ const renderClient = (row: AdministratorType) => {
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const auth = useAuth()
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -91,6 +89,7 @@ const RowOptions = ({ id }: { id: number }) => {
   }
 
   const handleDelete = () => {
+    // @ts-ignore
     dispatch(deleteAdministrator(id) as any)
     handleRowOptionsClose()
   }
@@ -119,7 +118,7 @@ const RowOptions = ({ id }: { id: number }) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href={`/apps/administrator/overview/${id}`} // Include the id in the URL
+          href={`/apps/administrateurs/overview/${id}`} // Include the id in the URL
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
@@ -211,7 +210,7 @@ const UserList = () => {
   const administratorStore = useSelector((state: RootState) => state.administrator)
 
   useEffect(() => {
-    dispatch(fetchData() as any )
+    dispatch(fetchData() as any)
   }, [])
 
   useEffect(() => {

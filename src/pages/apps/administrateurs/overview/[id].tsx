@@ -29,6 +29,8 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { fetchAdministrator } from 'src/store/apps/administrator'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
+import EmailAppLayout from 'src/views/apps/mail/Mail'
+
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -36,8 +38,8 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import UserSuspendDialog from '../../../../views/apps/administrator/overview/UserSuspendDialog'
-import UserSubscriptionDialog from '../../../../views/apps/administrator/overview/UserSubscriptionDialog'
+import UserSuspendDialog from '../../../../views/apps/administrators/overview/UserSuspendDialog'
+import UserSubscriptionDialog from '../../../../views/apps/administrators/overview/UserSubscriptionDialog'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
@@ -78,7 +80,13 @@ const Sub = styled('sub')({
   alignSelf: 'flex-end'
 })
 
-const UserViewLeft = () => { 
+export interface UpdateAdministratorDto {
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
+const UserViewLeft = () => {
   const router = useRouter();
   const { id } = router.query;
   const dispatch = useDispatch<AppDispatch>()
@@ -88,7 +96,7 @@ const UserViewLeft = () => {
   const [openPlans, setOpenPlans] = useState<boolean>(false)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
-  const [userData, setUserData] = useState(null); // Use null as initial value
+  const [userData, setUserData] = useState<AdministratorType | null>(null);
 
 
 
@@ -102,17 +110,31 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     // Check if id exists and is a valid number
-    if (id && !isNaN(Number(id))){
+    if (id && !isNaN(Number(id))) {
       dispatch(fetchAdministrator(Number(id)) as any);
+      console.log('fetching admin');
     }
-    }, [id]);
 
-  const data: AdministratorType | null = administratorStore.data[0] || null;
+    // Cleanup function to reset state on component unmount
+    return () => {
+      // Reset state when the component is unmounted
+      setUserData(null);
+    };
+  }, [id]);
 
-  if (data) {
+
+  useEffect(() => {
+    // Update state when the data is updated
+    if (administratorStore.data && administratorStore.data.length > 0) {
+      setUserData(administratorStore.data[0]);
+    }
+    console.log('data', administratorStore.data);
+  }, [administratorStore.data]);
+
+  if (userData) {
     return (
-      <Grid container spacing={6}>
-        <Grid item xs={12}>
+      <Grid container spacing={3}  alignItems="stretch">
+        <Grid item xs={12} md={6} >
           <Card>
             <CardContent sx={{ pt: 15, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               {/* {data.avatar.length ? (
@@ -173,11 +195,11 @@ const UserViewLeft = () => {
               <Box sx={{ pb: 1 }}>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Username:</Typography>
-                  <Typography variant='body2'>@{data.firstName} {data.lastName}</Typography>
+                  <Typography variant='body2'>@{userData.firstName} {userData.lastName}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Billing Email:</Typography>
-                  <Typography variant='body2'>{data.phoneNumber}</Typography>
+                  <Typography variant='body2'>{userData.phoneNumber}</Typography>
                 </Box>
                 {/* <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Status:</Typography>
@@ -197,7 +219,7 @@ const UserViewLeft = () => {
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Contact:</Typography>
-                  <Typography variant='body2'>+1 {data.phoneNumber}</Typography>
+                  <Typography variant='body2'>+1 {userData.phoneNumber}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Language:</Typography>
@@ -236,18 +258,18 @@ const UserViewLeft = () => {
                 <form>
                   <Grid container spacing={6}>
                     <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='Full Name' defaultValue={data.firstName} />
+                      <TextField fullWidth label='Full Name' defaultValue={userData.firstName} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
                         label='Username'
-                        defaultValue={data.firstName}
+                        defaultValue={userData.firstName}
                         InputProps={{ startAdornment: <InputAdornment position='start'>@</InputAdornment> }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField fullWidth type='email' label='Billing Email' defaultValue={data.phoneNumber} />
+                      <TextField fullWidth type='email' label='Billing Email' defaultValue={userData.phoneNumber} />
                     </Grid>
                     {/* <Grid item xs={12} sm={6}>
                       <FormControl fullWidth>
@@ -268,7 +290,7 @@ const UserViewLeft = () => {
                       <TextField fullWidth label='TAX ID' defaultValue='Tax-8894' />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='Contact' defaultValue={`+1 ${data.phoneNumber}`} />
+                      <TextField fullWidth label='Contact' defaultValue={`+1 ${userData.phoneNumber}`} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <FormControl fullWidth>
@@ -330,166 +352,11 @@ const UserViewLeft = () => {
             <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} />
           </Card>
         </Grid>
-
-        <Grid item xs={12}>
-          <Card sx={{ boxShadow: 'none', border: theme => `2px solid ${theme.palette.primary.main}` }}>
-            <CardContent
-              sx={{ display: 'flex', flexWrap: 'wrap', pb: '0 !important', justifyContent: 'space-between' }}
-            >
-              <CustomChip skin='light' size='small' color='primary' label='Standard' />
-              <Box sx={{ display: 'flex', position: 'relative' }}>
-                <Typography variant='h6' sx={{ color: 'primary.main', alignSelf: 'flex-end' }}>
-                  $
-                </Typography>
-                <Typography
-                  variant='h3'
-                  sx={{
-                    color: 'primary.main'
-                  }}
-                >
-                  99
-                </Typography>
-                <Typography variant='body2' sx={{ color: 'text.primary', alignSelf: 'flex-end' }}>
-                  / month
-                </Typography>
-              </Box>
-            </CardContent>
-
-            <CardContent>
-              <Box sx={{ mt: 6, mb: 5 }}>
-                <Box sx={{ display: 'flex', mb: 3.5, alignItems: 'center', '& svg': { mr: 2, color: 'grey.300' } }}>
-                  <Icon icon='mdi:circle' fontSize='0.5rem' />
-                  <Typography variant='body2'>10 Users</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    mb: 3.5,
-                    display: 'flex',
-                    alignItems: 'center',
-                    '& svg': { mr: 2, color: 'grey.300' }
-                  }}
-                >
-                  <Icon icon='mdi:circle' fontSize='0.5rem' />
-                  <Typography variant='body2'>Up to 10GB storage</Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    '& svg': { mr: 2, color: 'grey.300' }
-                  }}
-                >
-                  <Icon icon='mdi:circle' fontSize='0.5rem' />
-                  <Typography variant='body2'>Basic Support</Typography>
-                </Box>
-              </Box>
-              <Box sx={{ display: 'flex', mb: 1.5, justifyContent: 'space-between' }}>
-                <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                  Days
-                </Typography>
-                <Typography variant='body2' sx={{ color: 'text.primary', fontWeight: 600 }}>
-                  26 of 30 Days
-                </Typography>
-              </Box>
-              <LinearProgress value={86.66} variant='determinate' sx={{ height: 6, borderRadius: '5px' }} />
-              <Typography variant='caption' sx={{ mt: 1.5, mb: 6, display: 'block' }}>
-                4 days remaining
-              </Typography>
-              <Button variant='contained' sx={{ width: '100%' }} onClick={handlePlansClickOpen}>
-                Upgrade Plan
-              </Button>
-            </CardContent>
-
-            <Dialog
-              open={openPlans}
-              onClose={handlePlansClose}
-              aria-labelledby='user-view-plans'
-              aria-describedby='user-view-plans-description'
-              sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 650, pt: 8, pb: 8 } }}
-            >
-              <DialogTitle id='user-view-plans' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-                Upgrade Plan
-              </DialogTitle>
-
-              <DialogContent>
-                <DialogContentText variant='body2' sx={{ textAlign: 'center' }} id='user-view-plans-description'>
-                  Choose the best plan for the user.
-                </DialogContentText>
-              </DialogContent>
-
-              <DialogContent
-                sx={{
-                  display: 'flex',
-                  pb: 8,
-                  pl: [6, 15],
-                  pr: [6, 15],
-                  alignItems: 'center',
-                  flexWrap: ['wrap', 'nowrap'],
-                  pt: theme => `${theme.spacing(2)} !important`
-                }}
-              >
-                <FormControl fullWidth size='small' sx={{ mr: [0, 3], mb: [3, 0] }}>
-                  <InputLabel id='user-view-plans-select-label'>Choose Plan</InputLabel>
-                  <Select
-                    label='Choose Plan'
-                    defaultValue='Standard'
-                    id='user-view-plans-select'
-                    labelId='user-view-plans-select-label'
-                  >
-                    <MenuItem value='Basic'>Basic - $0/month</MenuItem>
-                    <MenuItem value='Standard'>Standard - $99/month</MenuItem>
-                    <MenuItem value='Enterprise'>Enterprise - $499/month</MenuItem>
-                    <MenuItem value='Company'>Company - $999/month</MenuItem>
-                  </Select>
-                </FormControl>
-                <Button variant='contained' sx={{ minWidth: ['100%', 0] }}>
-                  Upgrade
-                </Button>
-              </DialogContent>
-
-              <Divider sx={{ m: '0 !important' }} />
-
-              <DialogContent sx={{ pt: 8, pl: [6, 15], pr: [6, 15] }}>
-                <Typography sx={{ fontWeight: 500, mb: 2, fontSize: '0.875rem' }}>
-                  User current plan is standard plan
-                </Typography>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexWrap: ['wrap', 'nowrap'],
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <Box sx={{ mr: 3, display: 'flex', ml: 2.4, position: 'relative' }}>
-                    <Sup>$</Sup>
-                    <Typography
-                      variant='h3'
-                      sx={{
-                        mb: -1.2,
-                        lineHeight: 1,
-                        color: 'primary.main',
-                        fontSize: '3rem !important'
-                      }}
-                    >
-                      99
-                    </Typography>
-                    <Sub>/ month</Sub>
-                  </Box>
-                  <Button
-                    color='error'
-                    sx={{ mt: 2 }}
-                    variant='outlined'
-                    onClick={() => setSubscriptionDialogOpen(true)}
-                  >
-                    Cancel Subscription
-                  </Button>
-                </Box>
-              </DialogContent>
-            </Dialog>
-          </Card>
+        <Grid item xs={12} md={6}>
+          <EmailAppLayout folder='inbox'/>
         </Grid>
       </Grid>
+
     )
   } else {
     return null

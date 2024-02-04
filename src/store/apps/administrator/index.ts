@@ -3,11 +3,11 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 
 // ** Axios Imports
 import axios from 'axios'
+import { HOST } from 'src/store/constants/hostname'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
-import { CreateAdministratorDto } from 'src/views/apps/administrator/list/AddAdministratorDrawer'
-import { UpdateAdministratorDto } from 'src/views/apps/administrator/list/EditAdministrator'
+import { CreateAdministratorDto } from 'src/views/apps/administrators/list/AddAdministratorDrawer'
+import { UpdateAdministratorDto } from 'src/pages/apps/administrateurs/overview/[id]'
 
-const HOST = process.env.NEXT_PUBLIC_API_URL
 
 interface Params {
   q: string
@@ -52,7 +52,6 @@ interface DeleteProps {
 export const deleteAdministrator = createAsyncThunk(
   'appAdministrators/deleteAdministrator',
   async (id: number, { getState, dispatch }: Redux) => {
-    console.log(id)
     await axios.delete(`${HOST}/administrators/${id}`)
     return id
   }
@@ -107,11 +106,25 @@ export const appAdministratorsSlice = createSlice({
     })
     builder.addCase(deleteAdministrator.fulfilled, (state, action) => {
       state.data = state.data.filter(administrator => administrator.id !== action.payload)
-      state.allData = state.allData.filter(administrator => administrator.id !== action.payload)    })
+      state.allData = state.allData.filter(administrator => administrator.id !== action.payload)
+    })
 
     builder.addCase(addAdministrator.fulfilled, (state, action) => {
       state.data.unshift(action.payload)
-      state.allData.unshift(action.payload)    })
+      state.allData.unshift(action.payload)
+    })
+    builder.addCase(fetchAdministrator.fulfilled, (state, action) => {
+      const userIdToDelete = action.payload.id;
+    
+      // Filter out the existing user data with the same ID
+      state.data = state.data.filter(administrator => administrator.id !== userIdToDelete);
+      state.allData = state.allData.filter(administrator => administrator.id !== userIdToDelete);
+    
+      // Add the updated user data to the beginning of the arrays
+      state.data.unshift(action.payload);
+      state.allData.unshift(action.payload);
+    });
+    
   }
 })
 

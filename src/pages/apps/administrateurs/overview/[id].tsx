@@ -9,6 +9,7 @@ import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import Select from '@mui/material/Select'
 import Switch from '@mui/material/Switch'
+import Avatar from '@mui/material/Avatar'
 import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
@@ -34,6 +35,7 @@ import EmailAppLayout from 'src/views/apps/mail/Mail'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import Image from 'next/image'
 
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
@@ -55,30 +57,6 @@ import { AnyAction } from '@reduxjs/toolkit'
 interface ColorsType {
   [key: string]: ThemeColor
 }
-
-
-const roleColors: ColorsType = {
-  admin: 'error',
-  editor: 'info',
-  author: 'warning',
-  maintainer: 'success',
-  subscriber: 'primary'
-}
-
-// ** Styled <sup> component
-const Sup = styled('sup')(({ theme }) => ({
-  top: '0.2rem',
-  left: '-0.6rem',
-  position: 'absolute',
-  color: theme.palette.primary.main
-}))
-
-// ** Styled <sub> component
-const Sub = styled('sub')({
-  fontWeight: 300,
-  fontSize: '1rem',
-  alignSelf: 'flex-end'
-})
 
 export interface UpdateAdministratorDto {
   firstName?: string;
@@ -103,10 +81,6 @@ const UserViewLeft = () => {
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true)
   const handleEditClose = () => setOpenEdit(false)
-
-  // Handle Upgrade Plan dialog
-  const handlePlansClickOpen = () => setOpenPlans(true)
-  const handlePlansClose = () => setOpenPlans(false)
 
   useEffect(() => {
     // Check if id exists and is a valid number
@@ -133,37 +107,23 @@ const UserViewLeft = () => {
 
   if (userData) {
     return (
-      <Grid container spacing={3}  alignItems="stretch">
-        <Grid item xs={12} md={6} >
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={5} >
           <Card>
             <CardContent sx={{ pt: 15, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-              {/* {data.avatar.length ? (
-                <CustomAvatar
-                  src={data.avatar}
-                  variant='rounded'
-                  alt={data.firstName}
-                  sx={{ width: 120, height: 120, fontWeight: 600, mb: 4, fontSize: '3rem' }}
-                />
-              ) : (
-                <CustomAvatar
-                  skin='light'
-                  variant='rounded'
-                  color={data.avatarColor as ThemeColor}
-                  sx={{ width: 120, height: 120, fontWeight: 600, mb: 4, fontSize: '3rem' }}
-                >
-                  {getInitials(data.firstName)}
-                </CustomAvatar>
-              )}
-              <Typography variant='h6' sx={{ mb: 4 }}>
-                {data.firstName}
+              <Avatar
+                alt='John Doe'
+                sx={{ width: 80, height: 80 }}
+                src='/images/avatars/1.png'
+              />              <Typography variant='h6' sx={{ mb: 4 }}>
+                {userData.firstName} {userData.lastName}
               </Typography>
               <CustomChip
                 skin='light'
                 size='small'
                 label='Administrator'
-                color={roleColors[data.role]}
                 sx={{ textTransform: 'capitalize' }}
-              /> */}
+              />
             </CardContent>
 
             <CardContent sx={{ my: 1 }}>
@@ -174,7 +134,7 @@ const UserViewLeft = () => {
                   </CustomAvatar>
                   <div>
                     <Typography variant='h6'>1.23k</Typography>
-                    <Typography variant='body2'>Task Done</Typography>
+                    <Typography variant='body2'> Done</Typography>
                   </div>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -219,7 +179,7 @@ const UserViewLeft = () => {
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Contact:</Typography>
-                  <Typography variant='body2'>+1 {userData.phoneNumber}</Typography>
+                  <Typography variant='body2'>{userData.phoneNumber}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Language:</Typography>
@@ -249,34 +209,35 @@ const UserViewLeft = () => {
               aria-describedby='user-view-edit-description'
             >
               <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-                Edit User Information
+              Modifier les inforamtions du l’utilisateur
               </DialogTitle>
               <DialogContent>
                 <DialogContentText variant='body2' id='user-view-edit-description' sx={{ textAlign: 'center', mb: 7 }}>
                   Updating user details will receive a privacy audit.
                 </DialogContentText>
                 <form>
-                  <Grid container spacing={6}>
+                  <Grid container spacing={6} >
                     <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='Full Name' defaultValue={userData.firstName} />
+                      <TextField fullWidth label='First Name' defaultValue={userData.firstName} />
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
-                        label='Username'
-                        defaultValue={userData.firstName}
-                        InputProps={{ startAdornment: <InputAdornment position='start'>@</InputAdornment> }}
+                        label='Last Name'
+                        defaultValue={userData.lastName}
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
+                      <TextField fullWidth label='Contact' defaultValue={`${userData.phoneNumber}`} />
+                    </Grid>
+                  {/*  <Grid item xs={12} sm={6}>
                       <TextField fullWidth type='email' label='Billing Email' defaultValue={userData.phoneNumber} />
                     </Grid>
-                    {/* <Grid item xs={12} sm={6}>
+                    <Grid item xs={12} sm={6}>
                       <FormControl fullWidth>
                         <InputLabel id='user-view-status-label'>Status</InputLabel>
                         <Select
                           label='Status'
-                          defaultValue={data.status}
                           id='user-view-status'
                           labelId='user-view-status-label'
                         >
@@ -285,14 +246,12 @@ const UserViewLeft = () => {
                           <MenuItem value='inactive'>Inactive</MenuItem>
                         </Select>
                       </FormControl>
-                    </Grid> */}
-                    <Grid item xs={12} sm={6}>
+                    </Grid>
+                     <Grid item xs={12} sm={6}>
                       <TextField fullWidth label='TAX ID' defaultValue='Tax-8894' />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='Contact' defaultValue={`+1 ${userData.phoneNumber}`} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
+                    </Grid> */}
+                 
+                    {/* <Grid item xs={12} sm={6}>
                       <FormControl fullWidth>
                         <InputLabel id='user-view-language-label'>Language</InputLabel>
                         <Select
@@ -327,7 +286,7 @@ const UserViewLeft = () => {
                           <MenuItem value='Germany'>Germany</MenuItem>
                         </Select>
                       </FormControl>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12}>
                       <FormControlLabel
                         label='Use as a billing address?'
@@ -352,11 +311,10 @@ const UserViewLeft = () => {
             <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} />
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <EmailAppLayout folder='inbox'/>
+        <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
+          <EmailAppLayout folder='inbox' />
         </Grid>
       </Grid>
-
     )
   } else {
     return null

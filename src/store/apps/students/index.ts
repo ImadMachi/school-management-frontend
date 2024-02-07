@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 
 // ** Axios Imports
 import axios from 'axios'
+import { UpdateStudentDto } from 'src/pages/apps/students/overview/[id]'
 import { StudentsType } from 'src/types/apps/studentTypes' 
 import { CreateStudentDto } from 'src/views/apps/student/list/AddStudentDrawer'
 
@@ -41,6 +42,15 @@ export const addStudent = createAsyncThunk(
     return response.data
   }
 )
+
+export const updateStudent = createAsyncThunk(
+  'appStudents/updateStudent',
+  async (payload: { id: number, updateStudentDto: UpdateStudentDto }, { getState, dispatch }: Redux) => {
+    const { id, updateStudentDto } = payload;
+    const response = await axios.patch(`${HOST}/students/${id}`, updateStudentDto);
+    return response.data;
+  }
+);
 
 // ** Delete addStudent
 interface DeleteProps {
@@ -102,7 +112,30 @@ export const appStudentsSlice = createSlice({
     builder.addCase(addStudent.fulfilled, (state, action) => {
       state.data.unshift(action.payload)
       state.allData.unshift(action.payload)    })
+      builder.addCase(fetchStudent.fulfilled, (state, action) => {
+        const userIdToDelete = action.payload.id;
+      
+        // Filter out the existing user data with the same ID
+        state.data = state.data.filter(student => student.id !== userIdToDelete);
+        state.allData = state.allData.filter(student => student.id !== userIdToDelete);
+      
+        // Add the updated user data to the beginning of the arrays
+        state.data.unshift(action.payload);
+        state.allData.unshift(action.payload);
+      });
+      
+      builder.addCase(updateStudent.fulfilled, (state, action) => {
+        const updateStudent = action.payload;
+        const index = state.allData.findIndex(student => student.id === updateStudent.id);
+      
+        if (index !== -1) {
+          // If the student is found, update the data in both data and allData arrays
+          state.data[index] = updateStudent;
+          state.allData[index] = updateStudent;
+        }
+      });
   }
+
 })
 
 export const { filterData } = appStudentsSlice.actions

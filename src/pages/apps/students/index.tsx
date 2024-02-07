@@ -120,7 +120,7 @@ const RowOptions = ({ id }: { id: number }) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href='/apps/user/view/overview/'
+          href={`/apps/students/overview/${id}`} 
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir

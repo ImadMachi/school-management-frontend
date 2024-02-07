@@ -43,6 +43,9 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import UserSuspendDialog from '../../../../views/apps/administrators/overview/UserSuspendDialog'
 import UserSubscriptionDialog from '../../../../views/apps/administrators/overview/UserSubscriptionDialog'
 
+import * as yup from 'yup'
+import { yupResolver } from '@hookform/resolvers/yup'
+
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
 
@@ -50,7 +53,10 @@ import { ThemeColor } from 'src/@core/layouts/types'
 import { getInitials } from 'src/@core/utils/get-initials'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
-import { AnyAction } from '@reduxjs/toolkit'
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
+import { updateAdministrator } from 'src/store/apps/administrator'
+import { Controller, useForm } from 'react-hook-form'
+import { FormHelperText } from '@mui/material'
 
 
 
@@ -64,23 +70,62 @@ export interface UpdateAdministratorDto {
   phoneNumber?: string;
 }
 
+const schema = yup.object().shape({
+  firstName: yup.string().min(3).required(),
+  lastName: yup.string().min(3).required(),
+  phoneNumber: yup.string().required()
+})
+
 const UserViewLeft = () => {
   const router = useRouter();
   const { id } = router.query;
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
+  const {
+    reset,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UpdateAdministratorDto>({
+    mode: 'onChange',
+    resolver: yupResolver(schema),
+  });
+
   const administratorStore = useSelector((state: RootState) => state.administrator)
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
-  const [openPlans, setOpenPlans] = useState<boolean>(false)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
   const [userData, setUserData] = useState<AdministratorType | null>(null);
 
-
-
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true)
   const handleEditClose = () => setOpenEdit(false)
+
+
+  const handleEditSubmit = (data: UpdateAdministratorDto) => {
+    // Ensure id is a number
+    const administratorId = parseInt(id as string, 10);
+    const partialUpdateAdministratorDto: Partial<UpdateAdministratorDto> = {};
+    if (data.firstName) partialUpdateAdministratorDto.firstName = data.firstName;
+    if (data.lastName) partialUpdateAdministratorDto.lastName = data.lastName;
+    if (data.phoneNumber) partialUpdateAdministratorDto.phoneNumber = data.phoneNumber;
+
+    // Dispatch the action with both id and updateAdministratorDto properties
+    dispatch(updateAdministrator({ id: administratorId, updateAdministratorDto: data }))
+      .then(() => {
+        // Rest of your logic
+        reset();
+      })
+      .catch((error) => {
+        // Handle error if needed
+        console.error('Update Administrator failed:', error);
+      });
+    handleEditClose();
+    reset(); 
+
+  };
+
+
 
   useEffect(() => {
     // Check if id exists and is a valid number
@@ -88,7 +133,6 @@ const UserViewLeft = () => {
       dispatch(fetchAdministrator(Number(id)) as any);
       console.log('fetching admin');
     }
-
     // Cleanup function to reset state on component unmount
     return () => {
       // Reset state when the component is unmounted
@@ -97,12 +141,13 @@ const UserViewLeft = () => {
   }, [id]);
 
 
+
+
   useEffect(() => {
     // Update state when the data is updated
     if (administratorStore.data && administratorStore.data.length > 0) {
       setUserData(administratorStore.data[0]);
     }
-    console.log('data', administratorStore.data);
   }, [administratorStore.data]);
 
   if (userData) {
@@ -121,7 +166,7 @@ const UserViewLeft = () => {
               <CustomChip
                 skin='light'
                 size='small'
-                label='Administrator'
+                label='Administrateur'
                 sx={{ textTransform: 'capitalize' }}
               />
             </CardContent>
@@ -154,28 +199,11 @@ const UserViewLeft = () => {
               <Divider sx={{ my: theme => `${theme.spacing(4)} !important` }} />
               <Box sx={{ pb: 1 }}>
                 <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Username:</Typography>
-                  <Typography variant='body2'>@{userData.firstName} {userData.lastName}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Billing Email:</Typography>
-                  <Typography variant='body2'>{userData.phoneNumber}</Typography>
-                </Box>
-                {/* <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Status:</Typography>
-                  <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
-                    {data.status}
-                  </Typography>
-                </Box> */}
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Role:</Typography>
-                  <Typography variant='body2' sx={{ textTransform: 'capitalize' }}>
-                    Administrator
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Tax ID:</Typography>
-                  <Typography variant='body2'>Tax-8894</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Prénom:</Typography>
+                  <Typography variant='body2'>{userData.firstName}</Typography>
+                </Box>   <Box sx={{ display: 'flex', mb: 2 }}>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Nom:</Typography>
+                  <Typography variant='body2'>{userData.lastName}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Contact:</Typography>
@@ -193,12 +221,12 @@ const UserViewLeft = () => {
             </CardContent>
 
             <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button variant='contained' sx={{ mr: 2 }} onClick={handleEditClickOpen}>
-                Edit
+              <Button variant='contained'  onClick={handleEditClickOpen}>
+                Modifier
               </Button>
-              <Button color='error' variant='outlined' onClick={() => setSuspendDialogOpen(true)}>
+              {/* <Button color='error' variant='outlined' onClick={() => setSuspendDialogOpen(true)}>
                 Suspend
-              </Button>
+              </Button> */}
             </CardActions>
 
             <Dialog
@@ -209,84 +237,76 @@ const UserViewLeft = () => {
               aria-describedby='user-view-edit-description'
             >
               <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
-              Modifier les inforamtions du l’utilisateur
+                Modifier les inforamtions du l’utilisateur
               </DialogTitle>
               <DialogContent>
                 <DialogContentText variant='body2' id='user-view-edit-description' sx={{ textAlign: 'center', mb: 7 }}>
                   Updating user details will receive a privacy audit.
                 </DialogContentText>
-                <form>
+                <form onSubmit={handleSubmit(handleEditClose)}>
                   <Grid container spacing={6} >
                     <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='First Name' defaultValue={userData.firstName} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        label='Last Name'
-                        defaultValue={userData.lastName}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='Contact' defaultValue={`${userData.phoneNumber}`} />
-                    </Grid>
-                  {/*  <Grid item xs={12} sm={6}>
-                      <TextField fullWidth type='email' label='Billing Email' defaultValue={userData.phoneNumber} />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <FormControl fullWidth>
-                        <InputLabel id='user-view-status-label'>Status</InputLabel>
-                        <Select
-                          label='Status'
-                          id='user-view-status'
-                          labelId='user-view-status-label'
-                        >
-                          <MenuItem value='pending'>Pending</MenuItem>
-                          <MenuItem value='active'>Active</MenuItem>
-                          <MenuItem value='inactive'>Inactive</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-                     <Grid item xs={12} sm={6}>
-                      <TextField fullWidth label='TAX ID' defaultValue='Tax-8894' />
-                    </Grid> */}
-                 
-                    {/* <Grid item xs={12} sm={6}>
-                      <FormControl fullWidth>
-                        <InputLabel id='user-view-language-label'>Language</InputLabel>
-                        <Select
-                          label='Language'
-                          defaultValue='English'
-                          id='user-view-language'
-                          labelId='user-view-language-label'
-                        >
-                          <MenuItem value='English'>English</MenuItem>
-                          <MenuItem value='Spanish'>Spanish</MenuItem>
-                          <MenuItem value='Portuguese'>Portuguese</MenuItem>
-                          <MenuItem value='Russian'>Russian</MenuItem>
-                          <MenuItem value='French'>French</MenuItem>
-                          <MenuItem value='German'>German</MenuItem>
-                        </Select>
+                      {/* <TextField fullWidth label='First Name' defaultValue={userData.firstName} /> */}
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name='firstName'
+                          control={control}
+                          defaultValue={userData.firstName}
+                          rules={{ required: 'Prénom est requis' }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label='Prénom'
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
                       </FormControl>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <FormControl fullWidth>
-                        <InputLabel id='user-view-country-label'>Country</InputLabel>
-                        <Select
-                          label='Country'
-                          defaultValue='USA'
-                          id='user-view-country'
-                          labelId='user-view-country-label'
-                        >
-                          <MenuItem value='USA'>USA</MenuItem>
-                          <MenuItem value='UK'>UK</MenuItem>
-                          <MenuItem value='Spain'>Spain</MenuItem>
-                          <MenuItem value='Russia'>Russia</MenuItem>
-                          <MenuItem value='France'>France</MenuItem>
-                          <MenuItem value='Germany'>Germany</MenuItem>
-                        </Select>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name='lastName'
+                          control={control}
+                          defaultValue={userData.lastName}
+                          rules={{ required: 'Nom est requis' }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label='Nom'
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
                       </FormControl>
-                    </Grid> */}
+                    </Grid>
+                    <Grid item xs={12}>
+
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name='phoneNumber'
+                          control={control}
+                          defaultValue={userData.phoneNumber}
+                          rules={{ required: 'Contact est requis' }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label='Contact'
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
                     <Grid item xs={12}>
                       <FormControlLabel
                         label='Use as a billing address?'
@@ -298,7 +318,7 @@ const UserViewLeft = () => {
                 </form>
               </DialogContent>
               <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button variant='contained' sx={{ mr: 1 }} onClick={handleEditClose}>
+                <Button variant='contained' sx={{ mr: 1 }} onClick={handleSubmit(handleEditSubmit)}>
                   Submit
                 </Button>
                 <Button variant='outlined' color='secondary' onClick={handleEditClose}>
@@ -306,15 +326,15 @@ const UserViewLeft = () => {
                 </Button>
               </DialogActions>
             </Dialog>
-
+            {/* 
             <UserSuspendDialog open={suspendDialogOpen} setOpen={setSuspendDialogOpen} />
-            <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} />
+            <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} /> */}
           </Card>
         </Grid>
         <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
           <EmailAppLayout folder='inbox' />
         </Grid>
-      </Grid>
+      </Grid >
     )
   } else {
     return null

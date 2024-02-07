@@ -125,6 +125,18 @@ export const appAdministratorsSlice = createSlice({
       state.allData.unshift(action.payload);
     });
     
+    builder.addCase(updateAdministrator.fulfilled, (state, action) => {
+      const updatedAdministrator = action.payload;
+      const index = state.allData.findIndex(administrator => administrator.id === updatedAdministrator.id);
+    
+      if (index !== -1) {
+        // If the administrator is found, update the data in both data and allData arrays
+        state.data[index] = updatedAdministrator;
+        state.allData[index] = updatedAdministrator;
+      }
+    });
+    
+    
   }
 })
 

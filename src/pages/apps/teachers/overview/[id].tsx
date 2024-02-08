@@ -11,25 +11,20 @@ import Select from '@mui/material/Select'
 import Switch from '@mui/material/Switch'
 import Avatar from '@mui/material/Avatar'
 import Divider from '@mui/material/Divider'
-import MenuItem from '@mui/material/MenuItem'
-import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import DialogTitle from '@mui/material/DialogTitle'
 import FormControl from '@mui/material/FormControl'
 import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
-import InputAdornment from '@mui/material/InputAdornment'
-import LinearProgress from '@mui/material/LinearProgress'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import DialogContentText from '@mui/material/DialogContentText'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { fetchAdministrator } from 'src/store/apps/administrator'
-import { AdministratorType } from 'src/types/apps/administratorTypes'
+import { fetchTeacher } from 'src/store/apps/teachers'
+import { TeachersType } from 'src/types/apps/teacherTypes'
 import EmailAppLayout from 'src/views/apps/mail/Mail'
 
 
@@ -40,8 +35,6 @@ import Image from 'next/image'
 // ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import UserSuspendDialog from '../../../../views/apps/administrators/overview/UserSuspendDialog'
-import UserSubscriptionDialog from '../../../../views/apps/administrators/overview/UserSubscriptionDialog'
 
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -54,9 +47,10 @@ import { getInitials } from 'src/@core/utils/get-initials'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
-import { updateAdministrator } from 'src/store/apps/administrator'
+import { updateTeacher } from 'src/store/apps/teachers'
 import { Controller, useForm } from 'react-hook-form'
 import { FormHelperText } from '@mui/material'
+import { formatDate } from 'src/@core/utils/format'
 
 
 
@@ -64,16 +58,22 @@ interface ColorsType {
   [key: string]: ThemeColor
 }
 
-export interface UpdateAdministratorDto {
+export interface UpdateTeacherDto {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  dateOfBirth?: Date;
+  dateOfEmployment?: Date;
+  sex?: string;
 }
 
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required()
+  phoneNumber: yup.string().required(),
+  dateOfBirth: yup.date().required(),
+  dateOfEmployment: yup.date().required(),
+  sex: yup.string().required()
 })
 
 const UserViewLeft = () => {
@@ -85,43 +85,46 @@ const UserViewLeft = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UpdateAdministratorDto>({
+  } = useForm<UpdateTeacherDto>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
 
-  const administratorStore = useSelector((state: RootState) => state.administrator)
+  const teacherStore = useSelector((state: RootState) => state.teachers)
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
-  const [userData, setUserData] = useState<AdministratorType | null>(null);
+  const [userData, setUserData] = useState<TeachersType | null>(null);
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true)
   const handleEditClose = () => setOpenEdit(false)
 
 
-  const handleEditSubmit = (data: UpdateAdministratorDto) => {
+  const handleEditSubmit = (data: UpdateTeacherDto) => {
     // Ensure id is a number
-    const administratorId = parseInt(id as string, 10);
-    const partialUpdateAdministratorDto: Partial<UpdateAdministratorDto> = {};
-    if (data.firstName) partialUpdateAdministratorDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateAdministratorDto.lastName = data.lastName;
-    if (data.phoneNumber) partialUpdateAdministratorDto.phoneNumber = data.phoneNumber;
+    const teacherId = parseInt(id as string, 10);
+    const partialUpdateTeacherDto: Partial<UpdateTeacherDto> = {};
+    if (data.firstName) partialUpdateTeacherDto.firstName = data.firstName;
+    if (data.lastName) partialUpdateTeacherDto.lastName = data.lastName;
+    if (data.phoneNumber) partialUpdateTeacherDto.phoneNumber = data.phoneNumber;
+    if (data.dateOfBirth) partialUpdateTeacherDto.dateOfBirth = data.dateOfBirth;
+    if (data.dateOfEmployment) partialUpdateTeacherDto.dateOfEmployment = data.dateOfEmployment;
+    if (data.sex) partialUpdateTeacherDto.sex = data.sex;
 
-    // Dispatch the action with both id and updateAdministratorDto properties
-    dispatch(updateAdministrator({ id: administratorId, updateAdministratorDto: data }))
+    // Dispatch the action with both id and updateteacherDto properties
+    dispatch(updateTeacher({ id: teacherId, updateTeacherDto: data }))
       .then(() => {
         // Rest of your logic
         reset();
       })
       .catch((error) => {
         // Handle error if needed
-        console.error('Update Administrator failed:', error);
+        console.error('Update teacher failed:', error);
       });
     handleEditClose();
-    reset(); 
+    reset();
 
   };
 
@@ -130,7 +133,7 @@ const UserViewLeft = () => {
   useEffect(() => {
     // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
-      dispatch(fetchAdministrator(Number(id)) as any);
+      dispatch(fetchTeacher(Number(id)) as any);
       console.log('fetching admin');
     }
     // Cleanup function to reset state on component unmount
@@ -145,10 +148,10 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     // Update state when the data is updated
-    if (administratorStore.data && administratorStore.data.length > 0) {
-      setUserData(administratorStore.data[0]);
+    if (teacherStore.data && teacherStore.data.length > 0) {
+      setUserData(teacherStore.data[0]);
     }
-  }, [administratorStore.data]);
+  }, [teacherStore.data]);
 
   if (userData) {
     return (
@@ -210,6 +213,18 @@ const UserViewLeft = () => {
                   <Typography variant='body2'>{userData.phoneNumber}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>La date de naissance:</Typography>
+                  <Typography variant='body2'>{formatDate(userData.dateOfBirth)}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', mb: 2 }}>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>La date d'employment:</Typography>
+                  <Typography variant='body2'>{formatDate(userData.dateOfEmployment)}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', mb: 2 }}>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Sexe:</Typography>
+                  <Typography variant='body2'>{userData.sex}</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Language:</Typography>
                   <Typography variant='body2'>English</Typography>
                 </Box>
@@ -221,7 +236,7 @@ const UserViewLeft = () => {
             </CardContent>
 
             <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button variant='contained'  onClick={handleEditClickOpen}>
+              <Button variant='contained' onClick={handleEditClickOpen}>
                 Modifier
               </Button>
               {/* <Button color='error' variant='outlined' onClick={() => setSuspendDialogOpen(true)}>
@@ -299,6 +314,69 @@ const UserViewLeft = () => {
                               <TextField
                                 {...field}
                                 label='Contact'
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name='dateOfBirth'
+                          control={control}
+                          defaultValue={new Date(userData.dateOfBirth).toLocaleDateString()}
+                          rules={{ required: 'date de naissance est requis' }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label='Date de naissance'
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name='dateOfEmployment'
+                          control={control}
+                          defaultValue={new Date(userData.dateOfEmployment).toLocaleDateString()}
+                          rules={{ required: 'Date employement est requis' }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label='Date employement'
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name='sex'
+                          control={control}
+                          defaultValue={userData.sex}
+                          rules={{ required: 'Sexe est requis' }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label='Sexe'
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />

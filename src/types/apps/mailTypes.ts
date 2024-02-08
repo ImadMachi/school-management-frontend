@@ -80,6 +80,7 @@ export type SenderType = {
 }
 
 export type MailType = {
+  isStarred: any
   id: number
   body: string
   subject: string

@@ -428,7 +428,7 @@ const MailLog = (props: MailLogType) => {
                         sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
                       >
                         {/* <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>{renderMailLabels(mail.labels)}</Box> */}
-                        {mail.attachments.length ? (
+                        {mail.attachments?.length ? (
                           <IconButton size='small'>
                             <Icon icon='mdi:attachment' fontSize='1.375rem' />
                           </IconButton>

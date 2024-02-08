@@ -29,6 +29,8 @@ import { getInitials } from 'src/@core/utils/get-initials'
 // ** Actions Imports
 import { fetchData, deleteAdministrator, filterData } from 'src/store/apps/administrator'
 
+import { setSelectedId } from 'src/store/apps/administrator'
+
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
@@ -76,14 +78,19 @@ const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
 
+  const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
+    dispatch(setSelectedId(id));
+    setAnchorEl(event.currentTarget)
+  };
+
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   const rowOptionsOpen = Boolean(anchorEl)
 
-  const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+  // const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
+  //   setAnchorEl(event.currentTarget)
+  // }
   const handleRowOptionsClose = () => {
     setAnchorEl(null)
   }
@@ -118,7 +125,7 @@ const RowOptions = ({ id }: { id: number }) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href={`/apps/administrateurs/overview/${id}`} // Include the id in the URL
+          href= '/apps/administrateurs/overview/inbox' // Include the id in the URL
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir

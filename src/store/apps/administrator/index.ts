@@ -6,7 +6,7 @@ import axios from 'axios'
 import { HOST } from 'src/store/constants/hostname'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
 import { CreateAdministratorDto } from 'src/views/apps/administrators/list/AddAdministratorDrawer'
-import { UpdateAdministratorDto } from 'src/pages/apps/administrateurs/overview/[id]'
+import { UpdateAdministratorDto } from 'src/pages/apps/administrateurs/overview/[folder]'
 
 
 interface Params {
@@ -72,13 +72,16 @@ interface AppAdministratorsState {
   total: number
   params: Record<string, any>
   allData: AdministratorType[]
+  selectedId: number | null;
+
 }
 
 const initialState: AppAdministratorsState = {
   data: [],
   total: 1,
   params: {},
-  allData: []
+  allData: [],
+  selectedId: null,
 }
 
 export const appAdministratorsSlice = createSlice({
@@ -96,7 +99,10 @@ export const appAdministratorsSlice = createSlice({
           `${administrator.firstName} ${administrator.lastName}`.toLowerCase().includes(filterValue) ||
           administrator.phoneNumber.toLowerCase().includes(filterValue)
       )
-    }
+    },
+    setSelectedId: (state, action: PayloadAction<number | null>) => {
+      state.selectedId = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
@@ -140,5 +146,6 @@ export const appAdministratorsSlice = createSlice({
   }
 })
 
+export const { setSelectedId } = appAdministratorsSlice.actions;
 export const { filterData } = appAdministratorsSlice.actions
 export default appAdministratorsSlice.reducer

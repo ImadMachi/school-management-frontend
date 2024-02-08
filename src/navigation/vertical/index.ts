@@ -18,16 +18,16 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:teacher'
     },
     {
-      path: '/apps/mail',
-      title: 'Messages',
-      icon: 'mdi:email'
-    },
-    {
       path: '/apps/students',
       action: 'manage',
       subject: 'student',
       title: 'Étudients',
       icon: 'mdi:school'
+    },
+    {
+      path: '/apps/mail',
+      title: 'Messages',
+      icon: 'mdi:email'
     }
   ]
 }

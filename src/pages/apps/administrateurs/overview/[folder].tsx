@@ -30,7 +30,8 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { fetchAdministrator } from 'src/store/apps/administrator'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
-import EmailAppLayout from 'src/views/apps/mail/Mail'
+import EmailAppLayout from 'src/views/apps/administrators/overview/mail/Mail'
+import { setSelectedId } from 'src/store/apps/administrator'
 
 
 // ** Icon Imports
@@ -78,8 +79,10 @@ const schema = yup.object().shape({
 
 const UserViewLeft = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { folder } = router.query;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
+  const selectedId = useSelector((state: RootState) => state.administrator.selectedId);
+  const id = selectedId;
   const {
     reset,
     control,
@@ -93,9 +96,8 @@ const UserViewLeft = () => {
   const administratorStore = useSelector((state: RootState) => state.administrator)
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
-  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
   const [userData, setUserData] = useState<AdministratorType | null>(null);
+
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true)
@@ -104,7 +106,7 @@ const UserViewLeft = () => {
 
   const handleEditSubmit = (data: UpdateAdministratorDto) => {
     // Ensure id is a number
-    const administratorId = parseInt(id as string, 10);
+    const administratorId = parseInt(id as unknown as string, 10);
     const partialUpdateAdministratorDto: Partial<UpdateAdministratorDto> = {};
     if (data.firstName) partialUpdateAdministratorDto.firstName = data.firstName;
     if (data.lastName) partialUpdateAdministratorDto.lastName = data.lastName;
@@ -122,7 +124,6 @@ const UserViewLeft = () => {
       });
     handleEditClose();
     reset(); 
-
   };
 
 
@@ -332,7 +333,7 @@ const UserViewLeft = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
-          <EmailAppLayout folder='inbox' />
+          <EmailAppLayout folder={folder as string}  />
         </Grid>
       </Grid >
     )

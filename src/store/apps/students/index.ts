@@ -4,7 +4,7 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 // ** Axios Imports
 import axios from 'axios'
 import { UpdateStudentDto } from 'src/pages/apps/students/overview/[id]'
-import { StudentsType } from 'src/types/apps/studentTypes' 
+import { StudentsType } from 'src/types/apps/studentTypes'
 import { CreateStudentDto } from 'src/views/apps/student/list/AddStudentDrawer'
 
 const HOST = process.env.NEXT_PUBLIC_API_URL
@@ -29,7 +29,7 @@ export const fetchData = createAsyncThunk('appStudents/fetchData', async () => {
   return response.data
 })
 
-export const fetchStudent = createAsyncThunk( 'appStudents/fetchStudent', async (id: number) => {
+export const fetchStudent = createAsyncThunk('appStudents/fetchStudent', async (id: number) => {
   const response = await axios.get(`${HOST}/students/${id}`);
   return response.data;
 });
@@ -107,33 +107,35 @@ export const appStudentsSlice = createSlice({
     })
     builder.addCase(deleteStudent.fulfilled, (state, action) => {
       state.data = state.data.filter(StaddStudent => StaddStudent.id !== action.payload)
-      state.allData = state.allData.filter(StaddStudent => StaddStudent.id !== action.payload)    })
+      state.allData = state.allData.filter(StaddStudent => StaddStudent.id !== action.payload)
+    })
 
     builder.addCase(addStudent.fulfilled, (state, action) => {
       state.data.unshift(action.payload)
-      state.allData.unshift(action.payload)    })
-      builder.addCase(fetchStudent.fulfilled, (state, action) => {
-        const userIdToDelete = action.payload.id;
-      
-        // Filter out the existing user data with the same ID
-        state.data = state.data.filter(student => student.id !== userIdToDelete);
-        state.allData = state.allData.filter(student => student.id !== userIdToDelete);
-      
-        // Add the updated user data to the beginning of the arrays
-        state.data.unshift(action.payload);
-        state.allData.unshift(action.payload);
-      });
-      
-      builder.addCase(updateStudent.fulfilled, (state, action) => {
-        const updateStudent = action.payload;
-        const index = state.allData.findIndex(student => student.id === updateStudent.id);
-      
-        if (index !== -1) {
-          // If the student is found, update the data in both data and allData arrays
-          state.data[index] = updateStudent;
-          state.allData[index] = updateStudent;
-        }
-      });
+      state.allData.unshift(action.payload)
+    })
+    builder.addCase(fetchStudent.fulfilled, (state, action) => {
+      const userIdToDelete = action.payload.id;
+
+      // Filter out the existing user data with the same ID
+      state.data = state.data.filter(student => student.id !== userIdToDelete);
+      state.allData = state.allData.filter(student => student.id !== userIdToDelete);
+
+      // Add the updated user data to the beginning of the arrays
+      state.data.unshift(action.payload);
+      state.allData.unshift(action.payload);
+    });
+
+    builder.addCase(updateStudent.fulfilled, (state, action) => {
+      const updateStudent = action.payload;
+      const index = state.allData.findIndex(student => student.id === updateStudent.id);
+
+      if (index !== -1) {
+        // If the student is found, update the data in both data and allData arrays
+        state.data[index] = updateStudent;
+        state.allData[index] = updateStudent;
+      }
+    });
   }
 
 })

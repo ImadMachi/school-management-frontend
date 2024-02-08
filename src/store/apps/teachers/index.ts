@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs/toolkit'
 
 import axios from 'axios'
-import { TeachersType } from 'src/types/apps/teacherTypes' 
+import { UpdateTeacherDto } from 'src/pages/apps/teachers/overview/[id]'
+import { TeachersType } from 'src/types/apps/teacherTypes'
 import { CreateTeacherDto } from 'src/views/apps/teacher/list/AddTeacherDrawer'
 
 const HOST = process.env.NEXT_PUBLIC_API_URL
@@ -77,11 +78,14 @@ export const deleteTeacher = createAsyncThunk(
         return id
     })
 
-export const updateTeacher = createAsyncThunk('appTeachers/updateTeacher',
-    async (data: { [key: string]: number | string }, { getState, dispatch }: Redux) => {
-        const response = await axios.put(`${HOST}/teachers/${data.id}`, data)
-        return response.data
-    })
+export const updateTeacher = createAsyncThunk(
+    'appteachers/updateTeacher',
+    async (payload: { id: number, updateTeacherDto: UpdateTeacherDto }, { getState, dispatch }: Redux) => {
+        const { id, updateTeacherDto } = payload;
+        const response = await axios.patch(`${HOST}/teachers/${id}`, updateTeacherDto);
+        return response.data;
+    }
+);
 
 export const appTeachersSlice = createSlice({
     name: 'appTeachers',
@@ -96,7 +100,7 @@ export const appTeachersSlice = createSlice({
             state.data = state.allData.filter(
                 teacher =>
                     `${teacher.firstName} ${teacher.lastName}`.toLowerCase().includes(filterValue) ||
-                    teacher.phoneNumber.toLowerCase().includes(filterValue) || 
+                    teacher.phoneNumber.toLowerCase().includes(filterValue) ||
                     teacher.dateOfBirth.toString().toLowerCase().includes(filterValue) ||
                     teacher.dateOfEmployment.toString().toLowerCase().includes(filterValue) ||
                     teacher.sex.toLowerCase().includes(filterValue)
@@ -119,11 +123,27 @@ export const appTeachersSlice = createSlice({
             state.allData.unshift(action.payload)
             console.log(action.payload)
         })
-        builder.addCase(updateTeacher.fulfilled, (state, action) => {
-            const index = state.data.findIndex((item) => item.id === action.payload.id)
-            state.data[index] = action.payload
-        })
+        builder.addCase(fetchTeacher.fulfilled, (state, action) => {
+            const userIdToDelete = action.payload.id;
 
+            // Filter out the existing user data with the same ID
+            state.data = state.data.filter(teacher => teacher.id !== userIdToDelete);
+            state.allData = state.allData.filter(teacher => teacher.id !== userIdToDelete);
+
+            // Add the updated user data to the beginning of the arrays
+            state.data.unshift(action.payload);
+            state.allData.unshift(action.payload);
+        })
+        builder.addCase(updateTeacher.fulfilled, (state, action) => {
+            const updateTeacher = action.payload;
+            const index = state.allData.findIndex(teacher => teacher.id === updateTeacher.id);
+
+            if (index !== -1) {
+                // If the teacher is found, update the data in both data and allData arrays
+                state.data[index] = updateTeacher;
+                state.allData[index] = updateTeacher;
+            }
+        })
     }
 })
 export const { filterData } = appTeachersSlice.actions;

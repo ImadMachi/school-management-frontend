@@ -54,6 +54,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
 import { Controller, useForm } from 'react-hook-form'
+import { formatDate } from 'src/@core/utils/format'
 
 
 
@@ -207,7 +208,7 @@ const UserViewLeft = () => {
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>La date de naissance:</Typography>
-                  <Typography variant='body2'>{userData.dateOfBirth.toString()}</Typography>
+                  <Typography variant='body2'>{formatDate(userData.dateOfBirth)}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Language:</Typography>
@@ -292,7 +293,7 @@ const UserViewLeft = () => {
                         <Controller
                           name='dateOfBirth'
                           control={control}
-                          defaultValue={userData.dateOfBirth}
+                          defaultValue={new Date(userData.dateOfBirth).toLocaleDateString()}
                           rules={{ required: 'Date de naissance est requis' }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>

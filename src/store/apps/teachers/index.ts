@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs/toolkit'
 
 import axios from 'axios'
-import { UpdateTeacherDto } from 'src/pages/apps/teachers/overview/[id]'
+import { UpdateTeacherDto } from 'src/pages/apps/teachers/overview/[folder]'
 import { TeachersType } from 'src/types/apps/teacherTypes'
 import { CreateTeacherDto } from 'src/views/apps/teacher/list/AddTeacherDrawer'
 
@@ -32,6 +32,8 @@ interface AppTeacherState {
     total: number
     params: Record<string, any>
     allData: TeachersType[]
+    selectedId: number | null;
+
 }
 
 
@@ -39,7 +41,8 @@ const initialState: AppTeacherState = {
     data: [],
     total: 1,
     params: {},
-    allData: []
+    allData: [],
+    selectedId: null
 }
 
 
@@ -105,7 +108,10 @@ export const appTeachersSlice = createSlice({
                     teacher.dateOfEmployment.toString().toLowerCase().includes(filterValue) ||
                     teacher.sex.toLowerCase().includes(filterValue)
             )
-        }
+        },
+        setSelectedId: (state, action: PayloadAction<number | null>) => {
+            state.selectedId = action.payload;
+        },
     },
     extraReducers: builder => {
         builder.addCase(fetchData.fulfilled, (state, action) => {
@@ -146,6 +152,8 @@ export const appTeachersSlice = createSlice({
         })
     }
 })
+
+export const { setSelectedId } = appTeachersSlice.actions;
 export const { filterData } = appTeachersSlice.actions;
 export default appTeachersSlice.reducer;
 

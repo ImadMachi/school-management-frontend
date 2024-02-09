@@ -25,7 +25,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { fetchTeacher } from 'src/store/apps/teachers'
 import { TeachersType } from 'src/types/apps/teacherTypes'
-import EmailAppLayout from 'src/views/apps/mail/Mail'
+import EmailAppLayout from 'src/views/apps/teacher/overview/mail/Mail'
 
 
 // ** Icon Imports
@@ -78,7 +78,9 @@ const schema = yup.object().shape({
 
 const UserViewLeft = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { folder } = router.query;
+  const selectedId = useSelector((state: RootState) => state.teachers.selectedId);
+  const id = selectedId;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const {
     reset,
@@ -104,7 +106,7 @@ const UserViewLeft = () => {
 
   const handleEditSubmit = (data: UpdateTeacherDto) => {
     // Ensure id is a number
-    const teacherId = parseInt(id as string, 10);
+    const teacherId = parseInt(id as unknown as string, 10);
     const partialUpdateTeacherDto: Partial<UpdateTeacherDto> = {};
     if (data.firstName) partialUpdateTeacherDto.firstName = data.firstName;
     if (data.lastName) partialUpdateTeacherDto.lastName = data.lastName;
@@ -410,7 +412,7 @@ const UserViewLeft = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
-          <EmailAppLayout folder='inbox' />
+          <EmailAppLayout folder={folder as string} />
         </Grid>
       </Grid >
     )

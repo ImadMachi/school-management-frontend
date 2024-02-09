@@ -32,7 +32,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteTeacher, filterData } from 'src/store/apps/teachers'
+import { fetchData, deleteTeacher, filterData, setSelectedId } from 'src/store/apps/teachers'
 
 // ** Types Imports
 import { TeachersType } from 'src/types/apps/teacherTypes'
@@ -82,9 +82,10 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const rowOptionsOpen = Boolean(anchorEl)
 
-  const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
+  const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
+    dispatch(setSelectedId(id));
     setAnchorEl(event.currentTarget)
-  }
+  };
   const handleRowOptionsClose = () => {
     setAnchorEl(null)
   }
@@ -118,7 +119,7 @@ const RowOptions = ({ id }: { id: number }) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href={`/apps/teachers/overview/${id}`} 
+          href='/apps/teachers/overview/inbox'
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir

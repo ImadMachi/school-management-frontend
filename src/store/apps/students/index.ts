@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 
 // ** Axios Imports
 import axios from 'axios'
-import { UpdateStudentDto } from 'src/pages/apps/students/overview/[id]'
+import { UpdateStudentDto } from 'src/pages/apps/students/overview/[folder]'
 import { StudentsType } from 'src/types/apps/studentTypes'
 import { CreateStudentDto } from 'src/views/apps/student/list/AddStudentDrawer'
 
@@ -72,13 +72,16 @@ interface AppStaddStudentsState {
   total: number
   params: Record<string, any>
   allData: StudentsType[]
+  selectedId: number | null;
+
 }
 
 const initialState: AppStaddStudentsState = {
   data: [],
   total: 1,
   params: {},
-  allData: []
+  allData: [],
+  selectedId: null
 }
 
 export const appStudentsSlice = createSlice({
@@ -97,7 +100,10 @@ export const appStudentsSlice = createSlice({
           students.dateOfBirth.toString().toLowerCase().includes(filterValue) ||
           students.sex.toLowerCase().includes(filterValue)
       )
-    }
+    },
+    setSelectedId: (state, action: PayloadAction<number | null>) => {
+      state.selectedId = action.payload;
+    },
   },
   extraReducers: builder => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
@@ -140,5 +146,6 @@ export const appStudentsSlice = createSlice({
 
 })
 
+export const { setSelectedId } = appStudentsSlice.actions;
 export const { filterData } = appStudentsSlice.actions
 export default appStudentsSlice.reducer

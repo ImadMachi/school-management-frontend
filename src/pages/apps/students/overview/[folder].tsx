@@ -30,7 +30,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { fetchStudent, updateStudent } from 'src/store/apps/students'
 import { StudentsType } from 'src/types/apps/studentTypes'
-import EmailAppLayout from 'src/views/apps/mail/Mail'
+import EmailAppLayout from 'src/views/apps/student/overview/mail/Mail'
 
 
 // ** Icon Imports
@@ -78,7 +78,9 @@ const schema = yup.object().shape({
 
 const UserViewLeft = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { folder } = router.query;
+  const selectedId = useSelector((state: RootState) => state.students.selectedId);
+  const id = selectedId
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const {
     reset,
@@ -93,9 +95,10 @@ const UserViewLeft = () => {
   const studentStore = useSelector((state: RootState) => state.students)
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
-  const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
+  // const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
+  // const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
   const [userData, setUserData] = useState<StudentsType | null>(null);
+
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true)
@@ -104,7 +107,7 @@ const UserViewLeft = () => {
 
   const handleEditSubmit = (data: UpdateStudentDto) => {
     // Ensure id is a number
-    const studentId = parseInt(id as string, 10);
+    const studentId = parseInt(id as unknown as string, 10);
     const partialUpdateStudentDto: Partial<UpdateStudentDto> = {};
     if (data.firstName) partialUpdateStudentDto.firstName = data.firstName;
     if (data.lastName) partialUpdateStudentDto.lastName = data.lastName;
@@ -353,7 +356,7 @@ const UserViewLeft = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
-          <EmailAppLayout folder='inbox' />
+          <EmailAppLayout folder={folder as string} />
         </Grid>
       </Grid >
     )

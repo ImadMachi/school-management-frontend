@@ -394,7 +394,11 @@ const MailDetails = (props: MailDetailsType) => {
                               key={item.id}
                               sx={{ display: 'flex', marginBottom: '3px', marginRight: '15px', alignItems: 'center' }}
                             >
-                              <Link href={`${HOST}/${item.filepath}`} download={item.filename}>
+                              <Link
+                                href={`${HOST}/uploads/attachments/${item.filepath}`}
+                                download={item.filename}
+                                target='_blank'
+                              >
                                 <Chip size='small' key={item.filename} label={item.filename} />
                               </Link>
                             </Box>

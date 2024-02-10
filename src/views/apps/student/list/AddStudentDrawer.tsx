@@ -38,17 +38,16 @@ interface SidebarAddStudentType {
 }
 
 export interface CreateStudentDto {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: Date;
-  sex: string;
+  firstName: string
+  lastName: string
+  dateOfBirth: Date
+  sex: string
   createAccount: boolean
   createUserDto?: {
     email: string
     password: string
   }
 }
-
 
 const showErrors = (field: string, valueLen: number, min: number) => {
   if (valueLen === 0) {
@@ -84,7 +83,7 @@ const schema = yup.object().shape({
   createAccount: yup.boolean().required()
 })
 
-const defaultValues= {
+const defaultValues = {
   firstName: '',
   lastName: '',
   dateOfBirth: new Date(),
@@ -94,9 +93,7 @@ const defaultValues= {
     email: '',
     password: ''
   }
-};
-
-
+}
 
 const SidebarAddStudent = (props: SidebarAddStudentType) => {
   // ** Props
@@ -133,7 +130,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     toggle()
     reset()
   }
-  
+
   return (
     <Drawer
       open={open}
@@ -189,52 +186,49 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="dateOfBirth"
+              name='dateOfBirth'
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  type="date"
+                  type='date'
                   value={value}
                   onChange={onChange}
-                  label="Date de Naissance"
+                  label='Date de Naissance'
                   error={Boolean(errors.dateOfBirth)}
                   InputLabelProps={{
-                    shrink: true,
+                    shrink: true
                   }}
                 />
               )}
             />
             {errors.dateOfBirth && (
-              <FormHelperText sx={{ color: 'error.main' }}>
-                {errors.dateOfBirth.message}
-              </FormHelperText>
+              <FormHelperText sx={{ color: 'error.main' }}>{errors.dateOfBirth.message}</FormHelperText>
             )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 6 }}>
-            <InputLabel htmlFor="sexe">sex</InputLabel>
+            <InputLabel htmlFor='sexe'>sex</InputLabel>
             <Controller
-              name="sex"
+              name='sex'
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  id="sex"
+                  id='sex'
                   value={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  label="Sexe"
+                  onChange={e => onChange(e.target.value)}
+                  label='Sexe'
                   error={Boolean(errors.sex)}
+                  defaultValue=''
                 >
-                  <MenuItem value="male">Masculin</MenuItem>
-                  <MenuItem value="female">Féminin</MenuItem>
+                  <MenuItem value='male'>Masculin</MenuItem>
+                  <MenuItem value='female'>Féminin</MenuItem>
                   {/* Add other options if needed */}
                 </Select>
               )}
             />
-            {errors.sex && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.sex.message}</FormHelperText>
-            )}
+            {errors.sex && <FormHelperText sx={{ color: 'error.main' }}>{errors.sex.message}</FormHelperText>}
           </FormControl>
 
           <FormControlLabel
@@ -295,7 +289,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
 
           {/**************  END CREATE ACCOUNT ***************/}
 
-
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
               Soumettre
@@ -310,4 +303,4 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   )
 }
 
-export default SidebarAddStudent;
+export default SidebarAddStudent

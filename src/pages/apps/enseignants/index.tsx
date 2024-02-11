@@ -3,7 +3,6 @@ import { useState, useEffect, MouseEvent, useCallback } from 'react'
 
 // ** Next Imports
 import Link from 'next/link'
-import { GetStaticProps, InferGetStaticPropsType } from 'next/types'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -33,18 +32,18 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteStudent, filterData, setSelectedId } from 'src/store/apps/students'
-// ** Types Imports
-import { StudentsType } from 'src/types/apps/studentTypes'
+import { fetchData, deleteTeacher, filterData, setSelectedId } from 'src/store/apps/teachers'
 
+// ** Types Imports
+import { TeachersType } from 'src/types/apps/teacherTypes'
 // ** Custom Table Components Imports
 import { useAuth } from 'src/hooks/useAuth'
-import TableHeader from 'src/views/apps/student/list/TableHeader'
-import SidebarAddStudent from 'src/views/apps/student/list/AddStudentDrawer'
+import TableHeader from 'src/views/apps/teacher/list/TableHeader'
+import SidebarAddTeacher from 'src/views/apps/teacher/list/AddTeacherDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface CellType {
-  row: StudentsType
+  row: TeachersType
 }
 interface AccountStatusType {
   [key: string]: ThemeColor
@@ -66,7 +65,7 @@ const StyledLink = styled(Link)(({ theme }) => ({
 }))
 
 // ** renders client column
-const renderClient = (row: StudentsType) => {
+const renderClient = (row: TeachersType) => {
   return (
     <CustomAvatar skin='light' color={'primary'} sx={{ mr: 3, width: 30, height: 30, fontSize: '.875rem' }}>
       {getInitials(`${row.firstName} ${row.lastName}`)}
@@ -77,7 +76,6 @@ const renderClient = (row: StudentsType) => {
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const auth = useAuth()
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -93,7 +91,7 @@ const RowOptions = ({ id }: { id: number }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteStudent(id) as any)
+    dispatch(deleteTeacher(id) as any)
     handleRowOptionsClose()
   }
 
@@ -121,7 +119,7 @@ const RowOptions = ({ id }: { id: number }) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href='/apps/students/overview/inbox' 
+          href='/apps/enseignants/overview/inbox'
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
@@ -161,14 +159,33 @@ const columns = [
     }
   },
   {
-     flex: 0.15,
-     minWidth: 120,
-     headerName: 'Date de Naissance',
-     field: 'dateOfBirth',
-     renderCell: ({ row }: CellType) => (
-       <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfBirth).toLocaleDateString() : '-'}</Typography>
-     ),
-   },
+    flex: 0.15,
+    minWidth: 120,
+    headerName: 'Telephone',
+    field: 'phoneNumber',
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.phoneNumber).toLocaleDateString() : '-'}</Typography>
+    ),
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
+    headerName: 'Date de Naissance',
+    field: 'dateOfBirth',
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfBirth).toLocaleDateString() : '-'}</Typography>
+    ),
+  },
+  {
+
+    flex: 0.15,
+    minWidth: 120,
+    headerName: 'Date de Embauche',
+    field: 'dateofEmployment',
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfEmployment).toLocaleDateString() : '-'}</Typography>
+    ),
+  },
   {
     flex: 0.1,
     minWidth: 90,
@@ -215,7 +232,7 @@ const UserList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const studentStore = useSelector((state: RootState) => state.students)
+  const teacherStore = useSelector((state: RootState) => state.teachers)
 
 
   useEffect(() => {
@@ -231,10 +248,12 @@ const UserList = () => {
   }, [])
 
   const generateCSVData = () => {
-    return studentStore.allData.map(item => ({
+    return teacherStore.allData.map(item => ({
       Prénom: item.firstName,
       Nom: item.lastName,
-      DateNaissance: item.dateOfBirth ,
+      DateNaissance: item.dateOfBirth,
+      DateEmbauche: item.dateOfEmployment,
+      Tel: item.phoneNumber,
       Sexe: item.sex || '-',
 
       compte: !!item.userId ? 'oui' : 'non'
@@ -245,29 +264,29 @@ const UserList = () => {
 
   return (
     <Grid container spacing={6}>
-    <Grid item xs={12}>
-      <Card>
-        <TableHeader
-          generateCSVData={generateCSVData}
-          value={value}
-          handleFilter={handleFilter}
-          toggle={toggleAddUserDrawer}
-        />
-        <DataGrid
-          autoHeight
-          rows={studentStore.data}
-          columns={columns}
-          checkboxSelection
-          pageSize={pageSize}
-          disableSelectionOnClick
-          rowsPerPageOptions={[10, 25, 50]}
-          onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
-        />
-      </Card>
-    </Grid>
+      <Grid item xs={12}>
+        <Card>
+          <TableHeader
+            generateCSVData={generateCSVData}
+            value={value}
+            handleFilter={handleFilter}
+            toggle={toggleAddUserDrawer}
+          />
+          <DataGrid
+            autoHeight
+            rows={teacherStore.data}
+            columns={columns}
+            checkboxSelection
+            pageSize={pageSize}
+            disableSelectionOnClick
+            rowsPerPageOptions={[10, 25, 50]}
+            onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
+          />
+        </Card>
+      </Grid>
 
-    <SidebarAddStudent open={addUserOpen} toggle={toggleAddUserDrawer} />
-  </Grid>
+      <SidebarAddTeacher open={addUserOpen} toggle={toggleAddUserDrawer} />
+    </Grid>
   )
 }
 

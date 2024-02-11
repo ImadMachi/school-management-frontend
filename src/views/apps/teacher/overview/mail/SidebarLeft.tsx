@@ -131,7 +131,7 @@ const SidebarLeft = (props: MailSidebarType) => {
           <List component='div'>
             <ListItemStyled
               component={Link}
-              href='/apps/teachers/overview/inbox'
+              href='/apps/enseignants/overview/inbox'
               onClick={handleListItemClick}
               sx={{ borderLeftColor: activeInboxCondition ? 'primary.main' : 'transparent' }}
             >
@@ -149,7 +149,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled>
             <ListItemStyled
               component={Link}
-              href='/apps/teachers/overview/sent'
+              href='/apps/enseignants/overview/sent'
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'sent') ? 'primary.main' : 'transparent'
@@ -172,7 +172,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled>
             <ListItemStyled
               component={Link}
-              href='/apps/teachers/overview/starred'
+              href='/apps/enseignants/overview/starred'
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'starred') ? 'primary.main' : 'transparent'
@@ -195,7 +195,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled>
             <ListItemStyled
               component={Link}
-              href='/apps/teachers/overview/trash'
+              href='/apps/enseignants/overview/trash'
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'trash') ? 'primary.main' : 'transparent'

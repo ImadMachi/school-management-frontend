@@ -11,16 +11,16 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:shield'
     },
     {
-      path: '/apps/teachers',
+      path: '/apps/enseignants',
       action: 'manage',
       subject: 'enseignants',
       title: 'Enseignants',
       icon: 'mdi:teacher'
     },
     {
-      path: '/apps/students',
+      path: '/apps/etudiants',
       action: 'manage',
-      subject: 'student',
+      subject: 'étudiants',
       title: 'Étudients',
       icon: 'mdi:school'
     },

@@ -28,9 +28,9 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import DialogContentText from '@mui/material/DialogContentText'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { fetchStudent, updateStudent } from 'src/store/apps/students'
-import { StudentsType } from 'src/types/apps/studentTypes'
-import EmailAppLayout from 'src/views/apps/student/overview/mail/Mail'
+import { fetchParent, updateParent } from 'src/store/apps/parents'
+import { ParentsType } from 'src/types/apps/parentTypes'
+import EmailAppLayout from 'src/views/apps/parents/overview/mail/Mail'
 
 
 // ** Icon Imports
@@ -62,24 +62,22 @@ interface ColorsType {
   [key: string]: ThemeColor
 }
 
-export interface UpdateStudentDto {
+export interface UpdateParentDto {
   firstName?: string;
   lastName?: string;
-  dateOfBirth?: Date;
-  sex?: string;
+  phoneNumber?: string;
 }
 
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
-  dateOfBirth: yup.date().required(),
-  sex: yup.string().required()
+  phoneNumber: yup.string().required()
 })
 
 const UserViewLeft = () => {
   const router = useRouter();
   const { folder } = router.query;
-  const selectedId = useSelector((state: RootState) => state.students.selectedId);
+  const selectedId = useSelector((state: RootState) => state.parents.selectedId);
   const id = selectedId
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const {
@@ -87,17 +85,17 @@ const UserViewLeft = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UpdateStudentDto>({
+  } = useForm<UpdateParentDto>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
 
-  const studentStore = useSelector((state: RootState) => state.students)
+  const parentStore = useSelector((state: RootState) => state.parents)
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
   // const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
   // const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
-  const [userData, setUserData] = useState<StudentsType | null>(null);
+  const [userData, setUserData] = useState<ParentsType | null>(null);
 
 
   // Handle Edit dialog
@@ -105,24 +103,23 @@ const UserViewLeft = () => {
   const handleEditClose = () => setOpenEdit(false)
 
 
-  const handleEditSubmit = (data: UpdateStudentDto) => {
+  const handleEditSubmit = (data: UpdateParentDto) => {
     // Ensure id is a number
-    const studentId = parseInt(id as unknown as string, 10);
-    const partialUpdateStudentDto: Partial<UpdateStudentDto> = {};
-    if (data.firstName) partialUpdateStudentDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateStudentDto.lastName = data.lastName;
-    if (data.dateOfBirth) partialUpdateStudentDto.dateOfBirth = data.dateOfBirth;
-    if (data.sex) partialUpdateStudentDto.sex = data.sex;
+    const parentId = parseInt(id as unknown as string, 10);
+    const partialUpdateParentDto: Partial<UpdateParentDto> = {};
+    if (data.firstName) partialUpdateParentDto.firstName = data.firstName;
+    if (data.lastName) partialUpdateParentDto.lastName = data.lastName;
+    if (data.phoneNumber) partialUpdateParentDto.phoneNumber = data.phoneNumber;
 
-    // Dispatch the action with both id and UpdateStudentDto properties
-    dispatch(updateStudent({ id: studentId, updateStudentDto: data }))
+    // Dispatch the action with both id and UpdateParentDto properties
+    dispatch(updateParent({ id: parentId, updateParentDto: data }))
       .then(() => {
         // Rest of your logic
         reset();
       })
       .catch((error) => {
         // Handle error if needed
-        console.error('Update Student failed:', error);
+        console.error('Update Parent failed:', error);
       });
     handleEditClose();
     reset();
@@ -134,7 +131,7 @@ const UserViewLeft = () => {
   useEffect(() => {
     // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
-      dispatch(fetchStudent(Number(id)) as any);
+      dispatch(fetchParent(Number(id)) as any);
       console.log('fetching admin');
     }
     // Cleanup function to reset state on component unmount
@@ -149,10 +146,10 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     // Update state when the data is updated
-    if (studentStore.data && studentStore.data.length > 0) {
-      setUserData(studentStore.data[0]);
+    if (parentStore.data && parentStore.data.length > 0) {
+      setUserData(parentStore.data[0]);
     }
-  }, [studentStore.data]);
+  }, [parentStore.data]);
 
   if (userData) {
     return (
@@ -170,7 +167,7 @@ const UserViewLeft = () => {
               <CustomChip
                 skin='light'
                 size='small'
-                label='Étudiant'
+                label='Parent'
                 sx={{ textTransform: 'capitalize' }}
               />
             </CardContent>
@@ -210,8 +207,8 @@ const UserViewLeft = () => {
                   <Typography variant='body2'>{userData.lastName}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>La date de naissance:</Typography>
-                  <Typography variant='body2'>{formatDate(userData.dateOfBirth)}</Typography>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Contact:</Typography>
+                  <Typography variant='body2'>{userData.phoneNumber}</Typography>
                 </Box>
                 <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Language:</Typography>
@@ -294,15 +291,15 @@ const UserViewLeft = () => {
 
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name='dateOfBirth'
+                          name='phoneNumber'
                           control={control}
-                          defaultValue={new Date(userData.dateOfBirth).toLocaleDateString()}
-                          rules={{ required: 'Date de naissance est requis' }}
+                          defaultValue={userData.phoneNumber}
+                          rules={{ required: 'Contact est requis' }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label='Date de naissance'
+                                label='Contact'
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -311,26 +308,7 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth sx={{ mb: 6 }}>
-                        <Controller
-                          name='sex'
-                          control={control}
-                          defaultValue={userData.sex}
-                          rules={{ required: 'Sexe est requis' }}
-                          render={({ field, fieldState }) => (
-                            <FormControl fullWidth sx={{ mb: 6 }}>
-                              <TextField
-                                {...field}
-                                label='Sexe'
-                                error={Boolean(fieldState.error)}
-                                helperText={fieldState.error?.message}
-                              />
-                            </FormControl>
-                          )}
-                        />
-                      </FormControl>
-                    </Grid>
+
                     <Grid item xs={12}>
                       <FormControlLabel
                         label='Use as a billing address?'

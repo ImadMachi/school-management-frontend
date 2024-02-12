@@ -183,7 +183,7 @@ const LoginPage = () => {
                 justifyContent: 'center'
               }}
             >
-              <Image src='/images/largaanier.png' alt='Larganier' width={55} height={49} />
+              <Image src='/images/larganier.png' alt='Larganier' width={55} height={49} />
               <Typography
                 variant='h6'
                 sx={{

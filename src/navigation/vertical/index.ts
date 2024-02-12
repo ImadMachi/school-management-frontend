@@ -25,6 +25,13 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:school'
     },
     {
+      path: '/apps/parents',
+      action: 'manage',
+      subject: 'parents',
+      title: 'Parents',
+      icon: 'mdi:account-child'
+    },
+    {
       path: '/apps/mail',
       title: 'Messages',
       icon: 'mdi:email'

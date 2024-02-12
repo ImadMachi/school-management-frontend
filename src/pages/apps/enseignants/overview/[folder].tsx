@@ -171,12 +171,12 @@ const UserViewLeft = () => {
               <CustomChip
                 skin='light'
                 size='small'
-                label='Administrateur'
+                label='Enseignant'
                 sx={{ textTransform: 'capitalize' }}
               />
             </CardContent>
 
-            <CardContent sx={{ my: 1 }}>
+            {/* <CardContent sx={{ my: 1 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Box sx={{ mr: 8, display: 'flex', alignItems: 'center' }}>
                   <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4, width: 44, height: 44 }}>
@@ -197,7 +197,7 @@ const UserViewLeft = () => {
                   </div>
                 </Box>
               </Box>
-            </CardContent>
+            </CardContent> */}
 
             <CardContent>
               <Typography variant='h6'>Details</Typography>

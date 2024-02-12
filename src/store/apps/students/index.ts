@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction, Dispatch } from '@reduxjs
 
 // ** Axios Imports
 import axios from 'axios'
-import { UpdateStudentDto } from 'src/pages/apps/students/overview/[folder]'
+import { UpdateStudentDto } from 'src/pages/apps/etudiants/overview/[folder]'
 import { StudentsType } from 'src/types/apps/studentTypes'
 import { CreateStudentDto } from 'src/views/apps/student/list/AddStudentDrawer'
 

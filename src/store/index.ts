@@ -6,13 +6,15 @@ import administrator from './apps/administrator'
 import teachers from './apps/teachers'
 import mail from './apps/mail'
 import students from './apps/students'
+import parents from './apps/parents'
 
 export const store = configureStore({
   reducer: {
     administrator,
     teachers,
     mail,
-    students
+    students,
+    parents
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

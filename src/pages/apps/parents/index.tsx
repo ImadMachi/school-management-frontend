@@ -38,7 +38,7 @@ import { fetchData, deleteParent, filterData, setSelectedId } from 'src/store/ap
 import { ParentsType } from 'src/types/apps/parentTypes'
 // ** Custom Table Components Imports
 import { useAuth } from 'src/hooks/useAuth'
-import TableHeader from 'src/views/apps/student/list/TableHeader'
+import TableHeader from 'src/views/apps/parents/list/TableHeader'
 import SidebarAddStudent from 'src/views/apps/student/list/AddStudentDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
 

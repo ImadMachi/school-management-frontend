@@ -97,9 +97,9 @@ const VerticalNavHeader = (props: Props) => {
         userNavMenuBranding(props)
       ) : (
         <StyledLink href='/'>
-          <Image src="/images/larganier.png" width={55} height={49} alt="Groupe Scolaire Larganier" />
+          <Image src="/images/larganier.png" width={55} height={49} alt="Groupe Scolaire L'arganier" />
           <HeaderTitle variant='h6' sx={{ ...menuCollapsedStyles, ...(navCollapsed && !navHover ? {} : { ml: 3 }) }}>
-            Larganier
+            L'arganier
           </HeaderTitle>
         </StyledLink>
       )}

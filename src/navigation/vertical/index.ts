@@ -4,6 +4,13 @@ import { VerticalNavItemsType } from 'src/@core/layouts/types'
 const navigation = (): VerticalNavItemsType => {
   return [
     {
+      path: '/apps/utilisateurs',
+      action: 'manage',
+      subject: 'user',
+      title: 'Gestion des utilisateurs',
+      icon: 'mdi:user'
+    },
+    {
       path: '/apps/administrateurs',
       action: 'manage',
       subject: 'administrator',

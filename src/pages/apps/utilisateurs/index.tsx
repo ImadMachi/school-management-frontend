@@ -33,17 +33,16 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteParent, filterData, setSelectedId } from 'src/store/apps/parents'
+import { fetchData,filterData, setSelectedId} from 'src/store/apps/users'
 // ** Types Imports
-import { ParentsType } from 'src/types/apps/parentTypes'
+import { UserType } from 'src/types/apps/UserType'
 // ** Custom Table Components Imports
 import { useAuth } from 'src/hooks/useAuth'
-import TableHeader from 'src/views/apps/parents/list/TableHeader'
-import SidebarAddParent from 'src/views/apps/parents/list/AddParentDrawer'
+import TableHeader from 'src/views/apps/user/list/TableHeader'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 interface CellType {
-  row: ParentsType
+  row: UserType
 }
 interface AccountStatusType {
   [key: string]: ThemeColor
@@ -65,10 +64,10 @@ const StyledLink = styled(Link)(({ theme }) => ({
 }))
 
 // ** renders client column
-const renderClient = (row: ParentsType) => {
+const renderClient = (row: UserType) => {
   return (
     <CustomAvatar skin='light' color={'primary'} sx={{ mr: 3, width: 30, height: 30, fontSize: '.875rem' }}>
-      {getInitials(`${row.firstName} ${row.lastName}`)}
+      {getInitials(`${row.id}`)}
     </CustomAvatar>
   )
 }
@@ -92,7 +91,7 @@ const RowOptions = ({ id }: { id: number }) => {
   }
 
   const handleDelete = () => {
-    dispatch(deleteParent(id) as any)
+    // dispatch(deleteuser(id) as any)
     handleRowOptionsClose()
   }
 
@@ -116,15 +115,15 @@ const RowOptions = ({ id }: { id: number }) => {
         }}
         PaperProps={{ style: { minWidth: '8rem' } }}
       >
-        <MenuItem
+        {/* <MenuItem
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href='/apps/parents/overview/inbox' 
+          href='/apps/users/overview/inbox' 
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='mdi:pencil-outline' fontSize={20} />
           Modifier
@@ -142,17 +141,17 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: 'parent',
-    field: 'fullName',
+    headerName: 'ID',
+    field: 'ID',
     renderCell: ({ row }: CellType) => {
-      const { firstName, lastName } = row
+      const { id } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {renderClient(row)}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
             <StyledLink href='/apps/user/view/overview/'>
-              {firstName} {lastName}
+              {id}
             </StyledLink>
           </Box>
         </Box>
@@ -162,12 +161,25 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'Tel',
-    field: 'phoneNumber',
+    headerName: 'Role',
+    field: 'role',
     renderCell: ({ row }: CellType) => {
       return (
         <Typography noWrap sx={{ textTransform: 'capitalize' }}>
-          {row.phoneNumber}
+          {row.role}
+        </Typography>
+      )
+    }
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
+    headerName: 'Email',
+    field: 'email',
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
+          {row.email}
         </Typography>
       )
     }
@@ -178,7 +190,7 @@ const columns = [
     headerName: 'Compte',
     field: 'userId',
     renderCell: ({ row }: CellType) => {
-      const status = !!row.userId ? 'oui' : 'non'
+      const status = !!row.isActive ? 'oui' : 'non'
       return (
         <CustomChip
           skin='light'
@@ -210,7 +222,7 @@ const UserList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
-  const parentStore = useSelector((state: RootState) => state.parents)
+  const userStore = useSelector((state: RootState) => state.users)
 
 
   useEffect(() => {
@@ -226,11 +238,11 @@ const UserList = () => {
   }, [])
 
   const generateCSVData = () => {
-    return parentStore.allData.map(item => ({
-      Prénom: item.firstName,
-      Nom: item.lastName,
-      Tel: item.phoneNumber,
-      compte: !!item.userId ? 'oui' : 'non'
+    return userStore.allData.map(item => ({
+      Id: item.id,
+      Role: item.role,
+      Email: item.email,
+      compte: !!item.isActive ? 'oui' : 'non'
     }))
   }
 
@@ -248,7 +260,7 @@ const UserList = () => {
         />
         <DataGrid
           autoHeight
-          rows={parentStore.data}
+          rows={userStore.data}
           columns={columns}
           checkboxSelection
           pageSize={pageSize}
@@ -259,7 +271,7 @@ const UserList = () => {
       </Card>
     </Grid>
 
-    <SidebarAddParent open={addUserOpen} toggle={toggleAddUserDrawer} />
+    {/* <SidebarAddStudent open={addUserOpen} toggle={toggleAddUserDrawer} /> */}
   </Grid>
   )
 }

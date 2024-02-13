@@ -121,17 +121,17 @@ const SidebarLeft = (props: MailSidebarType) => {
         }
       }}
     >
-      <Box sx={{ p: 5, overflowY: 'hidden' }}>
+      {/* <Box sx={{ p: 5, overflowY: 'hidden' }}>
         <Button fullWidth variant='contained' onClick={toggleComposeOpen}>
           Ecrire un message
         </Button>
-      </Box>
+      </Box> */}
       <ScrollWrapper>
         <Box sx={{ pt: 0, overflowY: 'hidden' }}>
           <List component='div'>
             <ListItemStyled
               component={Link}
-              href='/apps/etudiants/overview/inbox'
+              href='/apps/parents/overview/inbox'
               onClick={handleListItemClick}
               sx={{ borderLeftColor: activeInboxCondition ? 'primary.main' : 'transparent' }}
             >
@@ -149,7 +149,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled>
             <ListItemStyled
               component={Link}
-              href='/apps/etudiants/overview/sent'
+              href='/apps/parents/overview/sent'
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'sent') ? 'primary.main' : 'transparent'
@@ -170,9 +170,9 @@ const SidebarLeft = (props: MailSidebarType) => {
                 }}
               />
             </ListItemStyled>
-            <ListItemStyled
+            {/* <ListItemStyled
               component={Link}
-              href='/apps/etudiants/overview/starred'
+              href='/apps/parents/overview/starred'
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'starred') ? 'primary.main' : 'transparent'
@@ -192,10 +192,10 @@ const SidebarLeft = (props: MailSidebarType) => {
                   sx: { fontWeight: 500, ...(handleActiveItem('folder', 'starred') && { color: 'primary.main' }) }
                 }}
               />
-            </ListItemStyled>
+            </ListItemStyled> */}
             <ListItemStyled
               component={Link}
-              href='/apps/etudiants/overview/trash'
+              href='/apps/parents/overview/trash'
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'trash') ? 'primary.main' : 'transparent'

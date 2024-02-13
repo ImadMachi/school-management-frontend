@@ -81,8 +81,8 @@ const schema = yup.object().shape({
   createUserDto: yup.object().when('createAccount', {
     is: true,
     then: yup.object({
-      email: yup.string().email('Invalid email format').required('Email is required'),
-      password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required')
+      email: yup.string().email("Format d'e-mail invalide").required('Email est obligatoire'),
+      password: yup.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères').required('Le mot de passe est requis')
     }),
     otherwise: yup.object().strip()
   }),

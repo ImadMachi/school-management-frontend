@@ -178,12 +178,12 @@ const LoginPage = () => {
                 top: 30,
                 left: 40,
                 display: 'flex',
-                position: 'absolute',
+                position: 'absolute',   
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <Image src='/images/larganier.png' alt='Larganier' width={55} height={49} />
+              <Image src='/images/larganier.png' alt="L'arganier" width={55} height={49} />
               <Typography
                 variant='h6'
                 sx={{
@@ -194,12 +194,12 @@ const LoginPage = () => {
                   fontSize: '1.5rem !important'
                 }}
               >
-                LARGANIER
+                L'ARGANIER
               </Typography>
             </Box>
             <Box sx={{ mb: 6 }}>
-              <TypographyStyled variant='h5'>Welcome to LARGANIER! 👋🏻</TypographyStyled>
-              <Typography variant='body2'>Please sign-in to your accounT</Typography>
+              <TypographyStyled variant='h5'>Bienvenue chez L'ARGANIER ! 👋🏻</TypographyStyled>
+              <Typography variant='body2'>Veuillez vous connecter à votre compte</Typography>
             </Box>
             <Alert icon={false} sx={{ py: 3, mb: 6, ...bgColors.primaryLight, '& .MuiAlert-message': { p: 0 } }}>
               <Typography variant='caption' sx={{ mb: 2, display: 'block', color: 'primary.main' }}>
@@ -231,7 +231,7 @@ const LoginPage = () => {
               </FormControl>
               <FormControl fullWidth>
                 <InputLabel htmlFor='auth-login-v2-password' error={Boolean(errors.password)}>
-                  Password
+                  Mot de passe
                 </InputLabel>
                 <Controller
                   name='password'
@@ -241,7 +241,7 @@ const LoginPage = () => {
                     <OutlinedInput
                       value={value}
                       onBlur={onBlur}
-                      label='Password'
+                      label='Mot de passe'
                       onChange={onChange}
                       id='auth-login-v2-password'
                       error={Boolean(errors.password)}
@@ -270,20 +270,20 @@ const LoginPage = () => {
                 sx={{ mb: 4, display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}
               >
                 <FormControlLabel
-                  label='Remember Me'
+                  label='Se souvenir de moi'
                   control={<Checkbox checked={rememberMe} onChange={e => setRememberMe(e.target.checked)} />}
                 />
-                <LinkStyled href='/forgot-password'>Forgot Password?</LinkStyled>
+                <LinkStyled href='/forgot-password'>Mot de passe oublié?</LinkStyled>
               </Box>
               <Button fullWidth size='large' type='submit' variant='contained' sx={{ mb: 7 }}>
                 Login
               </Button>
               <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <Typography variant='body2' sx={{ mr: 2 }}>
-                  New on our platform?
+                 Nouveau sur notre plateforme ?
                 </Typography>
                 <Typography variant='body2'>
-                  <LinkStyled href='/register'>Create an account</LinkStyled>
+                  <LinkStyled href='/register'>Créer un compte</LinkStyled>
                 </Typography>
               </Box>
               <Divider sx={{ my: theme => `${theme.spacing(5)} !important` }}>or</Divider>

@@ -451,7 +451,7 @@ const MailLog = (props: MailLogType) => {
             ) : (
               <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center', alignItems: 'center', '& svg': { mr: 2 } }}>
                 <Icon icon='mdi:alert-circle-outline' fontSize={20} />
-                <Typography>No Mails Found</Typography>
+                <Typography>Aucun e-mail trouvé</Typography>
               </Box>
             )}
           </ScrollWrapper>

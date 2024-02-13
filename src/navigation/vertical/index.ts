@@ -7,7 +7,7 @@ const navigation = (): VerticalNavItemsType => {
       path: '/apps/utilisateurs',
       action: 'manage',
       subject: 'user',
-      title: 'Gestion des utilisateurs',
+      title: 'Utilisateurs',
       icon: 'mdi:user'
     },
     {

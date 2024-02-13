@@ -4,7 +4,6 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import { CSVLink } from 'react-csv'
 
-
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
@@ -12,20 +11,16 @@ interface TableHeaderProps {
   value: string
   toggle: () => void
   handleFilter: (val: string) => void
-}
-interface TableHeaderProps {
-  value: string
-  toggle: () => void
-  handleFilter: (val: string) => void
   generateCSVData: () => any
 }
+
 const TableHeader = (props: TableHeaderProps) => {
   // ** Props
   const { handleFilter, toggle, value } = props
 
   return (
     <Box sx={{ p: 5, pb: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-      <CSVLink data={props.generateCSVData()} filename={'parents.csv'}>
+      <CSVLink data={props.generateCSVData()} filename={'utilisateurs.csv'}>
         <Button
           sx={{ mr: 4, mb: 2 }}
           color='secondary'
@@ -40,16 +35,16 @@ const TableHeader = (props: TableHeaderProps) => {
           size='small'
           value={value}
           sx={{ mr: 4, mb: 2 }}
-          placeholder='Rechercher parent'
+          placeholder='Rechercher Utilisateur'
           onChange={e => handleFilter(e.target.value)}
         />
-
+{/* 
         <Button sx={{ mb: 2 }} onClick={toggle} variant='contained'>
-          Ajouter parent
-        </Button>
+          Ajouter Administrateur
+        </Button> */}
       </Box>
     </Box>
   )
 }
 
-export default TableHeader;
+export default TableHeader

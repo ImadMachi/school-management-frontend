@@ -121,11 +121,11 @@ const SidebarLeft = (props: MailSidebarType) => {
         }
       }}
     >
-      <Box sx={{ p: 5, overflowY: 'hidden' }}>
+      {/* <Box sx={{ p: 5, overflowY: 'hidden' }}>
         <Button fullWidth variant='contained' onClick={toggleComposeOpen}>
           Ecrire un message
         </Button>
-      </Box>
+      </Box> */}
       <ScrollWrapper>
         <Box sx={{ pt: 0, overflowY: 'hidden' }}>
           <List component='div'>
@@ -170,7 +170,7 @@ const SidebarLeft = (props: MailSidebarType) => {
                 }}
               />
             </ListItemStyled>
-            <ListItemStyled
+            {/* <ListItemStyled
               component={Link}
               href='/apps/enseignants/overview/starred'
               onClick={handleListItemClick}
@@ -192,7 +192,7 @@ const SidebarLeft = (props: MailSidebarType) => {
                   sx: { fontWeight: 500, ...(handleActiveItem('folder', 'starred') && { color: 'primary.main' }) }
                 }}
               />
-            </ListItemStyled>
+            </ListItemStyled> */}
             <ListItemStyled
               component={Link}
               href='/apps/enseignants/overview/trash'

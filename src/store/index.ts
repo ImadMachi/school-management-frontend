@@ -7,6 +7,7 @@ import teachers from './apps/teachers'
 import mail from './apps/mail'
 import students from './apps/students'
 import parents from './apps/parents'
+import users from './apps/users'
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,8 @@ export const store = configureStore({
     teachers,
     mail,
     students,
-    parents
+    parents,
+    users
   },
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({

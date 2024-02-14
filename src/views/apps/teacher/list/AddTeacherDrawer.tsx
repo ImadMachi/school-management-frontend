@@ -276,8 +276,8 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
                   label="Sexe"
                   error={Boolean(errors.sex)}
                 >
-                  <MenuItem value="male">Masculin</MenuItem>
-                  <MenuItem value="female">Féminin</MenuItem>
+                  <MenuItem value="mâle">Masculin</MenuItem>
+                  <MenuItem value="femelle">Féminin</MenuItem>
                   {/* Add other options if needed */}
                 </Select>
               )}

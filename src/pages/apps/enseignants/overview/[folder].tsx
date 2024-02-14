@@ -135,7 +135,6 @@ const UserViewLeft = () => {
     // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
       dispatch(fetchTeacher(Number(id)) as any);
-      console.log("fetching admin");
     }
     // Cleanup function to reset state on component unmount
     return () => {

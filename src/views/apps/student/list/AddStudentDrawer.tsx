@@ -222,8 +222,8 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   error={Boolean(errors.sex)}
                   defaultValue=''
                 >
-                  <MenuItem value='male'>Masculin</MenuItem>
-                  <MenuItem value='female'>Féminin</MenuItem>
+                  <MenuItem value='mâle'>Masculin</MenuItem>
+                  <MenuItem value='femelle'>Féminin</MenuItem>
                   {/* Add other options if needed */}
                 </Select>
               )}

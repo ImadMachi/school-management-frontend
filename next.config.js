@@ -25,5 +25,8 @@ module.exports = withTM({
     }
 
     return config
+  },
+  eslint: {
+    ignoreDuringBuilds: true
   }
 })

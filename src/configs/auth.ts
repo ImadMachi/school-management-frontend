@@ -1,15 +1,9 @@
-// export default {
-//   meEndpoint: '/auth/me',
-//   loginEndpoint: '/jwt/login',
-//   registerEndpoint: '/jwt/register',
-//   storageTokenKeyName: 'accessToken',
-//   onTokenExpiration: 'refreshToken' // logout | refreshToken
-// }
+import { HOST } from "src/store/constants/hostname";
 
 export default {
-  meEndpoint: 'http://localhost:8000/auth/profile',
-  loginEndpoint: 'http://localhost:8000/auth/login',
-  registerEndpoint: '/jwt/register',
-  storageTokenKeyName: 'accessToken',
-  onTokenExpiration: 'logout' // logout | refreshToken
-}
+  meEndpoint: `${HOST}/auth/profile`,
+  loginEndpoint: `${HOST}/auth/login`,
+  registerEndpoint: "/jwt/register",
+  storageTokenKeyName: "accessToken",
+  onTokenExpiration: "logout", // logout | refreshToken
+};

@@ -31,6 +31,8 @@ import { fetchData, deleteAdministrator, filterData } from 'src/store/apps/admin
 
 import { setSelectedId } from 'src/store/apps/administrator'
 
+import { setSelectedUserIds } from 'src/store/apps/administrator'
+
 // ** Types Imports
 import { RootState, AppDispatch } from 'src/store'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
@@ -74,12 +76,13 @@ const renderClient = (row: AdministratorType) => {
   )
 }
 
-const RowOptions = ({ id }: { id: number }) => {
+const RowOptions = ({ id }: { id: number } , {userId} :{userId :number}) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setSelectedId(id));
+    dispatch(setSelectedUserIds(userId));
     setAnchorEl(event.currentTarget)
   };
 

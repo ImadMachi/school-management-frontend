@@ -24,12 +24,11 @@ import ComposePopup from 'src/views/apps/administrators/overview/mail/ComposePop
 // ** Actions
 import {
   fetchMails,
-  updateMail,
   paginateMail,
   getCurrentMail,
-  updateMailLabel,
   handleSelectMail,
-  handleSelectAllMail
+  handleSelectAllMail,
+  
 } from 'src/store/apps/mail'
 
 // ** Variables

@@ -53,6 +53,12 @@ export const fetchMails = createAsyncThunk('appEmail/fetchMails', async (params:
   return { mails: response.data, filter: params }
 })
 
+export const fetchMailsByUserId = createAsyncThunk('appEmail/fetchMailsByUserId', async (params: { userId: number, folder: MailFolderType }) => {
+  const entityFolder = mapMailFolderToEntity(params.folder);
+  const response = await axios.get(`${HOST}/messages/user/${params.userId}?folder=${entityFolder}`);
+  return { mails: response.data, filter: { folder: params.folder } };
+});
+
 // ** Send Mail
 export const sendMail = createAsyncThunk('appEmail/sendMail', async (data: SendMailParamsType) => {
   const formData = new FormData()
@@ -168,6 +174,19 @@ export const appEmailSlice = createSlice({
       }
       state.mails.unshift(mail)
     })
+    // Add this reducer to handle the fetched messages
+    builder.addCase(fetchMailsByUserId.fulfilled, (state, action) => {
+      const mails = action.payload.mails.map((message: any) => {
+        return message;
+      });
+
+      // Assuming you have a similar structure as in fetchMails.fulfilled
+      state.mails = mails;
+      state.filter = {
+        ...state.filter,
+        ...action.payload.filter,
+      };
+    });
   }
 })
 

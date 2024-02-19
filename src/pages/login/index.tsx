@@ -237,7 +237,7 @@ const LoginPage = () => {
             >
               <Typography
                 variant="caption"
-                sx={{ mb: 2, display: "block", color: "primary.main" }}
+                sx={{ mb: 0, display: "block", color: "primary.main" }}
               >
                 Admin: <strong>admin@gmail.com</strong> / Pass:{" "}
                 <strong>123456</strong>
@@ -347,7 +347,7 @@ const LoginPage = () => {
                 variant="contained"
                 sx={{ mb: 7 }}
               >
-                Login
+                Se connecter
               </Button>
               <Box
                 sx={{
@@ -357,14 +357,14 @@ const LoginPage = () => {
                   justifyContent: "center",
                 }}
               >
-                <Typography variant="body2" sx={{ mr: 2 }}>
+                {/* <Typography variant="body2" sx={{ mr: 2 }}>
                   Nouveau sur notre plateforme ?
                 </Typography>
                 <Typography variant="body2">
                   <LinkStyled href="/register">Créer un compte</LinkStyled>
-                </Typography>
+                </Typography> */}
               </Box>
-              <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
+              {/* <Divider sx={{ my: (theme) => `${theme.spacing(5)} !important` }}>
                 or
               </Divider>
               <Box
@@ -409,7 +409,7 @@ const LoginPage = () => {
                 >
                   <Icon icon="mdi:google" />
                 </IconButton>
-              </Box>
+              </Box> */}
             </form>
           </BoxWrapper>
         </Box>

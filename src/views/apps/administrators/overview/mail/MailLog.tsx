@@ -41,6 +41,10 @@ import {
 } from 'src/types/apps/mailTypes'
 import { OptionType } from 'src/@core/components/option-menu/types'
 import { fetchMails } from 'src/store/apps/mail'
+import { fetchMailsByUserId } from 'src/store/apps/mail'
+import { useSelector } from 'react-redux'
+import { RootState } from 'src/store'
+
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: 'pointer',
@@ -102,6 +106,10 @@ const MailLog = (props: MailLogType) => {
 
   // ** State
   const [refresh, setRefresh] = useState<boolean>(false)
+
+  // ** Store Vars
+  const userId = useSelector((state: RootState) => state.administrator.selectUserId); // Replace 'yourSlice' with the name of your slice
+
 
   // ** Vars
   const folders: MailFoldersArrType[] = [
@@ -208,13 +216,20 @@ const MailLog = (props: MailLogType) => {
     // dispatch(updateMail({ emailIds: arr, dataToUpdate: { folder } }))
   }
 
-  const handleRefreshMailsClick = () => {
-    // @ts-ignore
-    dispatch(fetchMails({ q: query || '', folder: routeParams.folder, label: routeParams.label }))
-    setRefresh(true)
-    setTimeout(() => setRefresh(false), 1000)
-  }
+  // const handleRefreshMailsClick = () => {
+  //   // @ts-ignore
+  //   dispatch(fetchMails({ q: query || '', folder: routeParams.folder, label: routeParams.label }))
+  //   setRefresh(true)
+  //   setTimeout(() => setRefresh(false), 1000)
+  // }
 
+  const handleRefreshMailsClick = () => {
+    // Use the new function to fetch mails by userId and specify the folder
+    dispatch(fetchMailsByUserId({q: query || '', folder: routeParams.folder as MailFolderType, label: routeParams.label as MailLabelType , userId : userId })); // Replace 'inbox' with the desired folder
+    setRefresh(true);
+    setTimeout(() => setRefresh(false), 1000);
+    console.log('userId', userId);
+  };
   const handleFoldersMenu = () => {
     const array: OptionType[] = []
 
@@ -329,7 +344,7 @@ const MailLog = (props: MailLogType) => {
         <Divider sx={{ m: '0 !important' }} />
         <Box sx={{ p: 0, position: 'relative', overflowX: 'hidden', height: 'calc(100% - 7.25rem)' }}>
           <ScrollWrapper hidden={hidden}>
-            {store && store.mails && store.mails.length ? (
+            {store && store.mails && store.mails.length && userId != null ? (
               <List sx={{ p: 0 }}>
                 {store.mails.map((mail: MailType) => {
                   return (
@@ -427,7 +442,7 @@ const MailLog = (props: MailLogType) => {
                         className='mail-info-right'
                         sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}
                       >
-                        {/* <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>{renderMailLabels(mail.labels)}</Box> */}
+                        {/* <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>{renderMailLabels(mail.labels)}</Box>  */}
                         {mail.attachments?.length ? (
                           <IconButton size='small'>
                             <Icon icon='mdi:attachment' fontSize='1.375rem' />

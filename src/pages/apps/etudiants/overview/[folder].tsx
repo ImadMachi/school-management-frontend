@@ -213,10 +213,10 @@ const UserViewLeft = () => {
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>La date de naissance:</Typography>
                   <Typography variant='body2'>{formatDate(userData.dateOfBirth)}</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
+                {/* <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
                   <Typography variant='body2'>English</Typography>
-                </Box>
+                </Box> */}
                 <Box sx={{ display: 'flex' }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Pays:</Typography>
                   <Typography variant='body2'>Maroc</Typography>
@@ -245,7 +245,6 @@ const UserViewLeft = () => {
               </DialogTitle>
               <DialogContent>
                 <DialogContentText variant='body2' id='user-view-edit-description' sx={{ textAlign: 'center', mb: 7 }}>
-                  Updating user details will receive a privacy audit.
                 </DialogContentText>
                 <form onSubmit={handleSubmit(handleEditClose)}>
                   <Grid container spacing={6} >
@@ -331,13 +330,13 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                       <FormControlLabel
                         label='Use as a billing address?'
                         control={<Switch defaultChecked />}
                         sx={{ '& .MuiTypography-root': { fontWeight: 500 } }}
                       />
-                    </Grid>
+                    </Grid> */}
                   </Grid>
                 </form>
               </DialogContent>

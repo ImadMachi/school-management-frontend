@@ -14,7 +14,8 @@ import {
   UpdateMailParamsType,
   PaginateMailParamsType,
   MailFolderType,
-  SendMailParamsType
+  SendMailParamsType,
+  FetchMailByUserIdParamsType
 } from 'src/types/apps/mailTypes'
 
 interface ReduxType {
@@ -53,7 +54,7 @@ export const fetchMails = createAsyncThunk('appEmail/fetchMails', async (params:
   return { mails: response.data, filter: params }
 })
 
-export const fetchMailsByUserId = createAsyncThunk('appEmail/fetchMailsByUserId', async (params: { userId: number, folder: MailFolderType }) => {
+export const fetchMailsByUserId = createAsyncThunk('appEmail/fetchMailsByUserId', async (params : FetchMailByUserIdParamsType ) => {
   const entityFolder = mapMailFolderToEntity(params.folder);
   const response = await axios.get(`${HOST}/messages/user/${params.userId}?folder=${entityFolder}`);
   return { mails: response.data, filter: { folder: params.folder } };

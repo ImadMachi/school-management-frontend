@@ -123,7 +123,7 @@ const RowOptions = ({ id }: { id: number }) => {
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
-        </MenuItem> */}
+        </MenuItem>
         <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='mdi:pencil-outline' fontSize={20} />
           Modifier
@@ -131,7 +131,7 @@ const RowOptions = ({ id }: { id: number }) => {
         <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='mdi:delete-outline' fontSize={20} />
           Supprimer
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </>
   )

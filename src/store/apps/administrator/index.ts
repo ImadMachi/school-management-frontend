@@ -73,7 +73,7 @@ interface AppAdministratorsState {
   params: Record<string, any>
   allData: AdministratorType[]
   selectedId: number | null;
-  selectUserIds: number| null;
+  selectUserId: number| null;
 
 }
 
@@ -83,7 +83,7 @@ const initialState: AppAdministratorsState = {
   params: {},
   allData: [],
   selectedId: null,
-  selectUserIds: null,
+  selectUserId: null,
 }
 
 export const appAdministratorsSlice = createSlice({
@@ -105,8 +105,8 @@ export const appAdministratorsSlice = createSlice({
     setSelectedId: (state, action: PayloadAction<number | null>) => {
       state.selectedId = action.payload;
     },
-    setSelectedUserIds: (state, action: PayloadAction<number | null>) => {
-      state.selectUserIds = action.payload;
+    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
+      state.selectUserId = action.payload;
     }
   },
   extraReducers: builder => {
@@ -152,6 +152,6 @@ export const appAdministratorsSlice = createSlice({
 })
 
 export const { setSelectedId } = appAdministratorsSlice.actions;
-export const { setSelectedUserIds } = appAdministratorsSlice.actions;
+export const { setSelectedUserId } = appAdministratorsSlice.actions;
 export const { filterData } = appAdministratorsSlice.actions
 export default appAdministratorsSlice.reducer

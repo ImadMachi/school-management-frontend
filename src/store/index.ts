@@ -1,13 +1,15 @@
 // ** Toolkit imports
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from "@reduxjs/toolkit";
 
 // ** Reducers
-import administrator from './apps/administrator'
-import teachers from './apps/teachers'
-import mail from './apps/mail'
-import students from './apps/students'
-import parents from './apps/parents'
-import users from './apps/users'
+import administrator from "./apps/administrator";
+import teachers from "./apps/teachers";
+import mail from "./apps/mail";
+import students from "./apps/students";
+import parents from "./apps/parents";
+import users from "./apps/users";
+import categories from "./apps/categories";
+import classes from "./apps/classes";
 
 export const store = configureStore({
   reducer: {
@@ -16,13 +18,15 @@ export const store = configureStore({
     mail,
     students,
     parents,
-    users
+    users,
+    categories,
+    classes,
   },
-  middleware: getDefaultMiddleware =>
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false
-    }) as any
-})
+      serializableCheck: false,
+    }) as any,
+});
 
-export type AppDispatch = typeof store.dispatch
-export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;

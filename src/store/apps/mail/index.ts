@@ -17,6 +17,7 @@ import {
   PaginateMailParamsType,
   MailFolderType,
   SendMailParamsType,
+  FetchMailByUserIdParamsType,
 } from "src/types/apps/mailTypes";
 
 interface ReduxType {
@@ -65,6 +66,17 @@ export const fetchMails = createAsyncThunk(
       `${HOST}/messages/auth?folder=${entityFolder}`
     );
     return { mails: response.data, filter: params };
+  }
+);
+
+export const fetchMailsByUserId = createAsyncThunk(
+  "appEmail/fetchMailsByUserId",
+  async (params: FetchMailByUserIdParamsType) => {
+    const entityFolder = mapMailFolderToEntity(params.folder);
+    const response = await axios.get(
+      `${HOST}/messages/user/${params.userId}?folder=${entityFolder}`
+    );
+    return { mails: response.data, filter: { folder: params.folder } };
   }
 );
 
@@ -229,8 +241,22 @@ export const appEmailSlice = createSlice({
       state.mails.unshift(mail);
       toast.success("Message envoyé avec succès");
     });
+
     builder.addCase(sendMail.rejected, (state, action) => {
       toast.error("Erreur lors de l'envoi du message");
+    });
+
+    builder.addCase(fetchMailsByUserId.fulfilled, (state, action) => {
+      const mails = action.payload.mails.map((message: any) => {
+        return message;
+      });
+
+      // Assuming you have a similar structure as in fetchMails.fulfilled
+      state.mails = mails;
+      state.filter = {
+        ...state.filter,
+        ...action.payload.filter,
+      };
     });
   },
 });

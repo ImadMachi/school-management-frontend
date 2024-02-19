@@ -39,6 +39,14 @@ export type FetchMailParamsType = {
   label: MailLabelType;
 };
 
+
+export type FetchMailByUserIdParamsType = {
+  q: string
+  folder: MailFolderType 
+  label: MailLabelType
+  userId: number | null
+}
+
 export type SendMailParamsType = {
   recipients: { id: number }[];
   subject: string;

@@ -14,7 +14,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Types
 import { RootState, AppDispatch } from 'src/store'
-import { MailLayoutType, MailLabelColors } from 'src/types/apps/mailTypes'
+import { MailLayoutType, MailLabelColors, UpdateMailLabelType, UpdateMailParamsType } from 'src/types/apps/mailTypes'
 
 // ** Email App Component Imports
 import MailLog from 'src/views/apps/administrators/overview/mail/MailLog'
@@ -24,12 +24,11 @@ import ComposePopup from 'src/views/apps/administrators/overview/mail/ComposePop
 // ** Actions
 import {
   fetchMails,
-  updateMail,
   paginateMail,
   getCurrentMail,
-  updateMailLabel,
   handleSelectMail,
-  handleSelectAllMail
+  handleSelectAllMail,
+  
 } from 'src/store/apps/mail'
 
 // ** Variables
@@ -107,18 +106,19 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
         dispatch={dispatch}
         setQuery={setQuery}
         direction={direction}
-        updateMail={updateMail}
         routeParams={routeParams}
         labelColors={labelColors}
         paginateMail={paginateMail}
         getCurrentMail={getCurrentMail}
-        updateMailLabel={updateMailLabel}
         mailDetailsOpen={mailDetailsOpen}
         handleSelectMail={handleSelectMail}
         setMailDetailsOpen={setMailDetailsOpen}
         handleSelectAllMail={handleSelectAllMail}
-        handleLeftSidebarToggle={handleLeftSidebarToggle}
-      />
+        handleLeftSidebarToggle={handleLeftSidebarToggle} updateMail={function (data: UpdateMailParamsType): void {
+          throw new Error('Function not implemented.')
+        } } updateMailLabel={function (data: UpdateMailLabelType): void {
+          throw new Error('Function not implemented.')
+        } }      />
       <ComposePopup
         mdAbove={mdAbove}
         composeOpen={composeOpen}

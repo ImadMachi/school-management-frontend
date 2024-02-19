@@ -35,6 +35,8 @@ import {
 
 import { setSelectedId } from "src/store/apps/administrator";
 
+import { setSelectedUserId } from "src/store/apps/administrator";
+
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
 import { AdministratorType } from "src/types/apps/administratorTypes";
@@ -82,12 +84,13 @@ const renderClient = (row: AdministratorType) => {
   );
 };
 
-const RowOptions = ({ id }: { id: number }) => {
+const RowOptions = ({ id }: { id: number }, { userId }: { userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setSelectedId(id));
+    dispatch(setSelectedUserId(userId));
     setAnchorEl(event.currentTarget);
   };
 
@@ -138,10 +141,10 @@ const RowOptions = ({ id }: { id: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
-          <Icon icon="mdi:pencil-outline" fontSize={20} />
+        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
+          <Icon icon='mdi:pencil-outline' fontSize={20} />
           Modifier
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
@@ -159,6 +162,7 @@ const columns = [
     field: "firstName",
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
+      const dispatch = useDispatch<AppDispatch>();
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -170,7 +174,10 @@ const columns = [
               flexDirection: "column",
             }}
           >
-            <StyledLink href="/apps/user/view/overview/">
+            <StyledLink
+              href="/apps/administrateurs/overview/inbox"
+              onClick={() => dispatch(setSelectedId(row.id))}
+            >
               {firstName} {lastName}
             </StyledLink>
           </Box>

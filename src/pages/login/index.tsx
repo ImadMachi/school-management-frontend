@@ -225,6 +225,23 @@ const LoginPage = () => {
               <Typography variant="body2">
                 Veuillez vous connecter à votre compte
               </Typography>
+            </Box>
+            <Alert
+              icon={false}
+              sx={{
+                py: 3,
+                mb: 6,
+                ...bgColors.primaryLight,
+                "& .MuiAlert-message": { p: 0 },
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ mb: 2, display: "block", color: "primary.main" }}
+              >
+                Admin: <strong>admin@gmail.com</strong> / Pass:{" "}
+                <strong>123456</strong>
+              </Typography>
             </Alert>
             <form
               noValidate

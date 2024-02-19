@@ -1,12 +1,14 @@
 // ** Redux Imports
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** Axios Imports
-import axios from 'axios'
+import axios from "axios";
+import { de } from "date-fns/locale";
+import toast from "react-hot-toast";
 
 // ** Types
-import { Dispatch } from 'redux'
-import { HOST } from 'src/store/constants/hostname'
+import { Dispatch } from "redux";
+import { HOST } from "src/store/constants/hostname";
 import {
   MailType,
   UpdateMailLabelType,
@@ -14,163 +16,225 @@ import {
   UpdateMailParamsType,
   PaginateMailParamsType,
   MailFolderType,
-  SendMailParamsType
-} from 'src/types/apps/mailTypes'
+  SendMailParamsType,
+} from "src/types/apps/mailTypes";
 
 interface ReduxType {
-  getState: any
-  dispatch: Dispatch<any>
+  getState: any;
+  dispatch: Dispatch<any>;
 }
 
 /************** map MailFolderType to appropriate value for backend ******************* */
 type MailEntityMap = {
-  [Key in MailFolderType]: 'recipients' | 'sender' | 'draft' | 'starredBy' | 'spam' | 'trashedBy'
-}
+  [Key in MailFolderType]:
+    | "recipients"
+    | "sender"
+    | "draft"
+    | "starredBy"
+    | "spam"
+    | "trashedBy";
+};
 
-const mapMailFolderToEntity = (folder: MailFolderType): MailEntityMap[MailFolderType] => {
+const mapMailFolderToEntity = (
+  folder: MailFolderType
+): MailEntityMap[MailFolderType] => {
   switch (folder) {
-    case 'inbox':
-      return 'recipients'
-    case 'sent':
-      return 'sender'
-    case 'draft':
-      return 'draft'
-    case 'starred':
-      return 'starredBy'
-    case 'spam':
-      return 'spam'
-    case 'trash':
-      return 'trashedBy'
+    case "inbox":
+      return "recipients";
+    case "sent":
+      return "sender";
+    case "draft":
+      return "draft";
+    case "starred":
+      return "starredBy";
+    case "spam":
+      return "spam";
+    case "trash":
+      return "trashedBy";
     default:
-      throw new Error('Invalid mail folder type')
+      throw new Error("Invalid mail folder type");
   }
-}
+};
 
 // ** Fetch Mails
-export const fetchMails = createAsyncThunk('appEmail/fetchMails', async (params: FetchMailParamsType) => {
-  const entityFolder = mapMailFolderToEntity(params.folder)
-  const response = await axios.get(`${HOST}/messages/auth?folder=${entityFolder}`)
-  return { mails: response.data, filter: params }
-})
+export const fetchMails = createAsyncThunk(
+  "appEmail/fetchMails",
+  async (params: FetchMailParamsType) => {
+    const entityFolder = mapMailFolderToEntity(params.folder);
+    const response = await axios.get(
+      `${HOST}/messages/auth?folder=${entityFolder}`
+    );
+    return { mails: response.data, filter: params };
+  }
+);
 
 // ** Send Mail
-export const sendMail = createAsyncThunk('appEmail/sendMail', async (data: SendMailParamsType) => {
-  const formData = new FormData()
-  formData.append('subject', data.subject)
-  formData.append('body', data.body)
-  for (let i = 0; i < data.recipients.length; i++) {
-    formData.append(`recipients[${i}][id]`, data.recipients[i].id.toString())
-  }
-  for (let file of data.attachments) {
-    formData.append(file.name, file)
-  }
-
-  const response = await axios.post(`${HOST}/messages`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
+export const sendMail = createAsyncThunk(
+  "appEmail/sendMail",
+  async (data: SendMailParamsType) => {
+    const formData = new FormData();
+    formData.append("subject", data.subject);
+    formData.append("body", data.body);
+    for (let i = 0; i < data.recipients.length; i++) {
+      formData.append(`recipients[${i}][id]`, data.recipients[i].id.toString());
     }
-  })
-  return response.data
-})
+    for (let file of data.attachments) {
+      formData.append(file.name, file);
+    }
+    formData.append("categoryId", data.category.toString());
+
+    const response = await axios.post(`${HOST}/messages`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  }
+);
 
 // ** Get Current Mail
-export const getCurrentMail = createAsyncThunk('appEmail/selectMail', async (id: number | string) => {
-  const response = await axios.get(`${HOST}/messages/${id}`)
-  return response.data
-})
+export const getCurrentMail = createAsyncThunk(
+  "appEmail/selectMail",
+  async (id: number | string) => {
+    const response = await axios.get(`${HOST}/messages/${id}`);
+    return response.data;
+  }
+);
 
 // ** Prev/Next Mails
-export const paginateMail = createAsyncThunk('appEmail/paginateMail', async (params: PaginateMailParamsType) => {
-  const response = await axios.get('/apps/email/paginate-email', { params })
+export const paginateMail = createAsyncThunk(
+  "appEmail/paginateMail",
+  async (params: PaginateMailParamsType) => {
+    const response = await axios.get("/apps/email/paginate-email", { params });
 
-  return response.data
-})
+    return response.data;
+  }
+);
 
 interface InitialStateProps {
-  mails: MailType[]
-  mailMeta: any
-  filter: FetchMailParamsType
-  currentMail: MailType | null
-  selectedMails: number[]
+  mails: MailType[];
+  mailMeta: any;
+  filter: FetchMailParamsType;
+  currentMail: MailType | null;
+  selectedMails: number[];
 }
 
 const initialState: InitialStateProps = {
   mails: [],
   mailMeta: null,
   filter: {
-    q: '',
+    q: "",
     //@ts-ignore
-    label: '',
-    folder: 'inbox'
+    label: "",
+    folder: "inbox",
   },
   currentMail: null,
-  selectedMails: []
-}
+  selectedMails: [],
+};
 
 export const appEmailSlice = createSlice({
-  name: 'appEmail',
+  name: "appEmail",
   initialState,
   reducers: {
     handleSelectMail: (state, action) => {
-      const mails: any = state.selectedMails
+      const mails: any = state.selectedMails;
       if (!mails.includes(action.payload)) {
-        mails.push(action.payload)
+        mails.push(action.payload);
       } else {
-        mails.splice(mails.indexOf(action.payload), 1)
+        mails.splice(mails.indexOf(action.payload), 1);
       }
-      state.selectedMails = mails
+      state.selectedMails = mails;
     },
     handleSelectAllMail: (state, action) => {
-      const selectAllMails: number[] = []
+      const selectAllMails: number[] = [];
       if (action.payload && state.mails !== null) {
-        selectAllMails.length = 0
+        selectAllMails.length = 0;
 
         // @ts-ignore
-        state.mails.forEach((mail: MailType) => selectAllMails.push(mail.id))
+        state.mails.forEach((mail: MailType) => selectAllMails.push(mail.id));
       } else {
-        selectAllMails.length = 0
+        selectAllMails.length = 0;
       }
-      state.selectedMails = selectAllMails as any
-    }
+      state.selectedMails = selectAllMails as any;
+    },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     builder.addCase(fetchMails.fulfilled, (state, action) => {
       const mails = action.payload.mails.map((mail: any) => {
-        if (mail.sender.administrator) {
-          mail.sender.senderData = mail.sender.administrator
+        if (mail.sender.director) {
+          mail.sender.senderData = mail.sender.director;
+          delete mail.sender.director;
+        } else if (mail.sender.administrator) {
+          mail.sender.senderData = mail.sender.administrator;
+          delete mail.sender.administrator;
         } else if (mail.sender.teacher) {
-          mail.sender.senderData = mail.sender.teacher
+          mail.sender.senderData = mail.sender.teacher;
+          delete mail.sender.teacher;
+        } else if (mail.sender.student) {
+          mail.sender.senderData = mail.sender.student;
+          delete mail.sender.student;
+        } else if (mail.sender.parent) {
+          mail.sender.senderData = mail.sender.parent;
+          delete mail.sender.parent;
         }
-        return mail
-      })
 
-      state.mails = mails
-      state.filter = action.payload.filter
-    })
+        return mail;
+      });
+
+      state.mails = mails;
+      state.filter = action.payload.filter;
+    });
     builder.addCase(getCurrentMail.fulfilled, (state, action) => {
-      const mail = action.payload
-      if (mail.sender.administrator) {
-        mail.sender.senderData = mail.sender.administrator
+      const mail = action.payload;
+      if (mail.sender.director) {
+        mail.sender.senderData = mail.sender.director;
+        delete mail.sender.director;
+      } else if (mail.sender.administrator) {
+        mail.sender.senderData = mail.sender.administrator;
+        delete mail.sender.administrator;
       } else if (mail.sender.teacher) {
-        mail.sender.senderData = mail.sender.teacher
+        mail.sender.senderData = mail.sender.teacher;
+        delete mail.sender.teacher;
+      } else if (mail.sender.student) {
+        mail.sender.senderData = mail.sender.student;
+        delete mail.sender.student;
+      } else if (mail.sender.parent) {
+        mail.sender.senderData = mail.sender.parent;
+        delete mail.sender.parent;
       }
-      state.currentMail = mail
-    })
+
+      state.currentMail = mail;
+    });
     builder.addCase(paginateMail.fulfilled, (state, action) => {
-      state.currentMail = action.payload
-    })
+      state.currentMail = action.payload;
+    });
     builder.addCase(sendMail.fulfilled, (state, action) => {
-      const mail = action.payload
-      if (mail.sender.administrator) {
-        mail.sender.senderData = mail.sender.administrator
+      const mail = action.payload;
+      if (mail.sender.director) {
+        mail.sender.senderData = mail.sender.director;
+        delete mail.sender.director;
+      } else if (mail.sender.administrator) {
+        mail.sender.senderData = mail.sender.administrator;
+        delete mail.sender.administrator;
       } else if (mail.sender.teacher) {
-        mail.sender.senderData = mail.sender.teacher
+        mail.sender.senderData = mail.sender.teacher;
+        delete mail.sender.teacher;
+      } else if (mail.sender.student) {
+        mail.sender.senderData = mail.sender.student;
+        delete mail.sender.student;
+      } else if (mail.sender.parent) {
+        mail.sender.senderData = mail.sender.parent;
+        delete mail.sender.parent;
       }
-      state.mails.unshift(mail)
-    })
-  }
-})
+      state.mails.unshift(mail);
+      toast.success("Message envoyé avec succès");
+    });
+    builder.addCase(sendMail.rejected, (state, action) => {
+      toast.error("Erreur lors de l'envoi du message");
+    });
+  },
+});
 
-export const { handleSelectMail, handleSelectAllMail } = appEmailSlice.actions
+export const { handleSelectMail, handleSelectAllMail } = appEmailSlice.actions;
 
-export default appEmailSlice.reducer
+export default appEmailSlice.reducer;

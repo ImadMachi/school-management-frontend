@@ -76,7 +76,7 @@ const renderClient = (row: AdministratorType) => {
   )
 }
 
-const RowOptions = ({ id }: { id: number } , {userId} :{userId :number}) => {
+const RowOptions = ({ id , userId }: { id: number , userId : number } ) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
 
@@ -84,6 +84,8 @@ const RowOptions = ({ id }: { id: number } , {userId} :{userId :number}) => {
     dispatch(setSelectedId(id));
     dispatch(setSelectedUserId(userId));
     setAnchorEl(event.currentTarget)
+    console.log('id', id)
+    console.log('userId', userId)
   };
 
   // ** State
@@ -207,7 +209,7 @@ const columns = [
     sortable: false,
     field: 'actions',
     headerName: 'Actions',
-    renderCell: ({ row }: CellType) => <RowOptions id={row.id} />
+    renderCell: ({ row }: CellType) => <RowOptions id={row.id} userId={row.userId} />
   }
 ]
 

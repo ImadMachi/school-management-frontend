@@ -126,10 +126,10 @@ const RowOptions = ({ id }: { id: number }) => {
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
         </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
+        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='mdi:pencil-outline' fontSize={20} />
           Modifier
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
           <Icon icon='mdi:delete-outline' fontSize={20} />
           Supprimer
@@ -147,12 +147,16 @@ const columns = [
     field: 'fullName',
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row
+      const dispatch = useDispatch<AppDispatch>()
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {renderClient(row)}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
-            <StyledLink href='/apps/user/view/overview/'>
+            <StyledLink 
+            href='/apps/etudiants/overview/inbox'
+            onClick={() => dispatch(setSelectedId(row.id))}>
+
               {firstName} {lastName}
             </StyledLink>
           </Box>

@@ -98,7 +98,7 @@ const UserViewLeft = () => {
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [userData, setUserData] = useState<AdministratorType | null>(null);
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<number>(5);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>('auto');
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
@@ -147,7 +147,7 @@ const UserViewLeft = () => {
     if (administratorStore.data && administratorStore.data.length > 0) {
       setUserData(administratorStore.data[0]);
     if (administratorStore.data[0].userId == null) {
-      setSuspendDialogOpen(13);
+      setSuspendDialogOpen('auto');
     }
   }
 
@@ -157,7 +157,7 @@ const UserViewLeft = () => {
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={suspendDialogOpen}>
+        <Grid item xs={12} md={5} sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen}}>
           <Card>
             <CardContent
               sx={{

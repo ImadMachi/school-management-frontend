@@ -17,7 +17,7 @@ import { RootState, AppDispatch } from 'src/store'
 import { MailLayoutType, MailLabelColors } from 'src/types/apps/mailTypes'
 
 // ** Email App Component Imports
-import MailLog from 'src/views/apps/student/overview/mail/MailLog'
+import MailLog from './MailLog'
 import SidebarLeft from './SidebarLeft'
 import ComposePopup from './ComposePopup'
 

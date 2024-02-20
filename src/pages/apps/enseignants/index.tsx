@@ -171,9 +171,13 @@ const columns = [
     minWidth: 120,
     headerName: 'Telephone',
     field: 'phoneNumber',
-    renderCell: ({ row }: CellType) => (
-      <Typography noWrap>{row.dateOfBirth ? new Date(row.phoneNumber).toLocaleDateString() : '-'}</Typography>
-    ),
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Typography noWrap sx={{ textTransform: 'capitalize' }}>
+          {row.phoneNumber}
+        </Typography>
+      )
+    }
   },
   {
     flex: 0.15,
@@ -191,7 +195,7 @@ const columns = [
     headerName: 'Date de Embauche',
     field: 'dateofEmployment',
     renderCell: ({ row }: CellType) => (
-      <Typography noWrap>{row.dateOfBirth ? new Date(row.dateOfEmployment).toLocaleDateString() : '-'}</Typography>
+      <Typography noWrap>{row.dateOfEmployment ? new Date(row.dateOfEmployment).toLocaleDateString() : '-'}</Typography>
     ),
   },
   {

@@ -94,7 +94,7 @@ const UserViewLeft = () => {
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
   const [userData, setUserData] = useState<ParentsType | null>(null);
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<number>(5)
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>('auto')
 
 
   // Handle Edit dialog
@@ -148,14 +148,14 @@ const UserViewLeft = () => {
       setUserData(parentStore.data[0]);
     }
     if (parentStore.data[0].userId == null) {
-      setSuspendDialogOpen(13);
+      setSuspendDialogOpen('auto');
     }
   }, [parentStore.data]);
 
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={suspendDialogOpen} >
+        <Grid item xs={12} md={5} sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen}}>
           <Card>
             <CardContent sx={{ pt: 15, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               <Avatar

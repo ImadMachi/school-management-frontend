@@ -214,6 +214,7 @@ export const appEmailSlice = createSlice({
         mail.sender.senderData = mail.sender.parent;
         delete mail.sender.parent;
       }
+      console.log(mail);
 
       state.currentMail = mail;
     });

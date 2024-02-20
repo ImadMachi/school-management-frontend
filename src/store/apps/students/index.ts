@@ -73,6 +73,7 @@ interface AppStaddStudentsState {
   params: Record<string, any>
   allData: StudentsType[]
   selectedId: number | null;
+  selectedUserId: number | null;
 
 }
 
@@ -81,7 +82,8 @@ const initialState: AppStaddStudentsState = {
   total: 1,
   params: {},
   allData: [],
-  selectedId: null
+  selectedId: null,
+  selectedUserId: null,
 }
 
 export const appStudentsSlice = createSlice({
@@ -104,6 +106,9 @@ export const appStudentsSlice = createSlice({
     setSelectedId: (state, action: PayloadAction<number | null>) => {
       state.selectedId = action.payload;
     },
+    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
+      state.selectedUserId = action.payload;
+    }
   },
   extraReducers: builder => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
@@ -147,5 +152,6 @@ export const appStudentsSlice = createSlice({
 })
 
 export const { setSelectedId } = appStudentsSlice.actions;
+export const { setSelectedUserId } = appStudentsSlice.actions;
 export const { filterData } = appStudentsSlice.actions
 export default appStudentsSlice.reducer

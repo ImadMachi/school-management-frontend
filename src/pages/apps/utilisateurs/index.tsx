@@ -187,7 +187,7 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: 'Compte',
+    headerName: 'Activé',
     field: 'userId',
     renderCell: ({ row }: CellType) => {
       const status = !!row.isActive ? 'oui' : 'non'

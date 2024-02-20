@@ -42,6 +42,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import TableHeader from 'src/views/apps/student/list/TableHeader'
 import SidebarAddStudent from 'src/views/apps/student/list/AddStudentDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
+import { setSelectedUserId } from 'src/store/apps/students'
 
 interface CellType {
   row: StudentsType
@@ -74,7 +75,7 @@ const renderClient = (row: StudentsType) => {
   )
 }
 
-const RowOptions = ({ id }: { id: number }) => {
+const RowOptions = ({ id , userId}: { id: number , userId :number}) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const auth = useAuth()
@@ -86,6 +87,9 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setSelectedId(id));
+    dispatch(setSelectedUserId(userId));
+    console.log("id", id);
+    console.log("userId", userId);
     setAnchorEl(event.currentTarget)
   };
   const handleRowOptionsClose = () => {
@@ -155,7 +159,7 @@ const columns = [
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
             <StyledLink 
             href='/apps/etudiants/overview/inbox'
-            onClick={() => dispatch(setSelectedId(row.id))}>
+            onClick={() => dispatch(setSelectedId(row.id) , setSelectedUserId(row.userId)) }>
 
               {firstName} {lastName}
             </StyledLink>

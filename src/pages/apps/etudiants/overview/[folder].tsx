@@ -95,9 +95,8 @@ const UserViewLeft = () => {
   const studentStore = useSelector((state: RootState) => state.students)
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false)
-  // const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false)
-  // const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState<boolean>(false)
   const [userData, setUserData] = useState<StudentsType | null>(null);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState<number>(5);
 
 
   // Handle Edit dialog
@@ -135,7 +134,6 @@ const UserViewLeft = () => {
     // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
       dispatch(fetchStudent(Number(id)) as any);
-      console.log('fetching admin');
     }
     // Cleanup function to reset state on component unmount
     return () => {
@@ -152,12 +150,15 @@ const UserViewLeft = () => {
     if (studentStore.data && studentStore.data.length > 0) {
       setUserData(studentStore.data[0]);
     }
+    if (studentStore.data[0].userId == null) {
+      setSuspendDialogOpen(13);
+    }
   }, [studentStore.data]);
 
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={5} >
+        <Grid item xs={12} md={suspendDialogOpen} >
           <Card>
             <CardContent sx={{ pt: 15, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               <Avatar

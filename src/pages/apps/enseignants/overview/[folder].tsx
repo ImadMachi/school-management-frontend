@@ -94,10 +94,9 @@ const UserViewLeft = () => {
   const teacherStore = useSelector((state: RootState) => state.teachers);
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<boolean>(false);
-  const [subscriptionDialogOpen, setSubscriptionDialogOpen] =
-    useState<boolean>(false);
   const [userData, setUserData] = useState<TeachersType | null>(null);
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState<number>(5);
+
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
@@ -148,12 +147,15 @@ const UserViewLeft = () => {
     if (teacherStore.data && teacherStore.data.length > 0) {
       setUserData(teacherStore.data[0]);
     }
+    if (teacherStore.data[0].userId == null) {
+      setSuspendDialogOpen(13);
+    }
   }, [teacherStore.data]);
 
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={5}>
+        <Grid item xs={12} md={suspendDialogOpen}>
           <Card>
             <CardContent
               sx={{

@@ -192,7 +192,7 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: "Tel",
+    headerName: "Telephone",
     field: "phoneNumber",
     renderCell: ({ row }: CellType) => {
       return (

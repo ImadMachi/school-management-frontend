@@ -381,9 +381,12 @@ const UserViewLeft = () => {
             <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} /> */}
           </Card>
         </Grid>
-        <Grid item xs={12} md={7} sx={{ display: "flex" }}>
-          <EmailAppLayout folder={folder as string} />
-        </Grid>
+        {userData.userId !== null && (
+            <Grid item xs={12} md={7} sx={{ display: "flex" }}>
+              <EmailAppLayout folder={folder as string} />
+            </Grid>
+        )}
+
       </Grid>
     );
   } else {

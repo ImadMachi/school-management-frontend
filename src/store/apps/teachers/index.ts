@@ -37,6 +37,7 @@ interface AppTeacherState {
   params: Record<string, any>;
   allData: TeachersType[];
   selectedId: number | null;
+  selectedUserId: number | null;
 }
 
 const initialState: AppTeacherState = {
@@ -45,6 +46,7 @@ const initialState: AppTeacherState = {
   params: {},
   allData: [],
   selectedId: null,
+  selectedUserId: null,
 };
 
 export const fetchData = createAsyncThunk("appTeachers/fetchData", async () => {
@@ -127,6 +129,9 @@ export const appTeachersSlice = createSlice({
     setSelectedId: (state, action: PayloadAction<number | null>) => {
       state.selectedId = action.payload;
     },
+    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
+      state.selectedUserId = action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
@@ -179,5 +184,6 @@ export const appTeachersSlice = createSlice({
 });
 
 export const { setSelectedId } = appTeachersSlice.actions;
+export const { setSelectedUserId } = appTeachersSlice.actions;
 export const { filterData } = appTeachersSlice.actions;
 export default appTeachersSlice.reducer;

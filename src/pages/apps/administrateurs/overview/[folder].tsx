@@ -242,6 +242,7 @@ const UserViewLeft = () => {
                     {userData.phoneNumber}
                   </Typography>
                 </Box>
+                
                 {/* <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}

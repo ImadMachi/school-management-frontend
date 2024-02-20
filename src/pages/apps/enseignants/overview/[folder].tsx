@@ -270,6 +270,7 @@ const UserViewLeft = () => {
                   </Typography>
                   <Typography variant="body2">English</Typography>
                 </Box> */}
+                
                 <Box sx={{ display: "flex" }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}

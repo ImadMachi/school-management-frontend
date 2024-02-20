@@ -33,7 +33,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData,filterData, setSelectedId} from 'src/store/apps/users'
+import { fetchData, filterData, setSelectedId } from 'src/store/apps/users'
 // ** Types Imports
 import { UserType } from 'src/types/apps/UserType'
 // ** Custom Table Components Imports
@@ -141,17 +141,17 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: 'ID',
-    field: 'ID',
+    headerName: 'Utilisateur',
+    field: 'Utilisateur',
     renderCell: ({ row }: CellType) => {
-      const { id } = row
+      const { userData } = row
 
       return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {renderClient(row)}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
             <StyledLink href='/apps/user/view/overview/'>
-              {id}
+              {userData?.firstName ? userData?.firstName : 'Admin'} {userData?.lastName ? userData?.lastName : ''}
             </StyledLink>
           </Box>
         </Box>
@@ -250,29 +250,29 @@ const UserList = () => {
 
   return (
     <Grid container spacing={6}>
-    <Grid item xs={12}>
-      <Card>
-        <TableHeader
-          generateCSVData={generateCSVData}
-          value={value}
-          handleFilter={handleFilter}
-          toggle={toggleAddUserDrawer}
-        />
-        <DataGrid
-          autoHeight
-          rows={userStore.data}
-          columns={columns}
-          checkboxSelection
-          pageSize={pageSize}
-          disableSelectionOnClick
-          rowsPerPageOptions={[10, 25, 50]}
-          onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
-        />
-      </Card>
-    </Grid>
+      <Grid item xs={12}>
+        <Card>
+          <TableHeader
+            generateCSVData={generateCSVData}
+            value={value}
+            handleFilter={handleFilter}
+            toggle={toggleAddUserDrawer}
+          />
+          <DataGrid
+            autoHeight
+            rows={userStore.data}
+            columns={columns}
+            checkboxSelection
+            pageSize={pageSize}
+            disableSelectionOnClick
+            rowsPerPageOptions={[10, 25, 50]}
+            onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
+          />
+        </Card>
+      </Grid>
 
-    {/* <SidebarAddStudent open={addUserOpen} toggle={toggleAddUserDrawer} /> */}
-  </Grid>
+      {/* <SidebarAddStudent open={addUserOpen} toggle={toggleAddUserDrawer} /> */}
+    </Grid>
   )
 }
 

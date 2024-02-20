@@ -74,7 +74,7 @@ const renderClient = (row: ParentsType) => {
   )
 }
 
-const RowOptions = ({ id , userId}: { id: number , userId: number}) => {
+const RowOptions = ({ id, userId }: { id: number, userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const auth = useAuth()
@@ -124,7 +124,7 @@ const RowOptions = ({ id , userId}: { id: number , userId: number}) => {
           component={Link}
           sx={{ '& svg': { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href='/apps/parents/overview/inbox' 
+          href='/apps/parents/overview/inbox'
         >
           <Icon icon='mdi:eye-outline' fontSize={20} />
           Voir
@@ -157,10 +157,12 @@ const columns = [
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           {renderClient(row)}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
-            <StyledLink 
+            <StyledLink
               href='/apps/parents/overview/inbox'
-              onClick={() => dispatch(setSelectedId(row.id) , setSelectedUserId(row.userId)) }>
-              {firstName} {lastName}
+              onClick={() => {
+                dispatch(setSelectedId(row.id));
+                dispatch(setSelectedUserId(row.userId));
+              }}>{firstName} {lastName}
             </StyledLink>
           </Box>
         </Box>
@@ -247,29 +249,29 @@ const UserList = () => {
 
   return (
     <Grid container spacing={6}>
-    <Grid item xs={12}>
-      <Card>
-        <TableHeader
-          generateCSVData={generateCSVData}
-          value={value}
-          handleFilter={handleFilter}
-          toggle={toggleAddUserDrawer}
-        />
-        <DataGrid
-          autoHeight
-          rows={parentStore.data}
-          columns={columns}
-          checkboxSelection
-          pageSize={pageSize}
-          disableSelectionOnClick
-          rowsPerPageOptions={[10, 25, 50]}
-          onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
-        />
-      </Card>
-    </Grid>
+      <Grid item xs={12}>
+        <Card>
+          <TableHeader
+            generateCSVData={generateCSVData}
+            value={value}
+            handleFilter={handleFilter}
+            toggle={toggleAddUserDrawer}
+          />
+          <DataGrid
+            autoHeight
+            rows={parentStore.data}
+            columns={columns}
+            checkboxSelection
+            pageSize={pageSize}
+            disableSelectionOnClick
+            rowsPerPageOptions={[10, 25, 50]}
+            onPageSizeChange={(newPageSize: number) => setPageSize(newPageSize)}
+          />
+        </Card>
+      </Grid>
 
-    <SidebarAddParent open={addUserOpen} toggle={toggleAddUserDrawer} />
-  </Grid>
+      <SidebarAddParent open={addUserOpen} toggle={toggleAddUserDrawer} />
+    </Grid>
   )
 }
 

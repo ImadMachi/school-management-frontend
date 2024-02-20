@@ -178,7 +178,10 @@ const columns = [
           >
             <StyledLink
               href="/apps/administrateurs/overview/inbox"
-              onClick={() => dispatch(setSelectedId(row.id) , setSelectedUserId(row.userId)) }>
+              onClick={() => {
+                dispatch(setSelectedId(row.id));
+                dispatch(setSelectedUserId(row.userId)); 
+              }}>
               {firstName} {lastName}
             </StyledLink>
           </Box>

@@ -159,8 +159,10 @@ const columns = [
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
             <StyledLink 
             href='/apps/etudiants/overview/inbox'
-            onClick={() => dispatch(setSelectedId(row.id) , setSelectedUserId(row.userId)) }>
-
+            onClick={() => {
+              dispatch(setSelectedId(row.id));
+              dispatch(setSelectedUserId(row.userId)); 
+            }}>
               {firstName} {lastName}
             </StyledLink>
           </Box>

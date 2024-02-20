@@ -74,7 +74,7 @@ const renderClient = (row: TeachersType) => {
   )
 }
 
-const RowOptions = ({ id ,userId}: { id: number,userId: number }) => {
+const RowOptions = ({ id, userId }: { id: number, userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
 
@@ -156,8 +156,10 @@ const columns = [
           {renderClient(row)}
           <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
             <StyledLink href='/apps/enseignants/overview/inbox'
-              onClick={() => dispatch(setSelectedId(row.id), setSelectedUserId(row.userId)) }>
-              {firstName} {lastName}
+              onClick={() => {
+                dispatch(setSelectedId(row.id));
+                dispatch(setSelectedUserId(row.userId));
+              }}>              {firstName} {lastName}
             </StyledLink>
           </Box>
         </Box>

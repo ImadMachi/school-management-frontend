@@ -128,13 +128,12 @@ const UserViewLeft = () => {
 
 
   useEffect(() => {
-    // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
       dispatch(fetchParent(Number(id)) as any);
+    } else {
+      router.push("/apps/parents");
     }
-    // Cleanup function to reset state on component unmount
     return () => {
-      // Reset state when the component is unmounted
       setUserData(null);
     };
   }, [id]);
@@ -147,7 +146,7 @@ const UserViewLeft = () => {
     if (parentStore.data && parentStore.data.length > 0) {
       setUserData(parentStore.data[0]);
     }
-    if (parentStore.data[0].userId == null) {
+    if (parentStore.data[0]?.userId == null) {
       setSuspendDialogOpen('auto');
     }
   }, [parentStore.data]);
@@ -155,7 +154,7 @@ const UserViewLeft = () => {
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={5} sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen}}>
+        <Grid item xs={12} md={5} sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen }}>
           <Card>
             <CardContent sx={{ pt: 15, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
               <Avatar
@@ -334,9 +333,9 @@ const UserViewLeft = () => {
           </Card>
         </Grid>
         {userData.userId !== null && (
-        <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
-          <EmailAppLayout folder={folder as string} />
-        </Grid>
+          <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
+            <EmailAppLayout folder={folder as string} />
+          </Grid>
         )}
       </Grid >
     )

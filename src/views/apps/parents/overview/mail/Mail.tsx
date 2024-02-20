@@ -18,8 +18,8 @@ import { MailLayoutType, MailLabelColors } from 'src/types/apps/mailTypes'
 
 // ** Email App Component Imports
 import MailLog from 'src/views/apps/student/overview/mail/MailLog'
-import SidebarLeft from 'src/views/apps/student/overview/mail/SidebarLeft'
-import ComposePopup from 'src/views/apps/student/overview/mail/ComposePopup'
+import SidebarLeft from './SidebarLeft'
+import ComposePopup from './ComposePopup'
 
 // ** Actions
 import {

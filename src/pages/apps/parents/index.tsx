@@ -162,6 +162,8 @@ const columns = [
               onClick={() => {
                 dispatch(setSelectedId(row.id));
                 dispatch(setSelectedUserId(row.userId));
+                console.log("id", row.id);
+                console.log("userId", row.userId);
               }}>{firstName} {lastName}
             </StyledLink>
           </Box>

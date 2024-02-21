@@ -134,6 +134,9 @@ const UserViewLeft = () => {
     // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
       dispatch(fetchAdministrator(Number(id)) as any);
+    } else {
+      // If id is not valid or doesn't exist, redirect to the list page
+      router.push("/apps/administrateurs"); // Replace with your actual list page URL
     }
     // Cleanup function to reset state on component unmount
     return () => {
@@ -142,11 +145,12 @@ const UserViewLeft = () => {
     };
   }, [id]);
 
+
   useEffect(() => {
     // Update state when the data is updated
     if (administratorStore.data && administratorStore.data.length > 0) {
       setUserData(administratorStore.data[0]);
-    if (administratorStore.data[0].userId == null) {
+    if (administratorStore.data[0]?.userId == null) {
       setSuspendDialogOpen('auto');
     }
   }
@@ -238,6 +242,7 @@ const UserViewLeft = () => {
                     {userData.phoneNumber}
                   </Typography>
                 </Box>
+                
                 {/* <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}

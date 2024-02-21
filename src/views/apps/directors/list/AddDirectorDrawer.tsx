@@ -3,13 +3,10 @@ import { useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
-import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
@@ -26,18 +23,17 @@ import Icon from 'src/@core/components/icon'
 // ** Store Imports
 import { useDispatch } from 'react-redux'
 
-// ** Actions Imports
-import { addParent } from 'src/store/apps/parents'
 // ** Types Imports
 import { AppDispatch } from 'src/store'
 import { Checkbox, FormControlLabel } from '@mui/material'
+import { addDirector } from 'src/store/apps/directors'
 
-interface SidebarAddParentType {
+interface SidebaraddDirectorType {
   open: boolean
   toggle: () => void
 }
 
-export interface CreateParentDto {
+export interface CreateDirectorDto {
   firstName: string
   lastName: string
   phoneNumber: string
@@ -45,16 +41,6 @@ export interface CreateParentDto {
   createUserDto?: {
     email: string
     password: string
-  }
-}
-
-const showErrors = (field: string, valueLen: number, min: number) => {
-  if (valueLen === 0) {
-    return `${field} field is required`
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
-  } else {
-    return ''
   }
 }
 
@@ -73,8 +59,8 @@ const schema = yup.object().shape({
   createUserDto: yup.object().when('createAccount', {
     is: true,
     then: yup.object({
-      email: yup.string().email("Format d'e-mail invalide").required('Email est obligatoire'),
-      password: yup.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères').required('Le mot de passe est requis')
+      email: yup.string().email("Format d'e-mail invalide").required("Email est obligatoire"),
+      password: yup.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères').required("Le mot de passe est requis")
     }),
     otherwise: yup.object().strip()
   }),
@@ -92,7 +78,7 @@ const defaultValues = {
   }
 }
 
-const SidebarAddParent = (props: SidebarAddParentType) => {
+const SidebaraddDirector = (props: SidebaraddDirectorType) => {
   // ** Props
   const { open, toggle } = props
 
@@ -116,9 +102,8 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     defaultValue: false
   })
 
-  const onSubmit = (data: CreateParentDto) => {
-    dispatch(addParent(data) as any)
-    console.log(data)
+  const onSubmit = (data: CreateDirectorDto) => {
+    dispatch(addDirector(data) as any)
     toggle()
     reset()
   }
@@ -138,7 +123,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h6'>Ajouter Parent</Typography>
+        <Typography variant='h6'>Ajouter Directeur</Typography>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
@@ -181,7 +166,6 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
             />
             {errors.lastName && <FormHelperText sx={{ color: 'error.main' }}>{errors.lastName.message}</FormHelperText>}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name='phoneNumber'
@@ -274,4 +258,4 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
   )
 }
 
-export default SidebarAddParent
+export default SidebaraddDirector;

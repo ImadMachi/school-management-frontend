@@ -15,7 +15,14 @@ const navigation = (): VerticalNavItemsType => {
       action: 'manage',
       subject: 'administrator',
       title: 'Administrateurs',
-      icon: 'mdi:shield'
+      icon: 'mdi:account-cog'
+    },
+    {
+      path: '/apps/directeurs',
+      action: 'manage',
+      subject: 'director',
+      title: 'Directeurs',
+      icon: 'mdi:account-tie'
     },
     {
       path: '/apps/enseignants',

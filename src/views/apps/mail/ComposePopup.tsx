@@ -618,7 +618,7 @@ const ComposePopup = (props: MailComposeType) => {
             sx={{ mr: 3, fontSize: "0.875rem" }}
             htmlFor="select-input"
           >
-            Category:
+            Catégorie:
           </InputLabel>
         </div>
         <Select

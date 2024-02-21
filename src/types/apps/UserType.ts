@@ -12,9 +12,9 @@ export type UserType = {
 };
 
 export enum UserRole {
+  Director = "Director",
   Administrator = "Administrator",
   Teacher = "Teacher",
   Student = "Student",
   Parent = "Parent",
-  Director = "Director",
 }

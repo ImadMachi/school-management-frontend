@@ -119,11 +119,9 @@ const UserViewLeft = () => {
     // Dispatch the action with both id and updateteacherDto properties
     dispatch(updateTeacher({ id: teacherId, updateTeacherDto: data }))
       .then(() => {
-        // Rest of your logic
         reset();
       })
       .catch((error) => {
-        // Handle error if needed
         console.error("Update teacher failed:", error);
       });
     handleEditClose();
@@ -131,23 +129,23 @@ const UserViewLeft = () => {
   };
 
   useEffect(() => {
-    // Check if id exists and is a valid number
     if (id && !isNaN(Number(id))) {
       dispatch(fetchTeacher(Number(id)) as any);
+    } else {
+      router.push("/apps/enseignants");
     }
-    // Cleanup function to reset state on component unmount
     return () => {
-      // Reset state when the component is unmounted
       setUserData(null);
     };
   }, [id]);
+
 
   useEffect(() => {
     // Update state when the data is updated
     if (teacherStore.data && teacherStore.data.length > 0) {
       setUserData(teacherStore.data[0]);
     }
-    if (teacherStore.data[0].userId == null) {
+    if (teacherStore.data[0]?.userId== null) {
       setSuspendDialogOpen('auto');
     }
   }, [teacherStore.data]);
@@ -272,6 +270,7 @@ const UserViewLeft = () => {
                   </Typography>
                   <Typography variant="body2">English</Typography>
                 </Box> */}
+                
                 <Box sx={{ display: "flex" }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}

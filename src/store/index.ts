@@ -7,6 +7,7 @@ import teachers from "./apps/teachers";
 import mail from "./apps/mail";
 import students from "./apps/students";
 import parents from "./apps/parents";
+import directors from "./apps/directors";
 import users from "./apps/users";
 import categories from "./apps/categories";
 import classes from "./apps/classes";
@@ -18,6 +19,7 @@ export const store = configureStore({
     mail,
     students,
     parents,
+    directors,
     users,
     categories,
     classes,

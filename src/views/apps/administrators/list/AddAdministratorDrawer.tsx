@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { ChangeEvent, useRef, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
@@ -25,7 +25,7 @@ import { useDispatch } from 'react-redux'
 
 // ** Types Imports
 import { AppDispatch } from 'src/store'
-import { Checkbox, FormControlLabel } from '@mui/material'
+import { Checkbox, Chip, FormControlLabel, Grid } from '@mui/material'
 import { addAdministrator } from 'src/store/apps/administrator'
 
 interface SidebarAddAdministratorType {
@@ -37,6 +37,7 @@ export interface CreateAdministratorDto {
   firstName: string
   lastName: string
   phoneNumber: string
+  profileImage?: string
   createAccount: boolean
   createUserDto?: {
     email: string
@@ -56,6 +57,7 @@ const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
   phoneNumber: yup.string().required(),
+  profileImage: yup.string().nullable(),
   createUserDto: yup.object().when('createAccount', {
     is: true,
     then: yup.object({
@@ -71,6 +73,7 @@ const defaultValues = {
   firstName: '',
   lastName: '',
   phoneNumber: '',
+  profileImage: '',
   createAccount: false,
   createUserDto: {
     email: '',
@@ -79,9 +82,11 @@ const defaultValues = {
 }
 
 const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
-  // ** Props
-  const { open, toggle } = props
+  // ** Props  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
+  const { open, toggle } = props
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const {
@@ -112,6 +117,34 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     toggle()
     reset()
   }
+
+  const handleAttachmentButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+
+  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      const newFiles = Array.from(files);
+      const uniqueNewFiles = newFiles.filter((newFile) =>
+        selectedFiles.every(
+          (existingFile) => existingFile.name !== newFile.name
+        )
+      );
+      setSelectedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
+    }
+  };
+
+
+  const handleDeleteSelectedFile = (fileName: string) => {
+    setSelectedFiles((prevFiles) =>
+      prevFiles.filter((file) => file.name !== fileName)
+    );
+  };
+
 
   return (
     <Drawer
@@ -239,6 +272,43 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
                   <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
                 )}
               </FormControl>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}
+                  onClick={handleAttachmentButtonClick}
+                >
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={handleFileInputChange}
+                    multiple
+                  />
+                  Ajouter une image de profil
+                </Button>
+                {selectedFiles.map((file, index) => (
+                  <Box
+                    key={index}
+                    sx={{
+                      display: "flex",
+                      marginBottom: "3px",
+                      marginRight: "15px",
+                      marginTop: "9px",
+                      alignItems: "center",
+                    }}
+                  >
+                    {/* <Typography sx={{ fontSize: '0.875rem', color: 'success.main' }}>{file.name}</Typography> */}
+                    <Chip
+                      size="small"
+                      key={file.name}
+                      label={file.name}
+                      deleteIcon={<Icon icon="mdi:close" />}
+                      onDelete={() => handleDeleteSelectedFile(file.name)}
+                    />
+                  </Box>
+                ))}
+              </FormControl>
+
+
             </>
           )}
 

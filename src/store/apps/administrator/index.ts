@@ -9,6 +9,8 @@ import { CreateAdministratorDto } from 'src/views/apps/administrators/list/AddAd
 import { UpdateAdministratorDto } from 'src/pages/apps/administrateurs/overview/[folder]'
 
 
+// Use Record to define the type with known keys
+
 interface Params {
   q: string
 }
@@ -22,7 +24,6 @@ interface Redux {
   getState: any
   dispatch: Dispatch<any>
 }
-
 // ** Fetch Administrators
 export const fetchData = createAsyncThunk('appAdministrators/fetchData', async () => {
   const response = await axios.get(`${HOST}/administrators`)
@@ -34,14 +35,48 @@ export const fetchAdministrator = createAsyncThunk( 'appAdministrators/fetchAdmi
   return response.data;
 });
 
-// ** Add User
+
+// export const addAdministrator = createAsyncThunk(
+//   'appAdministrators/addAdministrator',
+//   async (data: CreateAdministratorDto, { getState, dispatch }: Redux) => {
+//     const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, data)
+//     return response.data
+//   }
+// )
+
 export const addAdministrator = createAsyncThunk(
   'appAdministrators/addAdministrator',
-  async (data: CreateAdministratorDto, { getState, dispatch }: Redux) => {
-    const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, data)
-    return response.data
+  async (data: CreateAdministratorDto) => {
+    const formData = new FormData();
+
+    // Append profileImage
+    if (data.profileImage && data.createAccount) {
+      formData.append('profileImage', data.profileImage, data.profileImage.name);
+    }
+
+    // Append other properties
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== 'profileImage' && key !== 'createUserDto') {
+        formData.append(key, value.toString());
+      }
+    });
+
+    // Append createAccount property explicitly
+    formData.append('createAccount', data.createAccount.toString());
+
+    // Append createUserDto properties
+    if (data.createUserDto && data.createAccount) {
+      Object.entries(data.createUserDto).forEach(([key, value]) => {
+        // Append properties with the desired format
+        formData.append(`createUserDto[${key}]`, value.toString());
+      });
+    }
+
+    const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, formData);
+    console.log(response.data);
+    return response.data;
   }
-)
+);
 
 // ** Delete Administrator
 interface DeleteProps {
@@ -100,7 +135,7 @@ export const appAdministratorsSlice = createSlice({
         administrator =>
           `${administrator.firstName} ${administrator.lastName}`.toLowerCase().includes(filterValue) ||
           administrator.phoneNumber.toLowerCase().includes(filterValue)
-      )
+      ) 
     },
     setSelectedId: (state, action: PayloadAction<number | null>) => {
       state.selectedId = action.payload;

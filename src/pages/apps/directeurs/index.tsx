@@ -27,7 +27,11 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
-import { fetchData,deleteDirector ,filterData} from "src/store/apps/directors";
+import {
+  fetchData,
+  deleteDirector,
+  filterData,
+} from "src/store/apps/directors";
 
 import { setSelectedId } from "src/store/apps/directors";
 
@@ -88,8 +92,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setSelectedId(id));
     dispatch(setSelectedUserId(userId));
     setAnchorEl(event.currentTarget);
-    console.log("id", id);
-    console.log("userId", userId);
   };
 
   // ** State
@@ -176,8 +178,9 @@ const columns = [
               href="/apps/directeurs/overview/inbox"
               onClick={() => {
                 dispatch(setSelectedId(row.id));
-                dispatch(setSelectedUserId(row.userId)); 
-              }}>
+                dispatch(setSelectedUserId(row.userId));
+              }}
+            >
               {firstName} {lastName}
             </StyledLink>
           </Box>
@@ -237,9 +240,7 @@ const DirectorList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
-  const directorStore = useSelector(
-    (state: RootState) => state.directors
-  );
+  const directorStore = useSelector((state: RootState) => state.directors);
 
   useEffect(() => {
     dispatch(fetchData() as any);

@@ -81,7 +81,6 @@ export const addTeacher = createAsyncThunk(
 export const deleteTeacher = createAsyncThunk(
   "appTeachers/deleteTeachers",
   async (id: number, { getState, dispatch }: Redux) => {
-    console.log(id);
     await axios.delete(`${HOST}/teachers/${id}`);
     return id;
   }
@@ -131,14 +130,13 @@ export const appTeachersSlice = createSlice({
     },
     setSelectedUserId: (state, action: PayloadAction<number | null>) => {
       state.selectedUserId = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
       state.data = action.payload;
       state.total = action.payload.length;
       state.allData = action.payload;
-      console.log(action.payload);
     });
     builder.addCase(deleteTeacher.fulfilled, (state, action) => {
       state.data = state.data.filter(
@@ -151,7 +149,6 @@ export const appTeachersSlice = createSlice({
     builder.addCase(addTeacher.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
-      console.log(action.payload);
     });
     builder.addCase(fetchTeacher.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;

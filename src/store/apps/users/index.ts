@@ -6,7 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 
 import axios from "axios";
-import { UserType } from "src/types/apps/UserType";
+import { UserRole, UserType } from "src/types/apps/UserType";
 const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface AppUserstate {
@@ -25,10 +25,13 @@ const initialState: AppUserstate = {
   selectedId: null,
 };
 
-export const fetchData = createAsyncThunk("appUsers/fetchData", async () => {
-  const response = await axios.get(`${HOST}/users`);
-  return response.data;
-});
+export const fetchData = createAsyncThunk(
+  "appUsers/fetchData",
+  async (role?: UserRole) => {
+    const response = await axios.get(`${HOST}/users?role=${role}`);
+    return response.data;
+  }
+);
 
 export const fetchUser = createAsyncThunk(
   "appUsers/fetchUser",
@@ -41,7 +44,6 @@ export const fetchUser = createAsyncThunk(
 // export const deleteUser = createAsyncThunk(
 //     'appUsers/deleteUsers',
 //     async (id: number, { getState, dispatch }: Redux) => {
-//         console.log(id)
 //         await axios.delete(`${HOST}/Users/${id}`)
 //         return id
 //     })
@@ -109,7 +111,6 @@ export const appUsersSlice = createSlice({
     // builder.addCase(addUser.fulfilled, (state, action) => {
     //     state.data.unshift(action.payload)
     //     state.allData.unshift(action.payload)
-    //     console.log(action.payload)
     // })
     builder.addCase(fetchUser.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;

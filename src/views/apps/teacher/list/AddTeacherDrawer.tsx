@@ -1,41 +1,41 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState } from "react";
 
 // ** MUI Imports
-import Drawer from '@mui/material/Drawer'
-import Select from '@mui/material/Select'
-import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
-import { styled } from '@mui/material/styles'
-import TextField from '@mui/material/TextField'
-import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
-import Typography from '@mui/material/Typography'
-import Box, { BoxProps } from '@mui/material/Box'
-import FormControl from '@mui/material/FormControl'
-import FormHelperText from '@mui/material/FormHelperText'
+import Drawer from "@mui/material/Drawer";
+import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import { styled } from "@mui/material/styles";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import Typography from "@mui/material/Typography";
+import Box, { BoxProps } from "@mui/material/Box";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
 
 // ** Third Party Imports
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { useForm, Controller, useWatch } from 'react-hook-form'
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm, Controller, useWatch } from "react-hook-form";
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from "src/@core/components/icon";
 
 // ** Store Imports
-import { useDispatch } from 'react-redux'
+import { useDispatch } from "react-redux";
 
 // ** Actions Imports
-import { addTeacher } from 'src/store/apps/teachers'
+import { addTeacher } from "src/store/apps/teachers";
 
 // ** Types Imports
-import { AppDispatch } from 'src/store'
-import { Checkbox, FormControlLabel } from '@mui/material'
+import { AppDispatch } from "src/store";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 interface SidebarAddTeacherType {
-  open: boolean
-  toggle: () => void
+  open: boolean;
+  toggle: () => void;
 }
 
 export interface CreateTeacherDto {
@@ -45,31 +45,30 @@ export interface CreateTeacherDto {
   dateOfBirth: Date;
   dateOfEmployment: Date;
   sex: string;
-  createAccount: boolean
+  createAccount: boolean;
   createUserDto?: {
-    email: string
-    password: string
-  }
+    email: string;
+    password: string;
+  };
 }
-
 
 const showErrors = (field: string, valueLen: number, min: number) => {
   if (valueLen === 0) {
-    return `${field} field is required`
+    return `${field} field is required`;
   } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
+    return `${field} must be at least ${min} characters`;
   } else {
-    return ''
+    return "";
   }
-}
+};
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+  display: "flex",
+  alignItems: "center",
   padding: theme.spacing(3, 4),
-  justifyContent: 'space-between',
-  backgroundColor: theme.palette.background.default
-}))
+  justifyContent: "space-between",
+  backgroundColor: theme.palette.background.default,
+}));
 
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
@@ -78,138 +77,154 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
-  createUserDto: yup.object().when('createAccount', {
+  createUserDto: yup.object().when("createAccount", {
     is: true,
     then: yup.object({
-      email: yup.string().email("Format d'e-mail invalide").required('Email est obligatoire'),
-      password: yup.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères').required('Le mot de passe est requis')
+      email: yup
+        .string()
+        .email("Format d'e-mail invalide")
+        .required("Email est obligatoire"),
+      password: yup
+        .string()
+        .min(6, "Le mot de passe doit contenir au moins 6 caractères")
+        .required("Le mot de passe est requis"),
     }),
-    otherwise: yup.object().strip()
+    otherwise: yup.object().strip(),
   }),
-  createAccount: yup.boolean().required()
-})
+  createAccount: yup.boolean().required(),
+});
 
-
-const defaultValues= {
-  firstName: '',
-  lastName: '',
-  phoneNumber: '',
+const defaultValues = {
+  firstName: "",
+  lastName: "",
+  phoneNumber: "",
   dateOfBirth: new Date(),
   dateOfEmployment: new Date(),
-  sex: '',
+  sex: "",
   createAccount: false,
   createUserDto: {
-    email: '',
-    password: ''
-  }
+    email: "",
+    password: "",
+  },
 };
 
 const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
   // ** Props
-  const { open, toggle } = props
+  const { open, toggle } = props;
 
   // ** Hooks
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   const {
     reset,
     control,
     getValues,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues,
-    mode: 'onChange',
-    resolver: yupResolver(schema)
-  })
+    mode: "onChange",
+    resolver: yupResolver(schema),
+  });
 
   const createAccount = useWatch({
     control,
-    name: 'createAccount',
-    defaultValue: false
-  })
+    name: "createAccount",
+    defaultValue: false,
+  });
 
   const onSubmit = (data: CreateTeacherDto) => {
-    dispatch(addTeacher(data) as any)
-    console.log(data)
-    toggle()
-    reset()
-  }
+    dispatch(addTeacher(data) as any);
+    toggle();
+    reset();
+  };
 
   const handleClose = () => {
-    toggle()
-    reset()
-  }
+    toggle();
+    reset();
+  };
 
   return (
     <Drawer
       open={open}
-      anchor='right'
-      variant='temporary'
+      anchor="right"
+      variant="temporary"
       onClose={handleClose}
       ModalProps={{ keepMounted: true }}
-      sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
+      sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h6'>Ajouter Enseignant</Typography>
-        <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
-          <Icon icon='mdi:close' fontSize={20} />
+        <Typography variant="h6">Ajouter Enseignant</Typography>
+        <IconButton
+          size="small"
+          onClick={handleClose}
+          sx={{ color: "text.primary" }}
+        >
+          <Icon icon="mdi:close" fontSize={20} />
         </IconButton>
       </Header>
       <Box sx={{ p: 5 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name='firstName'
+              name="firstName"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label='Prénom'
+                  label="Prénom"
                   onChange={onChange}
-                  placeholder='John'
+                  placeholder="John"
                   error={Boolean(errors.firstName)}
                 />
               )}
             />
             {errors.firstName && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.firstName.message}</FormHelperText>
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.firstName.message}
+              </FormHelperText>
             )}
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name='lastName'
+              name="lastName"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label='Nom'
+                  label="Nom"
                   onChange={onChange}
-                  placeholder='Doe'
+                  placeholder="Doe"
                   error={Boolean(errors.lastName)}
                 />
               )}
             />
-            {errors.lastName && <FormHelperText sx={{ color: 'error.main' }}>{errors.lastName.message}</FormHelperText>}
+            {errors.lastName && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.lastName.message}
+              </FormHelperText>
+            )}
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name='phoneNumber'
+              name="phoneNumber"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label='Num Tel'
+                  label="Num Tel"
                   onChange={onChange}
-                  placeholder='+212 612-345678'
+                  placeholder="+212 612-345678"
                   error={Boolean(errors.phoneNumber)}
                 />
               )}
             />
             {errors.phoneNumber && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.phoneNumber.message}</FormHelperText>
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.phoneNumber.message}
+              </FormHelperText>
             )}
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
@@ -231,7 +246,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
               )}
             />
             {errors.dateOfBirth && (
-              <FormHelperText sx={{ color: 'error.main' }}>
+              <FormHelperText sx={{ color: "error.main" }}>
                 {errors.dateOfBirth.message}
               </FormHelperText>
             )}
@@ -256,7 +271,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
               )}
             />
             {errors.dateOfEmployment && (
-              <FormHelperText sx={{ color: 'error.main' }}>
+              <FormHelperText sx={{ color: "error.main" }}>
                 {errors.dateOfEmployment.message}
               </FormHelperText>
             )}
@@ -283,61 +298,69 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
               )}
             />
             {errors.sex && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.sex.message}</FormHelperText>
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.sex.message}
+              </FormHelperText>
             )}
           </FormControl>
 
           <FormControlLabel
             control={
               <Controller
-                name='createAccount'
+                name="createAccount"
                 control={control}
-                render={({ field: { value, onChange } }) => <Checkbox checked={value} onChange={onChange} />}
+                render={({ field: { value, onChange } }) => (
+                  <Checkbox checked={value} onChange={onChange} />
+                )}
               />
             }
-            label='Créer un compte'
+            label="Créer un compte"
           />
 
           {/***************** START CREATE ACCOUNT **********************/}
-          {getValues('createAccount') && (
+          {getValues("createAccount") && (
             <>
               <FormControl fullWidth sx={{ mb: 6 }}>
                 <Controller
-                  name='createUserDto.email'
+                  name="createUserDto.email"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <TextField
                       value={value}
-                      label='Email'
+                      label="Email"
                       onChange={onChange}
-                      placeholder='john.doe@example.com'
+                      placeholder="john.doe@example.com"
                       error={Boolean(errors.createUserDto?.email)}
                     />
                   )}
                 />
                 {errors.createUserDto?.email && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.email.message}</FormHelperText>
+                  <FormHelperText sx={{ color: "error.main" }}>
+                    {errors.createUserDto.email.message}
+                  </FormHelperText>
                 )}
               </FormControl>
               <FormControl fullWidth sx={{ mb: 6 }}>
                 <Controller
-                  name='createUserDto.password'
+                  name="createUserDto.password"
                   control={control}
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <TextField
-                      type='password'
+                      type="password"
                       value={value}
-                      label='Mot de passe'
+                      label="Mot de passe"
                       onChange={onChange}
-                      placeholder='********'
+                      placeholder="********"
                       error={Boolean(errors.createUserDto?.password)}
                     />
                   )}
                 />
                 {errors.createUserDto?.password && (
-                  <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
+                  <FormHelperText sx={{ color: "error.main" }}>
+                    {errors.createUserDto.password.message}
+                  </FormHelperText>
                 )}
               </FormControl>
             </>
@@ -345,19 +368,28 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
 
           {/**************  END CREATE ACCOUNT ***************/}
 
-
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Button
+              size="large"
+              type="submit"
+              variant="contained"
+              sx={{ mr: 3 }}
+            >
               Soumettre
             </Button>
-            <Button size='large' variant='outlined' color='secondary' onClick={handleClose}>
+            <Button
+              size="large"
+              variant="outlined"
+              color="secondary"
+              onClick={handleClose}
+            >
               Annuler
             </Button>
           </Box>
         </form>
       </Box>
     </Drawer>
-  )
-}
+  );
+};
 
 export default SidebarAddTeacher;

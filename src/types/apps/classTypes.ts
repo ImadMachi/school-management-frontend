@@ -5,8 +5,7 @@ import { TeachersType } from "./teacherTypes";
 export type ClassType = {
   id: number;
   name: string;
-  startDate: string;
-  endDate: string;
+  schoolYear: string;
   students: StudentsType[];
   teachers: TeachersType[];
   administrator: AdministratorType;

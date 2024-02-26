@@ -92,8 +92,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setSelectedId(id));
     dispatch(setSelectedUserId(userId));
     setAnchorEl(event.currentTarget);
-    console.log("id", id);
-    console.log("userId", userId);
   };
 
   // ** State
@@ -180,8 +178,9 @@ const columns = [
               href="/apps/administrateurs/overview/inbox"
               onClick={() => {
                 dispatch(setSelectedId(row.id));
-                dispatch(setSelectedUserId(row.userId)); 
-              }}>
+                dispatch(setSelectedUserId(row.userId));
+              }}
+            >
               {firstName} {lastName}
             </StyledLink>
           </Box>

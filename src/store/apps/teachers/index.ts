@@ -6,7 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 
 import axios from "axios";
-import { UpdateTeacherDto } from "src/pages/apps/teachers/overview/[folder]";
+import { UpdateTeacherDto } from "src/pages/apps/enseignants/overview/[folder]";
 import { TeachersType } from "src/types/apps/teacherTypes";
 import { CreateTeacherDto } from "src/views/apps/teacher/list/AddTeacherDrawer";
 

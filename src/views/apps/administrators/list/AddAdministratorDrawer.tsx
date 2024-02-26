@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
@@ -25,8 +25,9 @@ import { useDispatch } from 'react-redux'
 
 // ** Types Imports
 import { AppDispatch } from 'src/store'
-import { Checkbox, FormControlLabel } from '@mui/material'
+import { Avatar, Checkbox, Chip, FormControlLabel, Grid } from '@mui/material'
 import { addAdministrator } from 'src/store/apps/administrator'
+import { on } from 'events'
 
 interface SidebarAddAdministratorType {
   open: boolean
@@ -42,6 +43,7 @@ export interface CreateAdministratorDto {
     email: string
     password: string
   }
+  profileImage?: File;
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -64,7 +66,12 @@ const schema = yup.object().shape({
     }),
     otherwise: yup.object().strip()
   }),
-  createAccount: yup.boolean().required()
+  createAccount: yup.boolean().required(),
+  profileImage: yup.mixed().when('createAccount', {
+    is: true,
+    then: yup.mixed(),
+    otherwise: yup.mixed().strip()
+  })
 })
 
 const defaultValues = {
@@ -74,13 +81,16 @@ const defaultValues = {
   createAccount: false,
   createUserDto: {
     email: '',
-    password: ''
-  }
+    password: '',
+  },
+  profileImage: undefined,
 }
 
 const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
-  // ** Props
+  // ** Props  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const { open, toggle } = props
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
@@ -88,6 +98,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -104,6 +115,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
 
   const onSubmit = (data: CreateAdministratorDto) => {
     dispatch(addAdministrator(data) as any)
+    console.log(data)
     toggle()
     reset()
   }
@@ -112,6 +124,8 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     toggle()
     reset()
   }
+
+
 
   return (
     <Drawer
@@ -239,9 +253,37 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
                   <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
                 )}
               </FormControl>
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='profileImage'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <Avatar
+                        src={value ? URL.createObjectURL(value) : ''}
+                        alt="User Image"
+                        sx={{ width: 100, height: 100, mr: 3 }}
+                        onClick={() => fileInputRef.current?.click()}
+                      />
+
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={e => {
+                          if (e.target.files) {
+                            return onChange(e.target.files[0]);
+                          }
+                          return onChange(null);
+                        }}
+                      />
+                    </>
+                  )}
+                />
+              </FormControl>
             </>
           )}
-
           {/**************  END CREATE ACCOUNT ***************/}
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>

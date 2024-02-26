@@ -7,6 +7,7 @@ import { HOST } from 'src/store/constants/hostname'
 import { AdministratorType } from 'src/types/apps/administratorTypes'
 import { CreateAdministratorDto } from 'src/views/apps/administrators/list/AddAdministratorDrawer'
 import { UpdateAdministratorDto } from 'src/pages/apps/administrateurs/overview/[folder]'
+import { fr } from 'date-fns/locale'
 
 
 // Use Record to define the type with known keys
@@ -30,7 +31,7 @@ export const fetchData = createAsyncThunk('appAdministrators/fetchData', async (
   return response.data
 })
 
-export const fetchAdministrator = createAsyncThunk( 'appAdministrators/fetchAdministrator', async (id: number) => {
+export const fetchAdministrator = createAsyncThunk('appAdministrators/fetchAdministrator', async (id: number) => {
   const response = await axios.get(`${HOST}/administrators/${id}`);
   return response.data;
 });
@@ -49,28 +50,28 @@ export const addAdministrator = createAsyncThunk(
   async (data: CreateAdministratorDto) => {
     const formData = new FormData();
 
-    // Append profileImage
-    if (data.profileImage && data.createAccount) {
-      formData.append('profileImage', data.profileImage, data.profileImage.name);
-    }
-
-    // Append other properties
-    Object.entries(data).forEach(([key, value]) => {
-      if (key !== 'profileImage' && key !== 'createUserDto') {
-        formData.append(key, value.toString());
-      }
-    });
-
     // Append createAccount property explicitly
+    formData.append('firstName', data.firstName);
+
+    formData.append('lastName', data.lastName);
+
+    formData.append('phoneNumber', data.phoneNumber);
+
     formData.append('createAccount', data.createAccount.toString());
 
-    // Append createUserDto properties
-    if (data.createUserDto && data.createAccount) {
-      Object.entries(data.createUserDto).forEach(([key, value]) => {
-        // Append properties with the desired format
-        formData.append(`createUserDto[${key}]`, value.toString());
-      });
-    }
+    formData.append('createUserDto[email]', data.createUserDto?.email || '');
+    
+    formData.append('createUserDto[password]', data.createUserDto?.password || '');
+    
+    formData.append('profileImage', data.profileImage || '');
+
+    // // Append createUserDto properties
+    // if (data.createUserDto && data.createAccount) {
+    //   Object.entries(data.createUserDto).forEach(([key, value]) => {
+    //     // Append properties with the desired format
+    //     formData.append(`createUserDto[${key}]`, value.toString());
+    //   });
+    // }
 
     const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, formData);
     console.log(response.data);
@@ -108,7 +109,7 @@ interface AppAdministratorsState {
   params: Record<string, any>
   allData: AdministratorType[]
   selectedId: number | null;
-  selectUserId: number| null;
+  selectUserId: number | null;
 
 }
 
@@ -135,7 +136,7 @@ export const appAdministratorsSlice = createSlice({
         administrator =>
           `${administrator.firstName} ${administrator.lastName}`.toLowerCase().includes(filterValue) ||
           administrator.phoneNumber.toLowerCase().includes(filterValue)
-      ) 
+      )
     },
     setSelectedId: (state, action: PayloadAction<number | null>) => {
       state.selectedId = action.payload;
@@ -161,28 +162,28 @@ export const appAdministratorsSlice = createSlice({
     })
     builder.addCase(fetchAdministrator.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
-    
+
       // Filter out the existing user data with the same ID
       state.data = state.data.filter(administrator => administrator.id !== userIdToDelete);
       state.allData = state.allData.filter(administrator => administrator.id !== userIdToDelete);
-    
+
       // Add the updated user data to the beginning of the arrays
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
-    
+
     builder.addCase(updateAdministrator.fulfilled, (state, action) => {
       const updatedAdministrator = action.payload;
       const index = state.allData.findIndex(administrator => administrator.id === updatedAdministrator.id);
-    
+
       if (index !== -1) {
         // If the administrator is found, update the data in both data and allData arrays
         state.data[index] = updatedAdministrator;
         state.allData[index] = updatedAdministrator;
       }
     });
-    
-    
+
+
   }
 })
 

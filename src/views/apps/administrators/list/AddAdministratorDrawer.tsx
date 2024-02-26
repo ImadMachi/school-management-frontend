@@ -27,6 +27,7 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'src/store'
 import { Avatar, Checkbox, Chip, FormControlLabel, Grid } from '@mui/material'
 import { addAdministrator } from 'src/store/apps/administrator'
+import { on } from 'events'
 
 interface SidebarAddAdministratorType {
   open: boolean
@@ -41,7 +42,6 @@ export interface CreateAdministratorDto {
   createUserDto?: {
     email: string
     password: string
-    [key: string]: any; // Index signature for additional properties
   }
   profileImage?: File;
 }
@@ -67,7 +67,11 @@ const schema = yup.object().shape({
     otherwise: yup.object().strip()
   }),
   createAccount: yup.boolean().required(),
-  profileImage: yup.mixed()
+  profileImage: yup.mixed().when('createAccount', {
+    is: true,
+    then: yup.mixed(),
+    otherwise: yup.mixed().strip()
+  })
 })
 
 const defaultValues = {
@@ -77,7 +81,7 @@ const defaultValues = {
   createAccount: false,
   createUserDto: {
     email: '',
-    password: ''
+    password: '',
   },
   profileImage: undefined,
 }
@@ -87,14 +91,14 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
 
   const { open, toggle } = props
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const {
     reset,
     control,
     getValues,
-    setValue,  
+    setValue,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -121,36 +125,6 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     reset()
   }
 
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-  
-    if (files && files.length > 0) {
-      const newFile: File | undefined = files[0];
-  
-      // Check if the selected file is an image (JPEG, PNG, JPG)
-      if (newFile && newFile.type.includes('image/')) {
-        // Update the profileImage attribute in react-hook-form
-        setValue('profileImage', newFile);
-        setSelectedFiles([newFile]);
-        console.log('Profile image updated.');
-  
-        // Clear the value of the file input to allow selecting the same file again
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-      } else {
-        console.log('Invalid file type. Please select an image (JPEG, PNG, JPG).');
-      }
-    }
-  };
-  
-
-
-  const handleDeleteSelectedFile = (fileName: string) => {
-    setSelectedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
-  };
 
 
   return (
@@ -279,48 +253,37 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
                   <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
                 )}
               </FormControl>
-              <FormControl fullWidth sx={{ mb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {/* Replace the Button with Avatar */}
-                <Avatar
-                  src={selectedFiles.length > 0 ? URL.createObjectURL(selectedFiles[0]) : undefined}
-                  alt="User Image"
-                  sx={{ width: 100, height: 100, mr: 3 }}
-                  onClick={() => fileInputRef.current?.click()}
-                />
+              <FormControl fullWidth sx={{ mb: 6 }}>
+                <Controller
+                  name='profileImage'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <Avatar
+                        src={value ? URL.createObjectURL(value) : ''}
+                        alt="User Image"
+                        sx={{ width: 100, height: 100, mr: 3 }}
+                        onClick={() => fileInputRef.current?.click()}
+                      />
 
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileInputChange}
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={e => {
+                          if (e.target.files) {
+                            return onChange(e.target.files[0]);
+                          }
+                          return onChange(null);
+                        }}
+                      />
+                    </>
+                  )}
                 />
-
-                {selectedFiles.length > 0 && (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      marginBottom: "3px",
-                      marginRight: "15px",
-                      marginTop: "9px",
-                      alignItems: "center",
-                    }}
-                  >
-                    <Chip
-                      size="small"
-                      key={selectedFiles[0].name}
-                      label={selectedFiles[0].name}
-                      deleteIcon={<Icon icon="mdi:close" />}
-                      onDelete={() => handleDeleteSelectedFile(selectedFiles[0].name)}
-                    />
-                  </Box>
-                )}
               </FormControl>
-
-
-
             </>
           )}
-
           {/**************  END CREATE ACCOUNT ***************/}
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>

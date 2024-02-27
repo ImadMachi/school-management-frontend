@@ -37,11 +37,31 @@ export const fetchStudent = createAsyncThunk('appStudents/fetchStudent', async (
 // ** Add User
 export const addStudent = createAsyncThunk(
   'appStudents/addStudent',
-  async (data: CreateStudentDto, { getState, dispatch }: Redux) => {
-    const response = await axios.post(`${HOST}/students?create-account=${data.createAccount}`, data)
-    return response.data
+  async (data: CreateStudentDto) => {
+    const formData = new FormData();
+
+    // Append createAccount property explicitly
+    formData.append('firstName', data.firstName);
+
+    formData.append('lastName', data.lastName);
+
+    formData.append('dateOfBirth', data.dateOfBirth.toString());    
+
+    formData.append('sex', data.sex);    
+
+    formData.append('createAccount', data.createAccount.toString());
+
+    formData.append('createUserDto[email]', data.createUserDto?.email || '');
+    
+    formData.append('createUserDto[password]', data.createUserDto?.password || '');
+    
+    formData.append('profileImage', data.profileImage || '');
+
+    const response = await axios.post(`${HOST}/students?create-account=${data.createAccount}`, formData);
+    console.log(response.data);
+    return response.data;
   }
-)
+);
 
 export const updateStudent = createAsyncThunk(
   'appStudents/updateStudent',

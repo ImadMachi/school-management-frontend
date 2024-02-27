@@ -38,6 +38,7 @@ import { UserRole, UserType } from "src/types/apps/UserType";
 import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/user/list/TableHeader";
 import { ThemeColor } from "src/@core/layouts/types";
+import { Avatar } from "@mui/material";
 
 interface CellType {
   row: UserType;
@@ -62,17 +63,17 @@ const StyledLink = styled(Link)(({ theme }) => ({
 }));
 
 // ** renders client column
+// ** renders client column
 const renderClient = (row: UserType) => {
   return (
-    <CustomAvatar
-      skin="light"
-      color={"primary"}
-      sx={{ mr: 3, width: 30, height: 30, fontSize: ".875rem" }}
-    >
-      {getInitials(`${row.id}`)}
-    </CustomAvatar>
+    <Avatar
+      alt={`Profile Image of ${row.userData.firstName} ${row.userData.lastName}`}
+      src={`http://localhost:8000/uploads/${row.userData.profileImage}`}
+      sx={{ width: 30, height: 30, marginRight: "10px" }}
+    />
   );
 };
+
 
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks

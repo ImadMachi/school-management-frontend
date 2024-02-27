@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
@@ -25,10 +25,11 @@ import { useDispatch } from 'react-redux'
 
 // ** Types Imports
 import { AppDispatch } from 'src/store'
-import { Checkbox, Chip, FormControlLabel } from '@mui/material'
+import { Avatar, Checkbox, Chip, FormControlLabel, Grid } from '@mui/material'
 import { addDirector } from 'src/store/apps/directors'
+import { on } from 'events'
 
-interface SidebaraddDirectorType {
+interface SidebarAddDirectorType {
   open: boolean
   toggle: () => void
 }
@@ -42,6 +43,7 @@ export interface CreateDirectorDto {
     email: string
     password: string
   }
+  profileImage?: File;
 }
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -64,7 +66,12 @@ const schema = yup.object().shape({
     }),
     otherwise: yup.object().strip()
   }),
-  createAccount: yup.boolean().required()
+  createAccount: yup.boolean().required(),
+  profileImage: yup.mixed().when('createAccount', {
+    is: true,
+    then: yup.mixed(),
+    otherwise: yup.mixed().strip()
+  })
 })
 
 const defaultValues = {
@@ -74,22 +81,24 @@ const defaultValues = {
   createAccount: false,
   createUserDto: {
     email: '',
-    password: ''
-  }
+    password: '',
+  },
+  profileImage: undefined,
 }
 
-const SidebaraddDirector = (props: SidebaraddDirectorType) => {
-  // ** Props
+const SidebarAddDirector = (props: SidebarAddDirectorType) => {
+  // ** Props  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const { open, toggle } = props
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  
+
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -106,6 +115,7 @@ const SidebaraddDirector = (props: SidebaraddDirectorType) => {
 
   const onSubmit = (data: CreateDirectorDto) => {
     dispatch(addDirector(data) as any)
+    console.log(data)
     toggle()
     reset()
   }
@@ -115,32 +125,6 @@ const SidebaraddDirector = (props: SidebaraddDirectorType) => {
     reset()
   }
 
-  const handleAttachmentButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const uniqueNewFiles = newFiles.filter((newFile) =>
-        selectedFiles.every(
-          (existingFile) => existingFile.name !== newFile.name
-        )
-      );
-      setSelectedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
-    }
-  };
-
-
-  const handleDeleteSelectedFile = (fileName: string) => {
-    setSelectedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
-  };
 
 
   return (
@@ -153,7 +137,7 @@ const SidebaraddDirector = (props: SidebaraddDirectorType) => {
       sx={{ '& .MuiDrawer-paper': { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant='h6'>Ajouter Directeur</Typography>
+        <Typography variant='h6'>Ajouter Director</Typography>
         <IconButton size='small' onClick={handleClose} sx={{ color: 'text.primary' }}>
           <Icon icon='mdi:close' fontSize={20} />
         </IconButton>
@@ -269,44 +253,38 @@ const SidebaraddDirector = (props: SidebaraddDirectorType) => {
                   <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
                 )}
               </FormControl>
-              <FormControl fullWidth sx={{ mb: 6 }}>
-                <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}
-                  onClick={handleAttachmentButtonClick}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileInputChange}
-                    multiple
-                  />
-                  Ajouter une image de profil
-                </Button>
-                {selectedFiles.map((file, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      marginBottom: "3px",
-                      marginRight: "15px",
-                      marginTop: "9px",
-                      alignItems: "center",
-                    }}
-                  >
-                    {/* <Typography sx={{ fontSize: '0.875rem', color: 'success.main' }}>{file.name}</Typography> */}
-                    <Chip
-                      size="small"
-                      key={file.name}
-                      label={file.name}
-                      deleteIcon={<Icon icon="mdi:close" />}
-                      onDelete={() => handleDeleteSelectedFile(file.name)}
-                    />
-                  </Box>
-                ))}
+              <FormControl fullWidth sx={{ mb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Controller
+                  name='profileImage'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <Avatar
+                        src={value ? URL.createObjectURL(value) : ''}
+                        alt="User Image"
+                        sx={{ width: 100, height: 100, mr: 3 }}
+                        onClick={() => fileInputRef.current?.click()}
+                      />
+
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={e => {
+                          if (e.target.files) {
+                            return onChange(e.target.files[0]);
+                          }
+                          return onChange(null);
+                        }}
+                      />
+                    </>
+                  )}
+                />
               </FormControl>
+              
             </>
           )}
-
           {/**************  END CREATE ACCOUNT ***************/}
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -323,4 +301,4 @@ const SidebaraddDirector = (props: SidebaraddDirectorType) => {
   )
 }
 
-export default SidebaraddDirector;
+export default SidebarAddDirector;

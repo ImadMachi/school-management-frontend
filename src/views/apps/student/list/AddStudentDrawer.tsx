@@ -30,7 +30,7 @@ import { useDispatch } from 'react-redux'
 import { addStudent } from 'src/store/apps/students'
 // ** Types Imports
 import { AppDispatch } from 'src/store'
-import { Checkbox, Chip, FormControlLabel } from '@mui/material'
+import { Avatar, Checkbox, Chip, FormControlLabel } from '@mui/material'
 
 interface SidebarAddStudentType {
   open: boolean
@@ -47,6 +47,7 @@ export interface CreateStudentDto {
     email: string
     password: string
   }
+  profileImage?: File;
 }
 
 const showErrors = (field: string, valueLen: number, min: number) => {
@@ -80,7 +81,12 @@ const schema = yup.object().shape({
     }),
     otherwise: yup.object().strip()
   }),
-  createAccount: yup.boolean().required()
+  createAccount: yup.boolean().required(),
+  profileImage: yup.mixed().when('createAccount', {
+    is: true,
+    then: yup.mixed(),
+    otherwise: yup.mixed().strip()
+  })
 })
 
 const defaultValues = {
@@ -92,7 +98,8 @@ const defaultValues = {
   createUserDto: {
     email: '',
     password: ''
-  }
+  },
+  profileImage: undefined,
 }
 
 const SidebarAddStudent = (props: SidebarAddStudentType) => {
@@ -313,40 +320,34 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
                 )}
               </FormControl>
-              <FormControl fullWidth sx={{ mb: 6 }}>
-                <Button size='large' type='submit' variant='contained' sx={{ mr: 3 }}
-                  onClick={handleAttachmentButtonClick}
-                >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileInputChange}
-                    multiple
-                  />
-                  Ajouter une image de profil
-                </Button>
-                {selectedFiles.map((file, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      marginBottom: "3px",
-                      marginRight: "15px",
-                      marginTop: "9px",
-                      alignItems: "center",
-                    }}
-                  >
-                    {/* <Typography sx={{ fontSize: '0.875rem', color: 'success.main' }}>{file.name}</Typography> */}
-                    <Chip
-                      size="small"
-                      key={file.name}
-                      label={file.name}
-                      deleteIcon={<Icon icon="mdi:close" />}
-                      onDelete={() => handleDeleteSelectedFile(file.name)}
-                    />
-                  </Box>
-                ))}
+              <FormControl fullWidth sx={{ mb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Controller
+                  name='profileImage'
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <Avatar
+                        src={value ? URL.createObjectURL(value) : ''}
+                        alt="User Image"
+                        sx={{ width: 100, height: 100, mr: 3 }}
+                        onClick={() => fileInputRef.current?.click()}
+                      />
+
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: "none" }}
+                        onChange={e => {
+                          if (e.target.files) {
+                            return onChange(e.target.files[0]);
+                          }
+                          return onChange(null);
+                        }}
+                      />
+                    </>
+                  )}
+                />
               </FormControl>
             </>
           )}

@@ -4,4 +4,10 @@ export type AdministratorType = {
   lastName: string
   phoneNumber: string
   userId: number
+  user: { 
+    id: number
+    email: string
+    profileImage: File
+  }
+
 }

@@ -253,7 +253,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
                   <FormHelperText sx={{ color: 'error.main' }}>{errors.createUserDto.password.message}</FormHelperText>
                 )}
               </FormControl>
-              <FormControl fullWidth sx={{ mb: 6 }}>
+              <FormControl fullWidth sx={{ mb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Controller
                   name='profileImage'
                   control={control}

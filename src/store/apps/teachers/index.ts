@@ -64,19 +64,36 @@ export const fetchTeacher = createAsyncThunk(
 
 export const addTeacher = createAsyncThunk(
   "appTeachers/addTeachers",
-  async (data: CreateTeacherDto, { getState, dispatch }: Redux) => {
-    try {
-      const response = await axios.post(
-        `${HOST}/teachers?create-account=true`,
-        data
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error adding teacher:", error);
-      throw error;
-    }
+  async (data: CreateTeacherDto) => {
+    const formData = new FormData();
+
+    // Append createAccount property explicitly
+    formData.append('firstName', data.firstName);
+
+    formData.append('lastName', data.lastName);
+
+    formData.append('dateOfBirth', data.dateOfBirth.toString());    
+
+    formData.append('dateOfEmployment', data.dateOfEmployment.toString());
+
+    formData.append('phoneNumber', data.phoneNumber);
+
+    formData.append('sex', data.sex);    
+
+    formData.append('createAccount', data.createAccount.toString());
+
+    formData.append('createUserDto[email]', data.createUserDto?.email || '');
+    
+    formData.append('createUserDto[password]', data.createUserDto?.password || '');
+    
+    formData.append('profileImage', data.profileImage || '');
+
+    const response = await axios.post(`${HOST}/teachers?create-account=${data.createAccount}`, formData);
+    console.log(response.data);
+    return response.data;
   }
 );
+
 
 export const deleteTeacher = createAsyncThunk(
   "appTeachers/deleteTeachers",

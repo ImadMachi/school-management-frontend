@@ -43,13 +43,35 @@ export const fetchParent = createAsyncThunk(
 );
 
 // ** Add User
+
 export const addParent = createAsyncThunk(
   "appParents/addParent",
-  async (data: CreateParentDto, { getState, dispatch }: Redux) => {
+  async (data: CreateParentDto) => {
+    const formData = new FormData();
+
+    // Append createAccount property explicitly
+    formData.append("firstName", data.firstName);
+
+    formData.append("lastName", data.lastName);
+
+    formData.append("phoneNumber", data.phoneNumber);
+
+    formData.append("createAccount", data.createAccount.toString());
+
+    formData.append("createUserDto[email]", data.createUserDto?.email || "");
+
+    formData.append(
+      "createUserDto[password]",
+      data.createUserDto?.password || ""
+    );
+
+    formData.append("profileImage", data.profileImage || "");
+
     const response = await axios.post(
       `${HOST}/parents?create-account=${data.createAccount}`,
-      data
+      formData
     );
+    console.log(response.data);
     return response.data;
   }
 );

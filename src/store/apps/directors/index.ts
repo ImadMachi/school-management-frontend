@@ -6,7 +6,7 @@ import axios from 'axios'
 import { HOST } from 'src/store/constants/hostname'
 import { DirectorType } from 'src/types/apps/directorTypes'
 import { CreateDirectorDto } from 'src/views/apps/directors/list/AddDirectorDrawer'
-import { UpdateDirectorDto } from 'src/pages/apps/administrateurs/overview/[folder]'
+import { UpdateDirectorDto } from 'src/pages/apps/directeurs/overview/[folder]'
 
 
 interface Params {
@@ -35,14 +35,32 @@ export const fetchDirector = createAsyncThunk( 'appDirectors/fetchDirector', asy
 });
 
 // ** Add User
+
 export const addDirector = createAsyncThunk(
   'appDirectors/addDirector',
-  async (data: CreateDirectorDto, { getState, dispatch }: Redux) => {
-    const response = await axios.post(`${HOST}/directors?create-account=${data.createAccount}`, data)
-    return response.data
-  }
-)
+  async (data: CreateDirectorDto) => {
+    const formData = new FormData();
 
+    // Append createAccount property explicitly
+    formData.append('firstName', data.firstName);
+
+    formData.append('lastName', data.lastName);
+
+    formData.append('phoneNumber', data.phoneNumber);
+
+    formData.append('createAccount', data.createAccount.toString());
+
+    formData.append('createUserDto[email]', data.createUserDto?.email || '');
+    
+    formData.append('createUserDto[password]', data.createUserDto?.password || '');
+    
+    formData.append('profileImage', data.profileImage || '');
+
+    const response = await axios.post(`${HOST}/directors?create-account=${data.createAccount}`, formData);
+    console.log(response.data);
+    return response.data;
+  }
+);
 // ** Delete Director
 interface DeleteProps {
   id: number

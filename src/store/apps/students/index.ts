@@ -106,7 +106,7 @@ export const deleteStudent = createAsyncThunk(
   }
 );
 
-interface AppStaddStudentsState {
+interface AppAddStudentsState {
   data: StudentsType[];
   total: number;
   params: Record<string, any>;
@@ -115,7 +115,7 @@ interface AppStaddStudentsState {
   selectedUserId: number | null;
 }
 
-const initialState: AppStaddStudentsState = {
+const initialState: AppAddStudentsState = {
   data: [],
   total: 1,
   params: {},
@@ -135,12 +135,12 @@ export const appStudentsSlice = createSlice({
         return;
       }
       state.data = state.allData.filter(
-        (students) =>
-          `${students.firstName} ${students.lastName}`
+        (student) =>
+          `${student.firstName} ${student.lastName}`
             .toLowerCase()
             .includes(filterValue) ||
-          students.dateOfBirth.toString().toLowerCase().includes(filterValue) ||
-          students.sex.toLowerCase().includes(filterValue)
+          student.dateOfBirth.toString().toLowerCase().includes(filterValue) ||
+          student.sex.toLowerCase().includes(filterValue)
       );
     },
     setSelectedId: (state, action: PayloadAction<number | null>) => {
@@ -158,10 +158,10 @@ export const appStudentsSlice = createSlice({
     });
     builder.addCase(deleteStudent.fulfilled, (state, action) => {
       state.data = state.data.filter(
-        (StaddStudent) => StaddStudent.id !== action.payload
+        (student) => student.id !== action.payload
       );
       state.allData = state.allData.filter(
-        (StaddStudent) => StaddStudent.id !== action.payload
+        (student) => student.id !== action.payload
       );
     });
 
@@ -174,10 +174,10 @@ export const appStudentsSlice = createSlice({
 
       // Filter out the existing user data with the same ID
       state.data = state.data.filter(
-        (student) => student.id !== userIdToDelete
+        (administrator) => administrator.id !== userIdToDelete
       );
       state.allData = state.allData.filter(
-        (student) => student.id !== userIdToDelete
+        (administrator) => administrator.id !== userIdToDelete
       );
 
       // Add the updated user data to the beginning of the arrays
@@ -186,15 +186,15 @@ export const appStudentsSlice = createSlice({
     });
 
     builder.addCase(updateStudent.fulfilled, (state, action) => {
-      const updateStudent = action.payload;
+      const updatedStudent = action.payload;
       const index = state.allData.findIndex(
-        (student) => student.id === updateStudent.id
+        (student) => student.id === updatedStudent.id
       );
 
       if (index !== -1) {
-        // If the student is found, update the data in both data and allData arrays
-        state.data[index] = updateStudent;
-        state.allData[index] = updateStudent;
+        // If the administrator is found, update the data in both data and allData arrays
+        state.data[index] = updatedStudent;
+        state.allData[index] = updatedStudent;
       }
     });
   },

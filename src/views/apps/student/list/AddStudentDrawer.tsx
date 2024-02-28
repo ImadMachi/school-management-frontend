@@ -1,15 +1,12 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
-import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
 import { styled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
-import InputLabel from "@mui/material/InputLabel";
 import Typography from "@mui/material/Typography";
 import Box, { BoxProps } from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
@@ -26,11 +23,19 @@ import Icon from "src/@core/components/icon";
 // ** Store Imports
 import { useDispatch } from "react-redux";
 
-// ** Actions Imports
-import { addStudent } from "src/store/apps/students";
 // ** Types Imports
 import { AppDispatch } from "src/store";
-import { Avatar, Checkbox, Chip, FormControlLabel } from "@mui/material";
+import {
+  Avatar,
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@mui/material";
+import { addStudent } from "src/store/apps/students";
 
 interface SidebarAddStudentType {
   open: boolean;
@@ -49,16 +54,6 @@ export interface CreateStudentDto {
   };
   profileImage?: File;
 }
-
-const showErrors = (field: string, valueLen: number, min: number) => {
-  if (valueLen === 0) {
-    return `${field} field is required`;
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`;
-  } else {
-    return "";
-  }
-};
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: "flex",
@@ -109,16 +104,18 @@ const defaultValues = {
 };
 
 const SidebarAddStudent = (props: SidebarAddStudentType) => {
-  // ** Props
+  // ** Props  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const { open, toggle } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -142,31 +139,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   const handleClose = () => {
     toggle();
     reset();
-  };
-
-  const handleAttachmentButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const uniqueNewFiles = newFiles.filter((newFile) =>
-        selectedFiles.every(
-          (existingFile) => existingFile.name !== newFile.name
-        )
-      );
-      setSelectedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
-    }
-  };
-
-  const handleDeleteSelectedFile = (fileName: string) => {
-    setSelectedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
   };
 
   return (
@@ -242,7 +214,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   type="date"
                   value={value}
                   onChange={onChange}
-                  label="Date de Naissance"
+                  label="Date de naissance"
                   error={Boolean(errors.dateOfBirth)}
                   InputLabelProps={{
                     shrink: true,
@@ -256,7 +228,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <InputLabel htmlFor="sexe">sex</InputLabel>
             <Controller
@@ -270,7 +241,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   onChange={(e) => onChange(e.target.value)}
                   label="Sexe"
                   error={Boolean(errors.sex)}
-                  defaultValue=""
                 >
                   <MenuItem value="mâle">Masculin</MenuItem>
                   <MenuItem value="femelle">Féminin</MenuItem>
@@ -284,7 +254,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <FormControlLabel
             control={
               <Controller
@@ -383,7 +352,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               </FormControl>
             </>
           )}
-
           {/**************  END CREATE ACCOUNT ***************/}
 
           <Box sx={{ display: "flex", alignItems: "center" }}>

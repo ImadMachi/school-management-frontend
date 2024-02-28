@@ -250,7 +250,8 @@ const UserList = () => {
   }, []);
 
   const generateCSVData = () => {
-    return parentStore.allData.map((item) => ({
+    return parentStore.data.map((item) => ({
+      id: item.id, // Add this line to include the id property
       Prénom: item.firstName,
       Nom: item.lastName,
       Tel: item.phoneNumber,

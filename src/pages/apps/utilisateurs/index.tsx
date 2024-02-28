@@ -64,17 +64,6 @@ const StyledLink = styled(Link)(({ theme }) => ({
 
 // ** renders client column
 // ** renders client column
-const renderClient = (row: UserType) => {
-  return (
-    <Avatar
-      alt={`Profile Image of ${row.userData.firstName} ${row.userData.lastName}`}
-      src={`http://localhost:8000/uploads/${row.userData.profileImage}`}
-      sx={{ width: 30, height: 30, marginRight: "10px" }}
-    />
-  );
-};
-
-
 const RowOptions = ({ id }: { id: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -165,10 +154,13 @@ const columns = [
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const { userData } = row;
-
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderClient(row)}
+          <Avatar
+            alt={`Profile Image of ${row.userData.firstName} ${row.userData.lastName}`}
+            src={`http://localhost:8000/uploads/${row.profileImage}`}
+            sx={{ width: 30, height: 30, marginRight: "10px" }}
+          />
           <Box
             sx={{
               display: "flex",
@@ -176,7 +168,11 @@ const columns = [
               flexDirection: "column",
             }}
           >
-            <StyledLink href="/apps/user/view/overview/">
+            <StyledLink
+              href={`/apps/${mapRoleToFrench(
+                row.role
+              ).toLowerCase()}s/view/overview/index`}
+            >
               {userData?.firstName ? userData?.firstName : "Admin"}{" "}
               {userData?.lastName ? userData?.lastName : ""}
             </StyledLink>

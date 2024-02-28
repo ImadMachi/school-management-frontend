@@ -147,25 +147,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     toggle()
     reset()
   }
-  const handleAttachmentButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
 
-
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const uniqueNewFiles = newFiles.filter((newFile) =>
-        selectedFiles.every(
-          (existingFile) => existingFile.name !== newFile.name
-        )
-      );
-      setSelectedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
-    }
-  };
 
 
   const handleDeleteSelectedFile = (fileName: string) => {

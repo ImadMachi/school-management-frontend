@@ -1,15 +1,12 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
 // ** MUI Imports
 import Drawer from '@mui/material/Drawer'
-import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
-import MenuItem from '@mui/material/MenuItem'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
-import InputLabel from '@mui/material/InputLabel'
 import Typography from '@mui/material/Typography'
 import Box, { BoxProps } from '@mui/material/Box'
 import FormControl from '@mui/material/FormControl'
@@ -26,11 +23,11 @@ import Icon from 'src/@core/components/icon'
 // ** Store Imports
 import { useDispatch } from 'react-redux'
 
-// ** Actions Imports
-import { addStudent } from 'src/store/apps/students'
 // ** Types Imports
 import { AppDispatch } from 'src/store'
-import { Avatar, Checkbox, Chip, FormControlLabel } from '@mui/material'
+import { Avatar, Checkbox, Chip, FormControlLabel, Grid, InputLabel, MenuItem, Select } from '@mui/material'
+import { addStudent } from 'src/store/apps/students'
+import { on } from 'events'
 
 interface SidebarAddStudentType {
   open: boolean
@@ -50,16 +47,6 @@ export interface CreateStudentDto {
   profileImage?: File;
 }
 
-const showErrors = (field: string, valueLen: number, min: number) => {
-  if (valueLen === 0) {
-    return `${field} field is required`
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`
-  } else {
-    return ''
-  }
-}
-
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -76,8 +63,8 @@ const schema = yup.object().shape({
   createUserDto: yup.object().when('createAccount', {
     is: true,
     then: yup.object({
-      email: yup.string().email("Format d'e-mail invalide").required('Email est obligatoire'),
-      password: yup.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères').required('Le mot de passe est requis')
+      email: yup.string().email("Format d'e-mail invalide").required("Email est obligatoire"),
+      password: yup.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères').required("Le mot de passe est requis")
     }),
     otherwise: yup.object().strip()
   }),
@@ -97,22 +84,24 @@ const defaultValues = {
   createAccount: false,
   createUserDto: {
     email: '',
-    password: ''
+    password: '',
   },
   profileImage: undefined,
 }
 
 const SidebarAddStudent = (props: SidebarAddStudentType) => {
-  // ** Props
+  // ** Props  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   const { open, toggle } = props
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>()
   const {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors }
   } = useForm({
@@ -139,32 +128,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     reset()
   }
 
-  const handleAttachmentButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const uniqueNewFiles = newFiles.filter((newFile) =>
-        selectedFiles.every(
-          (existingFile) => existingFile.name !== newFile.name
-        )
-      );
-      setSelectedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
-    }
-  };
-
-
-  const handleDeleteSelectedFile = (fileName: string) => {
-    setSelectedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
-  };
 
 
   return (
@@ -222,51 +185,52 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name='dateOfBirth'
+              name="dateOfBirth"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  type='date'
+                  type="date"
                   value={value}
                   onChange={onChange}
-                  label='Date de Naissance'
+                  label="Date de naissance"
                   error={Boolean(errors.dateOfBirth)}
                   InputLabelProps={{
-                    shrink: true
+                    shrink: true,
                   }}
                 />
               )}
             />
             {errors.dateOfBirth && (
-              <FormHelperText sx={{ color: 'error.main' }}>{errors.dateOfBirth.message}</FormHelperText>
+              <FormHelperText sx={{ color: 'error.main' }}>
+                {errors.dateOfBirth.message}
+              </FormHelperText>
             )}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
-            <InputLabel htmlFor='sexe'>sex</InputLabel>
+            <InputLabel htmlFor="sexe">sex</InputLabel>
             <Controller
-              name='sex'
+              name="sex"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <Select
-                  id='sex'
+                  id="sex"
                   value={value}
-                  onChange={e => onChange(e.target.value)}
-                  label='Sexe'
+                  onChange={(e) => onChange(e.target.value)}
+                  label="Sexe"
                   error={Boolean(errors.sex)}
-                  defaultValue=''
                 >
-                  <MenuItem value='mâle'>Masculin</MenuItem>
-                  <MenuItem value='femelle'>Féminin</MenuItem>
+                  <MenuItem value="mâle">Masculin</MenuItem>
+                  <MenuItem value="femelle">Féminin</MenuItem>
                   {/* Add other options if needed */}
                 </Select>
               )}
             />
-            {errors.sex && <FormHelperText sx={{ color: 'error.main' }}>{errors.sex.message}</FormHelperText>}
+            {errors.sex && (
+              <FormHelperText sx={{ color: 'error.main' }}>{errors.sex.message}</FormHelperText>
+            )}
           </FormControl>
-
           <FormControlLabel
             control={
               <Controller
@@ -351,7 +315,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               </FormControl>
             </>
           )}
-
           {/**************  END CREATE ACCOUNT ***************/}
 
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -368,4 +331,4 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   )
 }
 
-export default SidebarAddStudent
+export default SidebarAddStudent;

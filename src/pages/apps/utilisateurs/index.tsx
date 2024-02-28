@@ -156,11 +156,21 @@ const columns = [
       const { userData } = row;
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Avatar
-            alt={`Profile Image of ${row.userData.firstName} ${row.userData.lastName}`}
-            src={`http://localhost:8000/uploads/${row.profileImage}`}
-            sx={{ width: 30, height: 30, marginRight: "10px" }}
-          />
+      {row.profileImage ? (
+        <Avatar
+          alt={`Profile Image of ${row.userData.firstName} ${row.userData.lastName}`}
+          src={`http://localhost:8000/uploads/${row.profileImage}`}
+          sx={{ width: 30, height: 30, marginRight: "10px" }}
+        />
+      ) : (
+        <CustomAvatar
+          skin="light"
+          color={"primary"}
+          sx={{ width: 30, height: 30, fontSize: ".875rem" ,  marginRight: "10px" }}
+        >
+          {getInitials(`${row.userData.firstName} ${row.userData.lastName}`)}
+        </CustomAvatar>
+      )}
           <Box
             sx={{
               display: "flex",

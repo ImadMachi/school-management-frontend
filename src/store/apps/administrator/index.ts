@@ -36,15 +36,6 @@ export const fetchAdministrator = createAsyncThunk('appAdministrators/fetchAdmin
   return response.data;
 });
 
-
-// export const addAdministrator = createAsyncThunk(
-//   'appAdministrators/addAdministrator',
-//   async (data: CreateAdministratorDto, { getState, dispatch }: Redux) => {
-//     const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, data)
-//     return response.data
-//   }
-// )
-
 export const addAdministrator = createAsyncThunk(
   'appAdministrators/addAdministrator',
   async (data: CreateAdministratorDto) => {
@@ -64,15 +55,7 @@ export const addAdministrator = createAsyncThunk(
     formData.append('createUserDto[password]', data.createUserDto?.password || '');
     
     formData.append('profileImage', data.profileImage || '');
-
-    // // Append createUserDto properties
-    // if (data.createUserDto && data.createAccount) {
-    //   Object.entries(data.createUserDto).forEach(([key, value]) => {
-    //     // Append properties with the desired format
-    //     formData.append(`createUserDto[${key}]`, value.toString());
-    //   });
-    // }
-
+    
     const response = await axios.post(`${HOST}/administrators?create-account=${data.createAccount}`, formData);
     console.log(response.data);
     return response.data;

@@ -113,6 +113,15 @@ export const getCurrentMail = createAsyncThunk(
   }
 );
 
+// ** Mark Mail as Read
+export const markAsRead = createAsyncThunk(
+  "appEmail/markAsRead",
+  async (id: number | string) => {
+    const response = await axios.post(`${HOST}/messages/${id}/read`);
+    return id;
+  }
+);
+
 // ** Prev/Next Mails
 export const paginateMail = createAsyncThunk(
   "appEmail/paginateMail",
@@ -257,6 +266,14 @@ export const appEmailSlice = createSlice({
         ...state.filter,
         ...action.payload.filter,
       };
+    });
+
+    builder.addCase(markAsRead.fulfilled, (state, action) => {
+      state.mails.forEach((mail) => {
+        if (mail.id == action.payload) {
+          mail.isRead = true;
+        }
+      });
     });
   },
 });

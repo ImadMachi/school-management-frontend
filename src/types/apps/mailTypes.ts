@@ -39,13 +39,12 @@ export type FetchMailParamsType = {
   label: MailLabelType;
 };
 
-
 export type FetchMailByUserIdParamsType = {
-  q: string
-  folder: MailFolderType 
-  label: MailLabelType
-  userId: number | null
-}
+  q: string;
+  folder: MailFolderType;
+  label: MailLabelType;
+  userId: number | null;
+};
 
 export type SendMailParamsType = {
   recipients: { id: number }[];
@@ -116,6 +115,7 @@ export type MailType = {
   // labels: MailLabelType[]
   // hasPreviousMail?: boolean
   attachments: MailAttachmentType[];
+  isRead: true;
 };
 
 export type MailFoldersArrType = {

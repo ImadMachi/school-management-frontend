@@ -20,6 +20,8 @@ import CustomChip from "src/@core/components/mui/chip";
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 
+import * as yup from "yup";
+
 // ** Store Imports
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "src/store";
@@ -31,14 +33,33 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
-import { fetchData, filterData, setSelectedId } from "src/store/apps/users";
+import {
+  fetchData,
+  fetchUserById,
+  filterData,
+  setSelectedId,
+} from "src/store/apps/users";
 // ** Types Imports
 import { UserRole, UserType } from "src/types/apps/UserType";
 // ** Custom Table Components Imports
 import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/user/list/TableHeader";
 import { ThemeColor } from "src/@core/layouts/types";
-import { Avatar } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  TextField,
+} from "@mui/material";
+import EditUserPopup from "src/views/apps/user/list/EditUserPopup";
+import select from "src/@core/theme/overrides/select";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Action } from "@reduxjs/toolkit";
 
 interface CellType {
   row: UserType;
@@ -46,6 +67,18 @@ interface CellType {
 interface AccountStatusType {
   [key: string]: ThemeColor;
 }
+
+export interface UpdateUserDto {
+  profileImage?: File;
+  email?: string;
+  password?: string;
+}
+
+const schema = yup.object().shape({
+  firstName: yup.string().min(3).required(),
+  lastName: yup.string().min(3).required(),
+  phoneNumber: yup.string().required(),
+});
 
 const accountStatusObj: AccountStatusType = {
   oui: "success",
@@ -71,11 +104,59 @@ const RowOptions = ({ id }: { id: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editUserPopupOpen, setEditUserPopupOpen] = useState(false);
+  const [selectedUserForEdit, setSelectedUserForEdit] =
+    useState<UserType | null>(null);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [userData, setUserData] = useState<UserType | null>(null);
+  const {
+    reset,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UpdateUserDto>({
+    mode: "onChange",
+    resolver: yupResolver(schema),
+  });
 
   const rowOptionsOpen = Boolean(anchorEl);
+  const userStore = useSelector((state: RootState) => state.users);
+
+  useEffect(() => {
+    // Fetch user data when the component mounts
+    if (openEdit) {
+      dispatch(fetchUserById(id) as any);
+    }
+  }, [openEdit, dispatch, id]);
+
+  useEffect(() => {
+    // Update state when the data is updated
+    if (userStore.data && userStore.data.length > 0) {
+      setUserData(userStore.data[0]);
+    }
+    console.log("userStore.data", userStore.data[0]);
+  }, [userStore.data]);
+
+  const handleEditClick = () => {
+    dispatch(setSelectedId(id));
+    setOpenEdit(true);
+  };
+
+  const handleEditClose = () => {
+    setOpenEdit(false);
+    setUserData(null);
+  };
+
+  const handleEditSubmit = () => {
+    // Implement your logic to update user data here
+    // You can use updateUserById(userData) or similar function
+    // Don't forget to close the dialog after updating
+    handleEditClose();
+  };
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setSelectedId(id));
+    console.log(id);
     setAnchorEl(event.currentTarget);
   };
   const handleRowOptionsClose = () => {
@@ -109,22 +190,112 @@ const RowOptions = ({ id }: { id: number }) => {
       >
         {/* <MenuItem
           component={Link}
-          sx={{ '& svg': { mr: 2 } }}
+          sx={{ "& svg": { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href='/apps/users/overview/inbox' 
+          href="/apps/utili sateurs/overview/index"
         >
-          <Icon icon='mdi:eye-outline' fontSize={20} />
+          <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
-        </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
+        </MenuItem> */}
+        <MenuItem onClick={handleEditClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
           Modifier
         </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:delete-outline' fontSize={20} />
+        <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
-        </MenuItem> */}
+        </MenuItem>
       </Menu>
+      {/* Edit User Dialog */}
+      <Dialog
+        open={openEdit}
+        onClose={handleEditClose}
+        aria-labelledby="user-view-edit"
+        sx={{
+          "& .MuiPaper-root": {
+            width: "100%",
+            maxWidth: 650,
+            p: [2, 10],
+          },
+        }}
+        aria-describedby="user-view-edit-description"
+      >
+        <DialogTitle
+          id="user-view-edit"
+          sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
+        >
+          Modifier les informations de l'utilisateur
+        </DialogTitle>
+        <DialogContent>
+          {/* Display the old profile image */}
+          {userData && userData.profileImage && (
+            <Avatar
+              alt={`Profile Image of ${userData.userData?.firstName} ${userData.userData?.lastName}`}
+              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              sx={{ width: 100, height: 100, margin: "auto", mb: 2 }}
+            />
+          )}
+
+          <Grid item xs={12}>
+            <FormControl fullWidth sx={{ mb: 6 }}>
+              <Controller
+                name="email"
+                control={control}
+                defaultValue={userData?.email}
+                rules={{ required: "Contact est requis" }}
+                render={({ field, fieldState }) => (
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      {...field}
+                      label="Email"
+                      error={Boolean(fieldState.error)}
+                      helperText={fieldState.error?.message}
+                    />
+                  </FormControl>
+                )}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth sx={{ mb: 6 }}>
+              <Controller
+                name="password"
+                control={control}
+                defaultValue={userData?.email}
+                rules={{ required: "Contact est requis" }}
+                render={({ field, fieldState }) => (
+                  <FormControl fullWidth sx={{ mb: 6 }}>
+                    <TextField
+                      {...field}
+                      type="password"
+                      // value={value}
+                      label="Mot de passe"
+                      error={Boolean(fieldState.error)}
+                      helperText={fieldState.error?.message}
+                    />
+                  </FormControl>
+                )}
+              />
+            </FormControl>
+          </Grid>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            sx={{ mr: 1 }}
+            onSubmit={handleEditSubmit}
+          >
+            Submit
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleEditClose}
+          >
+            Cancel
+          </Button>
+        </DialogActions>{" "}
+      </Dialog>
     </>
   );
 };
@@ -153,24 +324,32 @@ const columns = [
     headerName: "Utilisateur",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
-      const { userData } = row;
+      const dispatch = useDispatch<AppDispatch>();
+
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-      {row.profileImage ? (
-        <Avatar
-          alt={`Profile Image of ${row.userData.firstName} ${row.userData.lastName}`}
-          src={`http://localhost:8000/uploads/${row.profileImage}`}
-          sx={{ width: 30, height: 30, marginRight: "10px" }}
-        />
-      ) : (
-        <CustomAvatar
-          skin="light"
-          color={"primary"}
-          sx={{ width: 30, height: 30, fontSize: ".875rem" ,  marginRight: "10px" }}
-        >
-          {getInitials(`${row.userData.firstName} ${row.userData.lastName}`)}
-        </CustomAvatar>
-      )}
+          {row.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${row.userData?.firstName} ${row.userData?.lastName}`}
+              src={`http://localhost:8000/uploads/${row.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color={"primary"}
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: ".875rem",
+                marginRight: "10px",
+              }}
+            >
+              {getInitials(
+                `${row.userData?.firstName} ${row.userData?.lastName}`
+              )}
+            </CustomAvatar>
+          )}
           <Box
             sx={{
               display: "flex",
@@ -179,12 +358,14 @@ const columns = [
             }}
           >
             <StyledLink
-              href={`/apps/${mapRoleToFrench(
-                row.role
-              ).toLowerCase()}s/view/overview/index`}
+              href="/apps/utilisateurs/overview/index"
+              onClick={() => {
+                dispatch(setSelectedId(row.id));
+                console.log("id", row.id);
+              }}
             >
-              {userData?.firstName ? userData?.firstName : "Admin"}{" "}
-              {userData?.lastName ? userData?.lastName : ""}
+              {row.userData?.firstName ? row.userData?.firstName : "Admin"}{" "}
+              {row.userData?.lastName ? row.userData?.lastName : ""}
             </StyledLink>
           </Box>
         </Box>

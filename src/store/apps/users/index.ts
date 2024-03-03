@@ -38,6 +38,13 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
+export const fetchUserById = createAsyncThunk( "appUsers/fetchUserById", async (id
+: number) => {
+  const response = await axios.get(`${HOST}/users/${id}`);
+  return response.data;
+}
+);
+
 // export const deleteUser = createAsyncThunk(
 //     'appUsers/deleteUsers',
 //     async (id: number, { getState, dispatch }: Redux) => {
@@ -112,6 +119,19 @@ export const appUsersSlice = createSlice({
     //     console.log(action.payload)
     // })
     builder.addCase(fetchUser.fulfilled, (state, action) => {
+      const userIdToDelete = action.payload.id;
+
+      // Filter out the existing user data with the same ID
+      state.data = state.data.filter((User) => User.id !== userIdToDelete);
+      state.allData = state.allData.filter(
+        (User) => User.id !== userIdToDelete
+      );
+
+      // Add the updated user data to the beginning of the arrays
+      state.data.unshift(action.payload);
+      state.allData.unshift(action.payload);
+    });
+    builder.addCase(fetchUserById.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
       // Filter out the existing user data with the same ID

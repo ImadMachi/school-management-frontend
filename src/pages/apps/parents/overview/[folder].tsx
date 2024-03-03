@@ -55,6 +55,7 @@ import { AppDispatch, RootState } from 'src/store'
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
 import { Controller, useForm } from 'react-hook-form'
 import { formatDate } from 'src/@core/utils/format'
+import { fetchUserById } from 'src/store/apps/users'
 
 
 
@@ -149,6 +150,8 @@ const UserViewLeft = () => {
     if (parentStore.data[0]?.userId == null) {
       setSuspendDialogOpen('auto');
     }
+
+  console.log('parentStore.data', parentStore.data)
   }, [parentStore.data]);
 
   if (userData) {

@@ -161,19 +161,20 @@ const columns = [
     renderCell: ({ row }: CellType) => {
       const dispatch = useDispatch<AppDispatch>();
       const [userData, setUserData] = useState<any>({});
-      const userStore = useSelector((state: RootState) => state.users.data);
+      const userStore = useSelector((state: RootState) => state.users);
 
       useEffect(() => {
         dispatch(fetchUserById(row.userId) as any);
       }, [row.userId]);
 
       useEffect(() => {
-        setUserData(userStore);
-      }, [userStore]);
+        setUserData(userStore.data[0]);
+        console.log("userStore.data", userStore.data);
+      }, [userStore.data]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {userData.profileImage ? (
+          {userData?.profileImage && row.userId ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
               src={`http://localhost:8000/uploads/${userData.profileImage}`}
@@ -201,7 +202,7 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/utilisateurs/overview/index"
+              href="/apps/parents/overview/index"
               onClick={() => {
                 dispatch(setSelectedId(row.id));
                 console.log("id", row.id);

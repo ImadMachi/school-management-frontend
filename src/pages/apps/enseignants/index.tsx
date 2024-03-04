@@ -42,6 +42,9 @@ import TableHeader from 'src/views/apps/teacher/list/TableHeader'
 import SidebarAddTeacher from 'src/views/apps/teacher/list/AddTeacherDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
 import { setSelectedUserId } from 'src/store/apps/teachers'
+import { fetchUserById } from 'src/store/apps/users'
+import { Avatar } from '@mui/material'
+import { UserType } from 'src/types/apps/UserType'
 
 interface CellType {
   row: TeachersType
@@ -145,26 +148,64 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: 'enseignant',
-    field: 'fullName',
+    headerName: "Utilisateur",
+    field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
-      const { firstName, lastName } = row
-      const dispatch = useDispatch<AppDispatch>()
+      const dispatch = useDispatch<AppDispatch>();
+      const [userData, setUserData] = useState <UserType | null>(null);
+      const userStore = useSelector((state: RootState) => state.users);
+
+      useEffect(() => {
+        dispatch(fetchUserById(row.userId) as any);
+      }, [row.userId]);
+
+      useEffect(() => {
+        setUserData(userStore.data[0]);
+        console.log("userStore.data", userStore.data);
+      }, [userStore.data]);
 
       return (
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {renderClient(row)}
-          <Box sx={{ display: 'flex', alignItems: 'flex-start', flexDirection: 'column' }}>
-            <StyledLink href='/apps/enseignants/overview/inbox'
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {userData?.profileImage && row.userId ? (
+            <Avatar
+              alt={`Profile Image of ${row.firstName} ${row.lastName}`}
+              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color={"primary"}
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: ".875rem",
+                marginRight: "10px",
+              }}
+            >
+              {getInitials(`${row.firstName} ${row.lastName}`)}
+            </CustomAvatar>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "column",
+            }}
+          >
+            <StyledLink
+              href="/apps/enseignants/overview/index"
               onClick={() => {
                 dispatch(setSelectedId(row.id));
-                dispatch(setSelectedUserId(row.userId));
-              }}>              {firstName} {lastName}
+                console.log("id", row.id);
+              }}
+            >
+              {row.firstName} {row.lastName}
             </StyledLink>
           </Box>
         </Box>
-      )
-    }
+      );
+    },
   },
   {
     flex: 0.15,

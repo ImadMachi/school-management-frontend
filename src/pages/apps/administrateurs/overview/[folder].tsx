@@ -24,7 +24,7 @@ import { fetchAdministrator } from "src/store/apps/administrator";
 import { fetchUserById } from "src/store/apps/users";
 import { AdministratorType } from "src/types/apps/administratorTypes";
 import EmailAppLayout from "src/views/apps/administrators/overview/mail/Mail";
-import { setSelectedId } from "src/store/apps/administrator";
+import { setAdministratorId } from "src/store/apps/administrator";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
@@ -51,7 +51,7 @@ import { updateAdministrator } from "src/store/apps/administrator";
 import { Controller, useForm } from "react-hook-form";
 import { FormHelperText } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
-import { setSelectedUserId } from "src/store/apps/administrator";
+import { setAdministratorUserId } from "src/store/apps/administrator";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -74,13 +74,13 @@ const UserViewLeft = () => {
   const { folder } = router.query;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const selectedId = useSelector(
-    (state: RootState) => state.administrator.selectedId
+    (state: RootState) => state.administrator.AdministratorId
   );
-  // const selectedUserId = useSelector(
-  //   (state: RootState) => state.administrator.selectUserId
-  // );
+  const selectedUserId = useSelector(
+   (state: RootState) => state.administrator.AdministratorUserId
+  );
   const id = selectedId;
-  // const userId = selectedUserId;
+  const userId = selectedUserId;
   const {
     reset,
     control,
@@ -150,15 +150,13 @@ const UserViewLeft = () => {
   }, [administratorStore.data]);
 
   useEffect(() => {
-    if (userData?.userId && !isNaN(Number(userData?.userId))) {
-      dispatch(fetchUserById(Number(userData?.userId)) as any);
-      }else {
-      router.push("/apps/administrateurs");
-    }
+    if (userId && !isNaN(Number(userId))) {
+      dispatch(fetchUserById(Number(userId)) as any);
+      }
     return () => {
       setUserData(null);
     };
-  }, [id]);
+  }, [userId]);
 
   useEffect(() => {
     // Update state when the data is updated
@@ -185,13 +183,13 @@ const UserViewLeft = () => {
                 flexDirection: "column",
               }}
             >
-              {userIdData?.profileImage ? (
+              {userId && userIdData?.profileImage ? (
                 <Avatar
                   alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
                   src={`http://localhost:8000/uploads/${userIdData.profileImage}`}
                   sx={{ width: 80, height: 80 }}
                 />
-              ) : (
+              ):(
                 <Avatar
                   alt="John Doe"
                   sx={{ width: 80, height: 80 }}

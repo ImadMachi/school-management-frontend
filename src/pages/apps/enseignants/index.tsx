@@ -32,7 +32,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 
 // ** Actions Imports
-import { fetchData, deleteTeacher, filterData, setSelectedId } from 'src/store/apps/teachers'
+import { fetchData, deleteTeacher, filterData, setTeacherId, setTeacherUserId } from 'src/store/apps/teachers'
 
 // ** Types Imports
 import { TeachersType } from 'src/types/apps/teacherTypes'
@@ -41,7 +41,6 @@ import { useAuth } from 'src/hooks/useAuth'
 import TableHeader from 'src/views/apps/teacher/list/TableHeader'
 import SidebarAddTeacher from 'src/views/apps/teacher/list/AddTeacherDrawer'
 import { ThemeColor } from 'src/@core/layouts/types'
-import { setSelectedUserId } from 'src/store/apps/teachers'
 import { fetchUserById } from 'src/store/apps/users'
 import { Avatar } from '@mui/material'
 import { UserType } from 'src/types/apps/UserType'
@@ -87,8 +86,8 @@ const RowOptions = ({ id, userId }: { id: number, userId: number }) => {
   const rowOptionsOpen = Boolean(anchorEl)
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setTeacherId(id));
+    dispatch(setTeacherUserId(userId));
     console.log("id", id);
     console.log("userId", userId);
     setAnchorEl(event.currentTarget)
@@ -196,7 +195,8 @@ const columns = [
             <StyledLink
               href="/apps/enseignants/overview/index"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
+                dispatch(setTeacherId(row.id));
+                dispatch(setTeacherUserId(row.userId));
                 console.log("id", row.id);
               }}
             >

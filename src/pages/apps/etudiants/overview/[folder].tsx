@@ -79,7 +79,7 @@ const schema = yup.object().shape({
 const UserViewLeft = () => {
   const router = useRouter();
   const { folder } = router.query;
-  const selectedId = useSelector((state: RootState) => state.students.selectedId);
+  const selectedId = useSelector((state: RootState) => state.students.studentId);
   const id = selectedId
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const {

@@ -14,7 +14,7 @@ interface AppUserstate {
   total: number;
   params: Record<string, any>;
   allData: UserType[];
-  selectedId: number | null;
+  selectedId: { id: number | null; role: string | null } | null;
 }
 
 const initialState: AppUserstate = {
@@ -80,7 +80,7 @@ export const appUsersSlice = createSlice({
           User.email.toLowerCase().includes(filterValue)
       );
     },
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
+ setSelectedId: (state, action: PayloadAction<{ id: number | null; role: string | null }>) => {
       state.selectedId = action.payload;
     },
   },

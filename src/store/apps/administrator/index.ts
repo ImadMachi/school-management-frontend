@@ -91,8 +91,8 @@ interface AppAdministratorsState {
   total: number
   params: Record<string, any>
   allData: AdministratorType[]
-  selectedId: number | null;
-  selectUserId: number | null;
+  AdministratorId: number | null;
+  AdministratorUserId: number | null;
 
 }
 
@@ -101,8 +101,8 @@ const initialState: AppAdministratorsState = {
   total: 1,
   params: {},
   allData: [],
-  selectedId: null,
-  selectUserId: null,
+  AdministratorId: null,
+  AdministratorUserId: null,
 }
 
 export const appAdministratorsSlice = createSlice({
@@ -121,11 +121,11 @@ export const appAdministratorsSlice = createSlice({
           administrator.phoneNumber.toLowerCase().includes(filterValue)
       )
     },
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
-      state.selectedId = action.payload;
+    setAdministratorId: (state, action: PayloadAction<number | null>) => {
+      state.AdministratorId = action.payload;
     },
-    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
-      state.selectUserId = action.payload;
+    setAdministratorUserId: (state, action: PayloadAction<number | null>) => {
+      state.AdministratorUserId = action.payload;
     }
   },
   extraReducers: builder => {
@@ -170,7 +170,7 @@ export const appAdministratorsSlice = createSlice({
   }
 })
 
-export const { setSelectedId } = appAdministratorsSlice.actions;
-export const { setSelectedUserId } = appAdministratorsSlice.actions;
+export const { setAdministratorId } = appAdministratorsSlice.actions;
+export const { setAdministratorUserId } = appAdministratorsSlice.actions;
 export const { filterData } = appAdministratorsSlice.actions
 export default appAdministratorsSlice.reducer

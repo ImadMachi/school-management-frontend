@@ -33,9 +33,7 @@ import {
   filterData,
 } from "src/store/apps/directors";
 
-import { setSelectedId } from "src/store/apps/directors";
-
-import { setSelectedUserId } from "src/store/apps/directors";
+import { setDirectorId ,setDirectorUserId } from "src/store/apps/directors";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
@@ -92,8 +90,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setDirectorId(id));
+    dispatch(setDirectorUserId(userId));
     setAnchorEl(event.currentTarget);
     console.log("id", id);
     console.log("userId", userId);
@@ -211,7 +209,8 @@ const columns = [
             <StyledLink
               href="/apps/directeurs/overview/index"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
+                dispatch(setDirectorId(row.id));
+                dispatch(setDirectorUserId(row.userId));
                 console.log("id", row.id);
               }}
             >

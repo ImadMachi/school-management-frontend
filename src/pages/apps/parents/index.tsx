@@ -36,7 +36,8 @@ import {
   fetchData,
   deleteParent,
   filterData,
-  setSelectedId,
+  setParentId,
+  setParentUserId
 } from "src/store/apps/parents";
 // ** Types Imports
 import { ParentsType } from "src/types/apps/parentTypes";
@@ -45,7 +46,6 @@ import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/parents/list/TableHeader";
 import SidebarAddParent from "src/views/apps/parents/list/AddParentDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
-import { setSelectedUserId } from "src/store/apps/parents";
 import { Avatar } from "@mui/material";
 import { ro } from "date-fns/locale";
 
@@ -95,8 +95,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setParentId(id));
+    dispatch(setParentUserId(userId));
     console.log("id", id);
     console.log("userId", userId);
     setAnchorEl(event.currentTarget);
@@ -204,7 +204,8 @@ const columns = [
             <StyledLink
               href="/apps/parents/overview/index"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
+                dispatch(setParentId(row.id));
+                dispatch(setParentUserId(row.userId));
                 console.log("id", row.id);
               }}
             >

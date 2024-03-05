@@ -33,9 +33,9 @@ import {
   filterData,
 } from "src/store/apps/administrator";
 
-import { setSelectedId } from "src/store/apps/administrator";
+import { setAdministratorId } from "src/store/apps/administrator";
 
-import { setSelectedUserId } from "src/store/apps/administrator";
+import { setAdministratorUserId } from "src/store/apps/administrator";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
@@ -46,9 +46,6 @@ import TableHeader from "src/views/apps/administrators/list/TableHeader";
 import AddAdministratorDrawer from "src/views/apps/administrators/list/AddAdministratorDrawer";
 import CustomChip from "src/@core/components/mui/chip";
 import { ThemeColor } from "src/@core/layouts/types";
-import { fetchUserById } from "src/store/apps/users";
-import { Avatar } from "@mui/material";
-import { UserType } from "src/types/apps/UserType";
 
 interface CellType {
   row: AdministratorType;
@@ -92,11 +89,9 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setAdministratorId(id));
+    dispatch(setAdministratorUserId(userId));
     setAnchorEl(event.currentTarget);
-    console.log("id", id);
-    console.log("userId", userId);
   };
 
   // ** State
@@ -163,44 +158,15 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: "Utilisateur",
-    field: "Utilisateur",
+    headerName: "administrateur",
+    field: "firstName",
     renderCell: ({ row }: CellType) => {
+      const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
-      const [userData, setUserData] = useState <UserType | null>(null);
-      const userStore = useSelector((state: RootState) => state.users);
-
-      useEffect(() => {
-        dispatch(fetchUserById(row.userId) as any);
-      }, [row.userId]);
-
-      useEffect(() => {
-        setUserData(userStore.data[0]);
-        console.log("userStore.data", userStore.data);
-      }, [userStore.data]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {userData?.profileImage && row.userId ? (
-            <Avatar
-              alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${userData.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color={"primary"}
-              sx={{
-                width: 30,
-                height: 30,
-                fontSize: ".875rem",
-                marginRight: "10px",
-              }}
-            >
-              {getInitials(`${row.firstName} ${row.lastName}`)}
-            </CustomAvatar>
-          )}
+          {renderClient(row)}
           <Box
             sx={{
               display: "flex",
@@ -209,13 +175,13 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/administrateurs/overview/index"
+              href="/apps/administrateurs/overview/inbox"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
-                console.log("id", row.id);
+                dispatch(setAdministratorId(row.id));
+                dispatch(setAdministratorUserId(row.userId));
               }}
             >
-              {row.firstName} {row.lastName}
+              {firstName} {lastName}
             </StyledLink>
           </Box>
         </Box>

@@ -60,6 +60,11 @@ import select from "src/@core/theme/overrides/select";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Action } from "@reduxjs/toolkit";
+import {setAdministratorId,setAdministratorUserId,} from "src/store/apps/administrator";
+import { setDirectorId, setDirectorUserId } from "src/store/apps/directors";
+import { setTeacherId, setTeacherUserId } from "src/store/apps/teachers";
+import { setStudentId, setStudentUserId } from "src/store/apps/students";
+import { setParentId, setParentUserId } from "src/store/apps/parents";
 
 interface CellType {
   row: UserType;
@@ -134,11 +139,10 @@ const RowOptions = ({ id }: { id: number }) => {
     if (userStore.data && userStore.data.length > 0) {
       setUserData(userStore.data[0]);
     }
-    console.log("userStore.data", userStore.data[0]);
   }, [userStore.data]);
 
   const handleEditClick = () => {
-    dispatch(setSelectedId(id));
+    // dispatch(setSelectedId(id));
     setOpenEdit(true);
   };
 
@@ -155,7 +159,7 @@ const RowOptions = ({ id }: { id: number }) => {
   };
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
+    // dispatch(setSelectedId(id));
     console.log(id);
     setAnchorEl(event.currentTarget);
   };
@@ -358,9 +362,26 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/utilisateurs/overview/index"
+              href={`/apps/${mapRoleToFrench(
+                row.role
+              ).toLowerCase()}s/overview/index`}
               onClick={() => {
-                dispatch(setSelectedId(row.id));
+                if (row.role === "Administrator") {
+                  dispatch(setAdministratorId(row.userData.id));
+                  dispatch(setAdministratorUserId(row.id));
+                } else if (row.role === "Director") {
+                  dispatch(setDirectorId(row.userData.id));
+                  dispatch(setDirectorUserId(row.id));
+                } else if (row.role === "Teacher") {
+                  dispatch(setTeacherId(row.userData.id));
+                  dispatch(setTeacherUserId(row.id));
+                } else if (row.role === "Student") {
+                  dispatch(setStudentId(row.userData.id));
+                  dispatch(setStudentUserId(row.id));
+                } else if (row.role === "Parent") {
+                  dispatch(setParentId(row.userData.id));
+                  dispatch(setParentUserId(row.id));
+                }
                 console.log("id", row.id);
               }}
             >

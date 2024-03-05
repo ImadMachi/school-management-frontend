@@ -77,7 +77,7 @@ const UserViewLeft = () => {
   const { folder } = router.query;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const selectedId = useSelector(
-    (state: RootState) => state.directors.selectedId
+    (state: RootState) => state.directors.directorId
   );
   const id = selectedId;
   const {

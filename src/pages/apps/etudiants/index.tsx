@@ -35,7 +35,8 @@ import {
   fetchData,
   deleteStudent,
   filterData,
-  setSelectedId,
+  setStudentId,
+  setStudentUserId,
 } from "src/store/apps/students";
 // ** Types Imports
 import { StudentsType } from "src/types/apps/studentTypes";
@@ -45,7 +46,6 @@ import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/student/list/TableHeader";
 import SidebarAddStudent from "src/views/apps/student/list/AddStudentDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
-import { setSelectedUserId } from "src/store/apps/students";
 import { fetchUserById } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
@@ -96,8 +96,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setStudentId(id));
+    dispatch(setStudentUserId(userId));
     console.log("id", id);
     console.log("userId", userId);
     setAnchorEl(event.currentTarget);
@@ -161,7 +161,7 @@ const columns = [
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const dispatch = useDispatch<AppDispatch>();
-      const [userData, setUserData] = useState <UserType | null>(null);
+      const [userData, setUserData] = useState<UserType | null>(null);
       const userStore = useSelector((state: RootState) => state.users);
 
       useEffect(() => {
@@ -205,7 +205,8 @@ const columns = [
             <StyledLink
               href="/apps/etudiants/overview/index"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
+                dispatch(setStudentId(row.id));
+                dispatch(setStudentUserId(row.userId));
                 console.log("id", row.id);
               }}
             >

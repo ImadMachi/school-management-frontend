@@ -3,12 +3,12 @@ export type UserType = {
   email: string;
   isActive: boolean;
   role: string;
+  profileImage?: string;
   userData: {
     id: number;
     firstName: string;
     lastName: string;
     phoneNumber?: string;
-    profileImage?: string;
   };
 };
 

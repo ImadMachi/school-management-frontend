@@ -1,65 +1,63 @@
 // ** React Imports
-import { useState } from 'react'
+import { useState } from "react";
 
 // ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import Select from '@mui/material/Select'
-import Switch from '@mui/material/Switch'
-import Avatar from '@mui/material/Avatar'
-import Divider from '@mui/material/Divider'
-import MenuItem from '@mui/material/MenuItem'
-import { styled } from '@mui/material/styles'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
-import CardContent from '@mui/material/CardContent'
-import CardActions from '@mui/material/CardActions'
-import DialogTitle from '@mui/material/DialogTitle'
-import FormControl from '@mui/material/FormControl'
-import DialogContent from '@mui/material/DialogContent'
-import DialogActions from '@mui/material/DialogActions'
-import InputAdornment from '@mui/material/InputAdornment'
-import LinearProgress from '@mui/material/LinearProgress'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import DialogContentText from '@mui/material/DialogContentText'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { fetchParent, updateParent } from 'src/store/apps/parents'
-import { ParentsType } from 'src/types/apps/parentTypes'
-import EmailAppLayout from 'src/views/apps/parents/overview/mail/Mail'
-
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import Select from "@mui/material/Select";
+import Switch from "@mui/material/Switch";
+import Avatar from "@mui/material/Avatar";
+import Divider from "@mui/material/Divider";
+import MenuItem from "@mui/material/MenuItem";
+import { styled } from "@mui/material/styles";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import DialogTitle from "@mui/material/DialogTitle";
+import FormControl from "@mui/material/FormControl";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import InputAdornment from "@mui/material/InputAdornment";
+import LinearProgress from "@mui/material/LinearProgress";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import DialogContentText from "@mui/material/DialogContentText";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { fetchParent, updateParent } from "src/store/apps/parents";
+import { ParentsType } from "src/types/apps/parentTypes";
+import EmailAppLayout from "src/views/apps/parents/overview/mail/Mail";
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
-import Image from 'next/image'
+import Icon from "src/@core/components/icon";
+import Image from "next/image";
 
 // ** Custom Components
-import CustomChip from 'src/@core/components/mui/chip'
-import CustomAvatar from 'src/@core/components/mui/avatar'
-import UserSuspendDialog from '../../../../views/apps/administrators/overview/UserSuspendDialog'
-import UserSubscriptionDialog from '../../../../views/apps/administrators/overview/UserSubscriptionDialog'
+import CustomChip from "src/@core/components/mui/chip";
+import CustomAvatar from "src/@core/components/mui/avatar";
+import UserSuspendDialog from "../../../../views/apps/administrators/overview/UserSuspendDialog";
+import UserSubscriptionDialog from "../../../../views/apps/administrators/overview/UserSubscriptionDialog";
 
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 // ** Types
-import { ThemeColor } from 'src/@core/layouts/types'
+import { ThemeColor } from "src/@core/layouts/types";
 
 // ** Utils Import
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from 'src/store'
-import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit'
-import { Controller, useForm } from 'react-hook-form'
-import { formatDate } from 'src/@core/utils/format'
-
-
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "src/store";
+import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
+import { Controller, useForm } from "react-hook-form";
+import { formatDate } from "src/@core/utils/format";
+import { fetchUserById } from "src/store/apps/users";
 
 interface ColorsType {
-  [key: string]: ThemeColor
+  [key: string]: ThemeColor;
 }
 
 export interface UpdateParentDto {
@@ -71,14 +69,14 @@ export interface UpdateParentDto {
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required()
-})
+  phoneNumber: yup.string().required(),
+});
 
 const UserViewLeft = () => {
   const router = useRouter();
   const { folder } = router.query;
-  const selectedId = useSelector((state: RootState) => state.parents.selectedId);
-  const id = selectedId
+  const selectedId = useSelector((state: RootState) => state.parents.parentId);
+  const id = selectedId;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const {
     reset,
@@ -86,21 +84,19 @@ const UserViewLeft = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<UpdateParentDto>({
-    mode: 'onChange',
+    mode: "onChange",
     resolver: yupResolver(schema),
   });
 
-  const parentStore = useSelector((state: RootState) => state.parents)
+  const parentStore = useSelector((state: RootState) => state.parents);
   // ** States
-  const [openEdit, setOpenEdit] = useState<boolean>(false)
+  const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [userData, setUserData] = useState<ParentsType | null>(null);
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>('auto')
-
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>("auto");
 
   // Handle Edit dialog
-  const handleEditClickOpen = () => setOpenEdit(true)
-  const handleEditClose = () => setOpenEdit(false)
-
+  const handleEditClickOpen = () => setOpenEdit(true);
+  const handleEditClose = () => setOpenEdit(false);
 
   const handleEditSubmit = (data: UpdateParentDto) => {
     // Ensure id is a number
@@ -118,14 +114,11 @@ const UserViewLeft = () => {
       })
       .catch((error) => {
         // Handle error if needed
-        console.error('Update Parent failed:', error);
+        console.error("Update Parent failed:", error);
       });
     handleEditClose();
     reset();
-
   };
-
-
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
@@ -138,37 +131,49 @@ const UserViewLeft = () => {
     };
   }, [id]);
 
-
-
-
   useEffect(() => {
     // Update state when the data is updated
     if (parentStore.data && parentStore.data.length > 0) {
       setUserData(parentStore.data[0]);
     }
     if (parentStore.data[0]?.userId == null) {
-      setSuspendDialogOpen('auto');
+      setSuspendDialogOpen("auto");
     }
+
+    console.log("parentStore.data", parentStore.data);
   }, [parentStore.data]);
 
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={5} sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen }}>
+        <Grid
+          item
+          xs={12}
+          md={5}
+          sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen }}
+        >
           <Card>
-            <CardContent sx={{ pt: 15, display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+            <CardContent
+              sx={{
+                pt: 15,
+                display: "flex",
+                alignItems: "center",
+                flexDirection: "column",
+              }}
+            >
               <Avatar
-                alt='John Doe'
+                alt="John Doe"
                 sx={{ width: 80, height: 80 }}
-                src='/images/avatars/1.png'
-              />              <Typography variant='h6' sx={{ mb: 4 }}>
+                src="/images/avatars/1.png"
+              />{" "}
+              <Typography variant="h6" sx={{ mb: 4 }}>
                 {userData.firstName} {userData.lastName}
               </Typography>
               <CustomChip
-                skin='light'
-                size='small'
-                label='Parent'
-                sx={{ textTransform: 'capitalize' }}
+                skin="light"
+                size="small"
+                label="Parent"
+                sx={{ textTransform: "capitalize" }}
               />
             </CardContent>
 
@@ -196,33 +201,54 @@ const UserViewLeft = () => {
             </CardContent> */}
 
             <CardContent>
-              <Typography variant='h6'>Details</Typography>
-              <Divider sx={{ my: theme => `${theme.spacing(4)} !important` }} />
+              <Typography variant="h6">Details</Typography>
+              <Divider
+                sx={{ my: (theme) => `${theme.spacing(4)} !important` }}
+              />
               <Box sx={{ pb: 1 }}>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Prénom:</Typography>
-                  <Typography variant='body2'>{userData.firstName}</Typography>
-                </Box>   <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Nom:</Typography>
-                  <Typography variant='body2'>{userData.lastName}</Typography>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Prénom:
+                  </Typography>
+                  <Typography variant="body2">{userData.firstName}</Typography>
+                </Box>{" "}
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Nom:
+                  </Typography>
+                  <Typography variant="body2">{userData.lastName}</Typography>
                 </Box>
-                <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Contact:</Typography>
-                  <Typography variant='body2'>{userData.phoneNumber}</Typography>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Contact:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.phoneNumber}
+                  </Typography>
                 </Box>
                 {/* <Box sx={{ display: 'flex', mb: 2 }}>
                   <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
                   <Typography variant='body2'>English</Typography>
                 </Box> */}
-                <Box sx={{ display: 'flex' }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Pays:</Typography>
-                  <Typography variant='body2'>Maroc</Typography>
+                <Box sx={{ display: "flex" }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Pays:
+                  </Typography>
+                  <Typography variant="body2">Maroc</Typography>
                 </Box>
               </Box>
             </CardContent>
 
-            <CardActions sx={{ display: 'flex', justifyContent: 'center' }}>
-              <Button variant='contained' onClick={handleEditClickOpen}>
+            <CardActions sx={{ display: "flex", justifyContent: "center" }}>
+              <Button variant="contained" onClick={handleEditClickOpen}>
                 Modifier
               </Button>
               {/* <Button color='error' variant='outlined' onClick={() => setSuspendDialogOpen(true)}>
@@ -233,31 +259,43 @@ const UserViewLeft = () => {
             <Dialog
               open={openEdit}
               onClose={handleEditClose}
-              aria-labelledby='user-view-edit'
-              sx={{ '& .MuiPaper-root': { width: '100%', maxWidth: 650, p: [2, 10] } }}
-              aria-describedby='user-view-edit-description'
+              aria-labelledby="user-view-edit"
+              sx={{
+                "& .MuiPaper-root": {
+                  width: "100%",
+                  maxWidth: 650,
+                  p: [2, 10],
+                },
+              }}
+              aria-describedby="user-view-edit-description"
             >
-              <DialogTitle id='user-view-edit' sx={{ textAlign: 'center', fontSize: '1.5rem !important' }}>
+              <DialogTitle
+                id="user-view-edit"
+                sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
+              >
                 Modifier les inforamtions du l’utilisateur
               </DialogTitle>
               <DialogContent>
-                <DialogContentText variant='body2' id='user-view-edit-description' sx={{ textAlign: 'center', mb: 7 }}>
-                </DialogContentText>
+                <DialogContentText
+                  variant="body2"
+                  id="user-view-edit-description"
+                  sx={{ textAlign: "center", mb: 7 }}
+                ></DialogContentText>
                 <form onSubmit={handleSubmit(handleEditClose)}>
-                  <Grid container spacing={6} >
+                  <Grid container spacing={6}>
                     <Grid item xs={12} sm={6}>
                       {/* <TextField fullWidth label='First Name' defaultValue={userData.firstName} /> */}
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name='firstName'
+                          name="firstName"
                           control={control}
                           defaultValue={userData.firstName}
-                          rules={{ required: 'Prénom est requis' }}
+                          rules={{ required: "Prénom est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label='Prénom'
+                                label="Prénom"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -269,15 +307,15 @@ const UserViewLeft = () => {
                     <Grid item xs={12} sm={6}>
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name='lastName'
+                          name="lastName"
                           control={control}
                           defaultValue={userData.lastName}
-                          rules={{ required: 'Nom est requis' }}
+                          rules={{ required: "Nom est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label='Nom'
+                                label="Nom"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -287,18 +325,17 @@ const UserViewLeft = () => {
                       </FormControl>
                     </Grid>
                     <Grid item xs={12}>
-
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name='phoneNumber'
+                          name="phoneNumber"
                           control={control}
                           defaultValue={userData.phoneNumber}
-                          rules={{ required: 'Contact est requis' }}
+                          rules={{ required: "Contact est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label='Contact'
+                                label="Contact"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -318,11 +355,19 @@ const UserViewLeft = () => {
                   </Grid>
                 </form>
               </DialogContent>
-              <DialogActions sx={{ justifyContent: 'center' }}>
-                <Button variant='contained' sx={{ mr: 1 }} onClick={handleSubmit(handleEditSubmit)}>
+              <DialogActions sx={{ justifyContent: "center" }}>
+                <Button
+                  variant="contained"
+                  sx={{ mr: 1 }}
+                  onClick={handleSubmit(handleEditSubmit)}
+                >
                   Submit
                 </Button>
-                <Button variant='outlined' color='secondary' onClick={handleEditClose}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleEditClose}
+                >
                   Cancel
                 </Button>
               </DialogActions>
@@ -333,15 +378,15 @@ const UserViewLeft = () => {
           </Card>
         </Grid>
         {userData.userId !== null && (
-          <Grid item xs={12} md={7} sx={{ display: 'flex' }} >
+          <Grid item xs={12} md={7} sx={{ display: "flex" }}>
             <EmailAppLayout folder={folder as string} />
           </Grid>
         )}
-      </Grid >
-    )
+      </Grid>
+    );
   } else {
-    return null
+    return null;
   }
-}
+};
 
-export default UserViewLeft
+export default UserViewLeft;

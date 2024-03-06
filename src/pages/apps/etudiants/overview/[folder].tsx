@@ -79,7 +79,7 @@ const schema = yup.object().shape({
 const UserViewLeft = () => {
   const router = useRouter();
   const { folder } = router.query;
-  const selectedId = useSelector((state: RootState) => state.students.selectedId);
+  const selectedId = useSelector((state: RootState) => state.students.studentId);
   const id = selectedId
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
   const {
@@ -174,30 +174,6 @@ const UserViewLeft = () => {
                 sx={{ textTransform: 'capitalize' }}
               />
             </CardContent>
-
-            {/* <CardContent sx={{ my: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box sx={{ mr: 8, display: 'flex', alignItems: 'center' }}>
-                  <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4, width: 44, height: 44 }}>
-                    <Icon icon='mdi:check' />
-                  </CustomAvatar>
-                  <div>
-                    <Typography variant='h6'>1.23k</Typography>
-                    <Typography variant='body2'> Done</Typography>
-                  </div>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4, width: 44, height: 44 }}>
-                    <Icon icon='mdi:star-outline' />
-                  </CustomAvatar>
-                  <div>
-                    <Typography variant='h6'>568</Typography>
-                    <Typography variant='body2'>Project Done</Typography>
-                  </div>
-                </Box>
-              </Box>
-            </CardContent> */}
-
             <CardContent>
               <Typography variant='h6'>Details</Typography>
               <Divider sx={{ my: theme => `${theme.spacing(4)} !important` }} />

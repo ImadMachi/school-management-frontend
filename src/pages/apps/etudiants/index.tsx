@@ -35,7 +35,8 @@ import {
   fetchData,
   deleteStudent,
   filterData,
-  setSelectedId,
+  setStudentId,
+  setStudentUserId,
 } from "src/store/apps/students";
 // ** Types Imports
 import { StudentsType } from "src/types/apps/studentTypes";
@@ -45,7 +46,9 @@ import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/student/list/TableHeader";
 import SidebarAddStudent from "src/views/apps/student/list/AddStudentDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
-import { setSelectedUserId } from "src/store/apps/students";
+import { fetchUserById } from "src/store/apps/users";
+import { Avatar } from "@mui/material";
+import { UserType } from "src/types/apps/UserType";
 
 interface CellType {
   row: StudentsType;
@@ -93,8 +96,10 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setStudentId(id));
+    dispatch(setStudentUserId(userId));
+    console.log("id", id);
+    console.log("userId", userId);
     setAnchorEl(event.currentTarget);
   };
   const handleRowOptionsClose = () => {
@@ -152,15 +157,46 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: "étudiant",
-    field: "fullName",
+    headerName: "Utilisateur",
+    field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
+      const [userData, setUserData] = useState<UserType | null>(null);
+      const userStore = useSelector((state: RootState) => state.users);
+
+      useEffect(() => {
+        dispatch(fetchUserById(row.userId) as any);
+      }, [row.userId]);
+
+      useEffect(() => {
+        const user = userStore.data.find((user) => user.id === row.userId);
+        setUserData(user || null);
+        console.log("userStore.data", userStore.data);
+      }, [userStore.data, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderClient(row)}
+          {userData?.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${row.firstName} ${row.lastName}`}
+              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color={"primary"}
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: ".875rem",
+                marginRight: "10px",
+              }}
+            >
+              {getInitials(`${row.firstName} ${row.lastName}`)}
+            </CustomAvatar>
+          )}{" "}
           <Box
             sx={{
               display: "flex",
@@ -169,13 +205,14 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/etudiants/overview/inbox"
+              href="/apps/etudiants/overview/index"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
-                dispatch(setSelectedUserId(row.userId));
+                dispatch(setStudentId(row.id));
+                dispatch(setStudentUserId(row.userId));
+                console.log("id", row.id);
               }}
             >
-              {firstName} {lastName}
+              {row.firstName} {row.lastName}
             </StyledLink>
           </Box>
         </Box>

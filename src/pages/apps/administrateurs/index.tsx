@@ -33,9 +33,9 @@ import {
   filterData,
 } from "src/store/apps/administrator";
 
-import { setSelectedId } from "src/store/apps/administrator";
+import { setAdministratorId } from "src/store/apps/administrator";
 
-import { setSelectedUserId } from "src/store/apps/administrator";
+import { setAdministratorUserId } from "src/store/apps/administrator";
 
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
@@ -46,6 +46,9 @@ import TableHeader from "src/views/apps/administrators/list/TableHeader";
 import AddAdministratorDrawer from "src/views/apps/administrators/list/AddAdministratorDrawer";
 import CustomChip from "src/@core/components/mui/chip";
 import { ThemeColor } from "src/@core/layouts/types";
+import { fetchUserById } from "src/store/apps/users";
+import { Avatar } from "@mui/material";
+import { UserType } from "src/types/apps/UserType";
 
 interface CellType {
   row: AdministratorType;
@@ -71,26 +74,26 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-// ** renders client column
-const renderClient = (row: AdministratorType) => {
-  return (
-    <CustomAvatar
-      skin="light"
-      color={"primary"}
-      sx={{ mr: 3, width: 30, height: 30, fontSize: ".875rem" }}
-    >
-      {getInitials(`${row.firstName} ${row.lastName}`)}
-    </CustomAvatar>
-  );
-};
+// // ** renders client column
+// const renderClient = (row: AdministratorType) => {
+//   return (
+//     <CustomAvatar
+//       skin="light"
+//       color={"primary"}
+//       sx={{ mr: 3, width: 30, height: 30, fontSize: ".875rem" }}
+//     >
+//       {getInitials(`${row.firstName} ${row.lastName}`)}
+//     </CustomAvatar>
+//   );
+// };
 
 const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setAdministratorId(id));
+    dispatch(setAdministratorUserId(userId));
     setAnchorEl(event.currentTarget);
   };
 
@@ -163,10 +166,41 @@ const columns = [
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
+      const [userData, setUserData] = useState<UserType | null>(null);
+      const userStore = useSelector((state: RootState) => state.users);
+
+      useEffect(() => {
+        dispatch(fetchUserById(row.userId) as any);
+      }, [row.userId]);
+
+      useEffect(() => {
+        const user = userStore.data.find((user) => user.id === row.userId);
+        setUserData(user || null);
+        console.log("userStore.data", userStore.data);
+      }, [userStore.data, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderClient(row)}
+          {userData?.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${row.firstName} ${row.lastName}`}
+              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color={"primary"}
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: ".875rem",
+                marginRight: "10px",
+              }}
+            >
+              {getInitials(`${row.firstName} ${row.lastName}`)}
+            </CustomAvatar>
+          )}{" "}
           <Box
             sx={{
               display: "flex",
@@ -177,8 +211,8 @@ const columns = [
             <StyledLink
               href="/apps/administrateurs/overview/inbox"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
-                dispatch(setSelectedUserId(row.userId));
+                dispatch(setAdministratorId(row.id));
+                dispatch(setAdministratorUserId(row.userId));
               }}
             >
               {firstName} {lastName}

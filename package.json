@@ -2,13 +2,18 @@
   "name": "materio-mui-react-nextjs-admin-template",
   "version": "2.0.0",
   "private": true,
+  "extensionKind": [
+    "ui"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "start-watch": "WATCHPACK_POLLING=true next start",
     "export": "next export",
-    "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js"
+    "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js",
+    "list-vscode-extensions": "code --list-extensions > extensions.txt",
+    "install-vscode-extensions": "while read extension; do code --install-extension \"$extension\"; done < extensions.txt"
   },
   "dependencies": {
     "@casl/ability": "6.3.2",

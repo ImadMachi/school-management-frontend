@@ -305,24 +305,6 @@ const MailDetails = (props: MailDetailsType) => {
                   </Box> */}
                 </Box>
               </Box>
-              {/* <Box sx={{ display: 'flex' }}>
-                <IconButton
-                  size='small'
-                  disabled={!mail.hasPreviousMail}
-                  sx={{ color: mail.hasPreviousMail ? 'text.primary' : 'text.secondary' }}
-                  onClick={() => dispatch(paginateMail({ dir: 'previous', emailId: mail.id }))}
-                >
-                  <Icon icon={prevMailIcon} />
-                </IconButton>
-                <IconButton
-                  size='small'
-                  disabled={!mail.hasNextMail}
-                  sx={{ color: mail.hasNextMail ? 'text.primary' : 'text.secondary' }}
-                  onClick={() => dispatch(paginateMail({ dir: 'next', emailId: mail.id }))}
-                >
-                  <Icon icon={nextMailIcon} />
-                </IconButton>
-              </Box> */}
             </Box>
           </Box>
           <Box
@@ -348,7 +330,7 @@ const MailDetails = (props: MailDetailsType) => {
                     <IconButton
                       size="small"
                       onClick={(e) =>
-                        handleStarMail(e, mail.id, !mail.isStarred)
+                        handleStarMail(e, mail.id, mail.isStarred)
                       }
                       sx={{
                         ...(mail.isStarred ? { color: "warning.main" } : {}),

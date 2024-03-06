@@ -14,7 +14,7 @@ export type MailFolderType =
 
 export type RouteParams = {
   label?: string;
-  folder?: string;
+  folder?: MailFolderType;
 };
 
 export type MailLayoutType = RouteParams & {};
@@ -36,7 +36,7 @@ export type FieldMenuItems = {
 export type FetchMailParamsType = {
   q: string;
   folder: MailFolderType;
-  label: MailLabelType;
+  // label: MailLabelType;
 };
 
 export type FetchMailByUserIdParamsType = {
@@ -102,7 +102,6 @@ export type SenderType = {
 };
 
 export type MailType = {
-  isStarred: any;
   id: number;
   body: string;
   subject: string;
@@ -115,7 +114,8 @@ export type MailType = {
   // labels: MailLabelType[]
   // hasPreviousMail?: boolean
   attachments: MailAttachmentType[];
-  isRead: true;
+  isRead: boolean;
+  isStarred: boolean;
 };
 
 export type MailFoldersArrType = {

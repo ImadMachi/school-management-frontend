@@ -109,6 +109,7 @@ export const getCurrentMail = createAsyncThunk(
   "appEmail/selectMail",
   async (id: number | string) => {
     const response = await axios.get(`${HOST}/messages/${id}`);
+
     return response.data;
   }
 );
@@ -119,6 +120,39 @@ export const markAsRead = createAsyncThunk(
   async (id: number | string) => {
     const response = await axios.post(`${HOST}/messages/${id}/read`);
     return id;
+  }
+);
+
+// ** Mark Mails as Starred
+export const markAsStarred = createAsyncThunk(
+  "appEmail/markAsStarred",
+  async (id: number) => {
+    const response = await axios.post(`${HOST}/messages/${id}/star`);
+    return id;
+  }
+);
+
+export const markAsUnStarred = createAsyncThunk(
+  "appEmail/markAsUnStarred",
+  async ({ id, folder }: { id: number; folder: MailFolderType }) => {
+    const response = await axios.delete(`${HOST}/messages/${id}/unstar`);
+    return { id, folder };
+  }
+);
+
+export const moveToTrash = createAsyncThunk(
+  "appEmail/moveToTrash",
+  async ({ id, folder }: { id: number; folder: MailFolderType }) => {
+    const response = await axios.post(`${HOST}/messages/${id}/trash`);
+    return { id, folder };
+  }
+);
+
+export const moveFromTrash = createAsyncThunk(
+  "appEmail/moveFromTrash",
+  async ({ id, folder }: { id: number; folder: MailFolderType }) => {
+    const response = await axios.delete(`${HOST}/messages/${id}/untrash`);
+    return { id, folder };
   }
 );
 
@@ -274,6 +308,36 @@ export const appEmailSlice = createSlice({
           mail.isRead = true;
         }
       });
+    });
+
+    builder.addCase(markAsStarred.fulfilled, (state, action) => {
+      state.mails.forEach((mail) => {
+        if (mail.id == action.payload) {
+          mail.isStarred = true;
+        }
+      });
+    });
+
+    builder.addCase(markAsUnStarred.fulfilled, (state, action) => {
+      state.mails.forEach((mail) => {
+        if (mail.id == action.payload.id) {
+          mail.isStarred = false;
+        }
+      });
+
+      if (action.payload.folder == "starred") {
+        state.mails = state.mails.filter(
+          (mail) => mail.id !== action.payload.id
+        );
+      }
+    });
+
+    builder.addCase(moveToTrash.fulfilled, (state, action) => {
+      if (action.payload.folder != "trash") {
+        state.mails = state.mails.filter(
+          (mail) => mail.id !== action.payload.id
+        );
+      }
     });
   },
 });

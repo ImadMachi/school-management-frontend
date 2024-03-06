@@ -40,7 +40,12 @@ import {
   MailFoldersObjType,
 } from "src/types/apps/mailTypes";
 import { OptionType } from "src/@core/components/option-menu/types";
-import { fetchMails } from "src/store/apps/mail";
+import {
+  fetchMails,
+  markAsStarred,
+  markAsUnStarred,
+  moveToTrash,
+} from "src/store/apps/mail";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -199,14 +204,26 @@ const MailLog = (props: MailLogType) => {
     trash: [foldersConfig.inbox, foldersConfig.spam],
   };
 
-  const handleMoveToTrash = () => {
-    // dispatch(updateMail({ emailIds: store.selectedMails, dataToUpdate: { folder: 'trash' } }))
+  const handleMoveToTrash = (e: SyntheticEvent, id: number) => {
+    e.stopPropagation();
+    dispatch(moveToTrash({ id, folder: routeParams.folder! }));
     dispatch(handleSelectAllMail(false));
   };
 
-  const handleStarMail = (e: SyntheticEvent, id: number, value: boolean) => {
+  const handleStarMail = async (
+    e: SyntheticEvent,
+    id: number,
+    isStarred: boolean
+  ) => {
     e.stopPropagation();
-    // dispatch(updateMail({ emailIds: [id], dataToUpdate: { isStarred: value } }))
+
+    if (isStarred) {
+      await dispatch(markAsUnStarred({ id, folder: routeParams.folder! }));
+    }
+    if (!isStarred) {
+      await dispatch(markAsStarred(id));
+    }
+    dispatch(getCurrentMail(id));
   };
 
   const handleReadMail = (id: number | number[], value: boolean) => {
@@ -233,8 +250,8 @@ const MailLog = (props: MailLogType) => {
     dispatch(
       fetchMails({
         q: query || "",
-        folder: routeParams.folder,
-        label: routeParams.label,
+        folder: routeParams.folder!,
+        // label: routeParams.label,
       })
     );
     setRefresh(true);
@@ -409,9 +426,10 @@ const MailLog = (props: MailLogType) => {
                     <MailItem
                       key={mail.id}
                       sx={{
-                        backgroundColor: mail.isRead
-                          ? "action.hover"
-                          : "background.paper",
+                        backgroundColor:
+                          mail.isRead && routeParams.folder !== "sent"
+                            ? "action.hover"
+                            : "background.paper",
                       }}
                       onClick={() => {
                         setMailDetailsOpen(true);
@@ -433,13 +451,16 @@ const MailLog = (props: MailLogType) => {
                         <IconButton
                           size="small"
                           onClick={(e) =>
-                            handleStarMail(e, mail.id, !mail.isStarred)
+                            handleStarMail(e, mail.id, mail.isStarred)
                           }
                           sx={{
                             mr: { xs: 0, sm: 3 },
-                            color: mail.isStarred
-                              ? "warning.main"
-                              : "text.secondary",
+                            color:
+                              routeParams.folder == "starred"
+                                ? "warning.main"
+                                : mail.isStarred
+                                ? "warning.main"
+                                : "text.secondary",
                             "& svg": {
                               display: { xs: "none", sm: "block" },
                             },
@@ -500,8 +521,7 @@ const MailLog = (props: MailLogType) => {
                           <Tooltip placement="top" title="Delete Mail">
                             <IconButton
                               onClick={(e) => {
-                                e.stopPropagation();
-                                // dispatch(updateMail({ emailIds: [mail.id], dataToUpdate: { folder: 'trash' } }))
+                                handleMoveToTrash(e, mail.id);
                               }}
                             >
                               <Icon icon="mdi:delete-outline" />

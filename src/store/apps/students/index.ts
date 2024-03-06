@@ -111,8 +111,8 @@ interface AppAddStudentsState {
   total: number;
   params: Record<string, any>;
   allData: StudentsType[];
-  selectedId: number | null;
-  selectedUserId: number | null;
+  studentId: number | null;
+  studentUserId: number | null;
 }
 
 const initialState: AppAddStudentsState = {
@@ -120,8 +120,8 @@ const initialState: AppAddStudentsState = {
   total: 1,
   params: {},
   allData: [],
-  selectedId: null,
-  selectedUserId: null,
+  studentId: null,
+  studentUserId: null,
 };
 
 export const appStudentsSlice = createSlice({
@@ -143,11 +143,11 @@ export const appStudentsSlice = createSlice({
           student.sex.toLowerCase().includes(filterValue)
       );
     },
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
-      state.selectedId = action.payload;
+    setStudentId: (state, action: PayloadAction<number | null>) => {
+      state.studentId = action.payload;
     },
-    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
-      state.selectedUserId = action.payload;
+    setStudentUserId: (state, action: PayloadAction<number | null>) => {
+      state.studentUserId = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -200,7 +200,7 @@ export const appStudentsSlice = createSlice({
   },
 });
 
-export const { setSelectedId } = appStudentsSlice.actions;
-export const { setSelectedUserId } = appStudentsSlice.actions;
+export const { setStudentId } = appStudentsSlice.actions;
+export const { setStudentUserId } = appStudentsSlice.actions;
 export const { filterData } = appStudentsSlice.actions;
 export default appStudentsSlice.reducer;

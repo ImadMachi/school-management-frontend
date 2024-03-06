@@ -110,8 +110,8 @@ interface AppaddParentsState {
   total: number;
   params: Record<string, any>;
   allData: ParentsType[];
-  selectedId: number | null;
-  selectedUserId: number | null;
+  parentId: number | null;
+  parentUserId: number | null;
 }
 
 const initialState: AppaddParentsState = {
@@ -119,8 +119,8 @@ const initialState: AppaddParentsState = {
   total: 1,
   params: {},
   allData: [],
-  selectedId: null,
-  selectedUserId: null,
+  parentId: null,
+  parentUserId: null,
 };
 
 export const appParentsSlice = createSlice({
@@ -141,11 +141,11 @@ export const appParentsSlice = createSlice({
           parents.phoneNumber.toString().toLowerCase().includes(filterValue)
       );
     },
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
-      state.selectedId = action.payload;
+    setParentId: (state, action: PayloadAction<number | null>) => {
+      state.parentId = action.payload;
     },
-    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
-      state.selectedUserId = action.payload;
+    setParentUserId: (state, action: PayloadAction<number | null>) => {
+      state.parentUserId = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -196,7 +196,7 @@ export const appParentsSlice = createSlice({
   },
 });
 
-export const { setSelectedId } = appParentsSlice.actions;
-export const { setSelectedUserId } = appParentsSlice.actions;
+export const { setParentId } = appParentsSlice.actions;
+export const { setParentUserId } = appParentsSlice.actions;
 export const { filterData } = appParentsSlice.actions;
 export default appParentsSlice.reducer;

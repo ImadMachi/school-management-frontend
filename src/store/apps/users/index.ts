@@ -14,7 +14,7 @@ interface AppUserstate {
   total: number;
   params: Record<string, any>;
   allData: UserType[];
-  selectedId: number | null;
+  selectedId: { id: number | null; role: string | null } | null;
 }
 
 const initialState: AppUserstate = {
@@ -39,6 +39,13 @@ export const fetchUser = createAsyncThunk(
     const response = await axios.get(`${HOST}/users/${id}`);
     return response.data;
   }
+);
+
+export const fetchUserById = createAsyncThunk( "appUsers/fetchUserById", async (id
+: number) => {
+  const response = await axios.get(`${HOST}/users/${id}`);
+  return response.data;
+}
 );
 
 // export const deleteUser = createAsyncThunk(
@@ -75,7 +82,7 @@ export const appUsersSlice = createSlice({
           User.email.toLowerCase().includes(filterValue)
       );
     },
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
+ setSelectedId: (state, action: PayloadAction<{ id: number | null; role: string | null }>) => {
       state.selectedId = action.payload;
     },
   },
@@ -113,6 +120,19 @@ export const appUsersSlice = createSlice({
     //     state.allData.unshift(action.payload)
     // })
     builder.addCase(fetchUser.fulfilled, (state, action) => {
+      const userIdToDelete = action.payload.id;
+
+      // Filter out the existing user data with the same ID
+      state.data = state.data.filter((User) => User.id !== userIdToDelete);
+      state.allData = state.allData.filter(
+        (User) => User.id !== userIdToDelete
+      );
+
+      // Add the updated user data to the beginning of the arrays
+      state.data.unshift(action.payload);
+      state.allData.unshift(action.payload);
+    });
+    builder.addCase(fetchUserById.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
       // Filter out the existing user data with the same ID

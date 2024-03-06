@@ -77,7 +77,7 @@ const UserViewLeft = () => {
   const router = useRouter();
   const { folder } = router.query;
   const selectedId = useSelector(
-    (state: RootState) => state.teachers.selectedId
+    (state: RootState) => state.teachers.teacherId
   );
   const id = selectedId;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
@@ -95,8 +95,7 @@ const UserViewLeft = () => {
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [userData, setUserData] = useState<TeachersType | null>(null);
-  const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>('auto');
-
+  const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>("auto");
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
@@ -139,21 +138,25 @@ const UserViewLeft = () => {
     };
   }, [id]);
 
-
   useEffect(() => {
     // Update state when the data is updated
     if (teacherStore.data && teacherStore.data.length > 0) {
       setUserData(teacherStore.data[0]);
     }
-    if (teacherStore.data[0]?.userId== null) {
-      setSuspendDialogOpen('auto');
+    if (teacherStore.data[0]?.userId == null) {
+      setSuspendDialogOpen("auto");
     }
   }, [teacherStore.data]);
 
   if (userData) {
     return (
       <Grid container spacing={3}>
-        <Grid item xs={12} md={5} sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen}}>
+        <Grid
+          item
+          xs={12}
+          md={5}
+          sx={{ marginLeft: suspendDialogOpen, marginRight: suspendDialogOpen }}
+        >
           <Card>
             <CardContent
               sx={{
@@ -270,7 +273,6 @@ const UserViewLeft = () => {
                   </Typography>
                   <Typography variant="body2">English</Typography>
                 </Box> */}
-                
                 <Box sx={{ display: "flex" }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -315,8 +317,7 @@ const UserViewLeft = () => {
                   variant="body2"
                   id="user-view-edit-description"
                   sx={{ textAlign: "center", mb: 7 }}
-                >
-                </DialogContentText>
+                ></DialogContentText>
                 <form onSubmit={handleSubmit(handleEditClose)}>
                   <Grid container spacing={6}>
                     <Grid item xs={12} sm={6}>
@@ -477,10 +478,9 @@ const UserViewLeft = () => {
           </Card>
         </Grid>
         {userData.userId !== null && (
-
-        <Grid item xs={12} md={7} sx={{ display: "flex" }}>
-          <EmailAppLayout folder={folder as string} />
-        </Grid>
+          <Grid item xs={12} md={7} sx={{ display: "flex" }}>
+            <EmailAppLayout folder={folder as string} />
+          </Grid>
         )}
       </Grid>
     );

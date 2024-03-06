@@ -133,6 +133,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     mode: "onChange",
     resolver: yupResolver(schema),
   });
+  const [isHovered, setIsHovered] = useState(false);
 
   const createAccount = useWatch({
     control,
@@ -395,10 +396,20 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
                       <Avatar
                         src={value ? URL.createObjectURL(value) : ""}
                         alt="User Image"
-                        sx={{ width: 100, height: 100, mr: 3 }}
+                        sx={{
+                          width: 100,
+                          height: 100,
+                          mr: 3,
+                          cursor: "pointer",
+                          border: isHovered
+                            ? "2px solid #72de95"
+                            : "2px solid transparent",
+                          transition: "border 0.3s ease",
+                        }}
                         onClick={() => fileInputRef.current?.click()}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => setIsHovered(false)}
                       />
-
                       <input
                         type="file"
                         ref={fileInputRef}

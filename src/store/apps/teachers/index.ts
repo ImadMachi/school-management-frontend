@@ -36,8 +36,8 @@ interface AppTeacherState {
   total: number;
   params: Record<string, any>;
   allData: TeachersType[];
-  selectedId: number | null;
-  selectedUserId: number | null;
+  teacherId: number | null;
+  teacherUserId: number | null;
 }
 
 const initialState: AppTeacherState = {
@@ -45,8 +45,8 @@ const initialState: AppTeacherState = {
   total: 1,
   params: {},
   allData: [],
-  selectedId: null,
-  selectedUserId: null,
+  teacherId: null,
+  teacherUserId: null,
 };
 
 export const fetchData = createAsyncThunk("appTeachers/fetchData", async () => {
@@ -68,32 +68,37 @@ export const addTeacher = createAsyncThunk(
     const formData = new FormData();
 
     // Append createAccount property explicitly
-    formData.append('firstName', data.firstName);
+    formData.append("firstName", data.firstName);
 
-    formData.append('lastName', data.lastName);
+    formData.append("lastName", data.lastName);
 
-    formData.append('dateOfBirth', data.dateOfBirth.toString());    
+    formData.append("dateOfBirth", data.dateOfBirth.toString());
 
-    formData.append('dateOfEmployment', data.dateOfEmployment.toString());
+    formData.append("dateOfEmployment", data.dateOfEmployment.toString());
 
-    formData.append('phoneNumber', data.phoneNumber);
+    formData.append("phoneNumber", data.phoneNumber);
 
-    formData.append('sex', data.sex);    
+    formData.append("sex", data.sex);
 
-    formData.append('createAccount', data.createAccount.toString());
+    formData.append("createAccount", data.createAccount.toString());
 
-    formData.append('createUserDto[email]', data.createUserDto?.email || '');
-    
-    formData.append('createUserDto[password]', data.createUserDto?.password || '');
-    
-    formData.append('profileImage', data.profileImage || '');
+    formData.append("createUserDto[email]", data.createUserDto?.email || "");
 
-    const response = await axios.post(`${HOST}/teachers?create-account=${data.createAccount}`, formData);
+    formData.append(
+      "createUserDto[password]",
+      data.createUserDto?.password || ""
+    );
+
+    formData.append("profileImage", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/teachers?create-account=${data.createAccount}`,
+      formData
+    );
     console.log(response.data);
     return response.data;
   }
 );
-
 
 export const deleteTeacher = createAsyncThunk(
   "appTeachers/deleteTeachers",
@@ -142,11 +147,11 @@ export const appTeachersSlice = createSlice({
           teacher.sex.toLowerCase().includes(filterValue)
       );
     },
-    setSelectedId: (state, action: PayloadAction<number | null>) => {
-      state.selectedId = action.payload;
+    setTeacherId: (state, action: PayloadAction<number | null>) => {
+      state.teacherId = action.payload;
     },
-    setSelectedUserId: (state, action: PayloadAction<number | null>) => {
-      state.selectedUserId = action.payload;
+    setTeacherUserId: (state, action: PayloadAction<number | null>) => {
+      state.teacherUserId = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -197,7 +202,7 @@ export const appTeachersSlice = createSlice({
   },
 });
 
-export const { setSelectedId } = appTeachersSlice.actions;
-export const { setSelectedUserId } = appTeachersSlice.actions;
+export const { setTeacherId } = appTeachersSlice.actions;
+export const { setTeacherUserId } = appTeachersSlice.actions;
 export const { filterData } = appTeachersSlice.actions;
 export default appTeachersSlice.reducer;

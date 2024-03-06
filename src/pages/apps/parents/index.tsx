@@ -23,6 +23,7 @@ import Icon from "src/@core/components/icon";
 // ** Store Imports
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "src/store";
+import { fetchUserById } from "src/store/apps/users";
 
 // ** Custom Components Imports
 import CustomAvatar from "src/@core/components/mui/avatar";
@@ -35,7 +36,8 @@ import {
   fetchData,
   deleteParent,
   filterData,
-  setSelectedId,
+  setParentId,
+  setParentUserId,
 } from "src/store/apps/parents";
 // ** Types Imports
 import { ParentsType } from "src/types/apps/parentTypes";
@@ -44,7 +46,9 @@ import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/parents/list/TableHeader";
 import SidebarAddParent from "src/views/apps/parents/list/AddParentDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
-import { setSelectedUserId } from "src/store/apps/parents";
+import { Avatar } from "@mui/material";
+import { ro } from "date-fns/locale";
+import { UserType } from "src/types/apps/UserType";
 
 interface CellType {
   row: ParentsType;
@@ -92,8 +96,10 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    dispatch(setSelectedId(id));
-    dispatch(setSelectedUserId(userId));
+    dispatch(setParentId(id));
+    dispatch(setParentUserId(userId));
+    console.log("id", id);
+    console.log("userId", userId);
     setAnchorEl(event.currentTarget);
   };
   const handleRowOptionsClose = () => {
@@ -151,15 +157,46 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: "parent",
-    field: "fullName",
+    headerName: "Utilisateur",
+    field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
+      const [userData, setUserData] = useState<UserType | null>(null);
+      const userStore = useSelector((state: RootState) => state.users);
+
+      useEffect(() => {
+        dispatch(fetchUserById(row.userId) as any);
+      }, [row.userId]);
+
+      useEffect(() => {
+        const user = userStore.data.find((user) => user.id === row.userId);
+        setUserData(user || null);
+        console.log("userStore.data", userStore.data);
+      }, [userStore.data, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderClient(row)}
+          {userData?.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${row.firstName} ${row.lastName}`}
+              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color={"primary"}
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: ".875rem",
+                marginRight: "10px",
+              }}
+            >
+              {getInitials(`${row.firstName} ${row.lastName}`)}
+            </CustomAvatar>
+          )}{" "}
           <Box
             sx={{
               display: "flex",
@@ -168,15 +205,14 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/parents/overview/inbox"
+              href="/apps/parents/overview/index"
               onClick={() => {
-                dispatch(setSelectedId(row.id));
-                dispatch(setSelectedUserId(row.userId));
+                dispatch(setParentId(row.id));
+                dispatch(setParentUserId(row.userId));
                 console.log("id", row.id);
-                console.log("userId", row.userId);
               }}
             >
-              {firstName} {lastName}
+              {row.firstName} {row.lastName}
             </StyledLink>
           </Box>
         </Box>

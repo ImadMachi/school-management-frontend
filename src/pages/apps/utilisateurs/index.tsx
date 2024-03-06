@@ -37,7 +37,6 @@ import {
   fetchData,
   fetchUserById,
   filterData,
-  setSelectedId,
 } from "src/store/apps/users";
 // ** Types Imports
 import { UserRole, UserType } from "src/types/apps/UserType";

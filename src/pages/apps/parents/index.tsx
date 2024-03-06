@@ -48,6 +48,7 @@ import SidebarAddParent from "src/views/apps/parents/list/AddParentDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
 import { Avatar } from "@mui/material";
 import { ro } from "date-fns/locale";
+import { UserType } from "src/types/apps/UserType";
 
 interface CellType {
   row: ParentsType;
@@ -159,8 +160,9 @@ const columns = [
     headerName: "Utilisateur",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
+      const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
-      const [userData, setUserData] = useState<any>({});
+      const [userData, setUserData] = useState<UserType | null>(null);
       const userStore = useSelector((state: RootState) => state.users);
 
       useEffect(() => {
@@ -168,13 +170,14 @@ const columns = [
       }, [row.userId]);
 
       useEffect(() => {
-        setUserData(userStore.data[0]);
+        const user = userStore.data.find((user) => user.id === row.userId);
+        setUserData(user || null);
         console.log("userStore.data", userStore.data);
-      }, [userStore.data]);
+      }, [userStore.data, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {userData?.profileImage && row.userId ? (
+          {userData?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
               src={`http://localhost:8000/uploads/${userData.profileImage}`}
@@ -193,7 +196,7 @@ const columns = [
             >
               {getInitials(`${row.firstName} ${row.lastName}`)}
             </CustomAvatar>
-          )}
+          )}{" "}
           <Box
             sx={{
               display: "flex",

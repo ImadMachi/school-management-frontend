@@ -67,7 +67,7 @@ export const addDirector = createAsyncThunk(
       data.createUserDto?.password || ""
     );
 
-    formData.append("profileImage", data.profileImage || "");
+    formData.append("profile-images", data.profileImage || "");
 
     const response = await axios.post(
       `${HOST}/directors?create-account=${data.createAccount}`,

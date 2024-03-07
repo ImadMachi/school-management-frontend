@@ -65,7 +65,7 @@ export const addParent = createAsyncThunk(
       data.createUserDto?.password || ""
     );
 
-    formData.append("profileImage", data.profileImage || "");
+    formData.append("profile-images", data.profileImage || "");
 
     const response = await axios.post(
       `${HOST}/parents?create-account=${data.createAccount}`,

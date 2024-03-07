@@ -33,11 +33,7 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
-import {
-  fetchData,
-  fetchUserById,
-  filterData,
-} from "src/store/apps/users";
+import { fetchData, fetchUserById, filterData } from "src/store/apps/users";
 // ** Types Imports
 import { UserRole, UserType } from "src/types/apps/UserType";
 // ** Custom Table Components Imports
@@ -59,7 +55,10 @@ import select from "src/@core/theme/overrides/select";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Action } from "@reduxjs/toolkit";
-import {setAdministratorId,setAdministratorUserId,} from "src/store/apps/administrator";
+import {
+  setAdministratorId,
+  setAdministratorUserId,
+} from "src/store/apps/administrator";
 import { setDirectorId, setDirectorUserId } from "src/store/apps/directors";
 import { setTeacherId, setTeacherUserId } from "src/store/apps/teachers";
 import { setStudentId, setStudentUserId } from "src/store/apps/students";
@@ -384,8 +383,7 @@ const columns = [
                 console.log("id", row.id);
               }}
             >
-              {row.userData?.firstName ? row.userData?.firstName : "Admin"}{" "}
-              {row.userData?.lastName ? row.userData?.lastName : ""}
+              {row.userData?.firstName} {row.userData?.lastName}
             </StyledLink>
           </Box>
         </Box>

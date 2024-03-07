@@ -89,7 +89,7 @@ export const addTeacher = createAsyncThunk(
       data.createUserDto?.password || ""
     );
 
-    formData.append("profileImage", data.profileImage || "");
+    formData.append("profile-images", data.profileImage || "");
 
     const response = await axios.post(
       `${HOST}/teachers?create-account=${data.createAccount}`,

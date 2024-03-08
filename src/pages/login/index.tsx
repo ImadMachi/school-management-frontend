@@ -188,7 +188,7 @@ const LoginPage = () => {
           }}
         >
           <BoxWrapper>
-            {/* <Box
+            <Box
               sx={{
                 top: 30,
                 left: 40,
@@ -224,7 +224,7 @@ const LoginPage = () => {
               <Typography variant="body2">
                 Veuillez vous connecter à votre compte
               </Typography>
-            </Box> */}
+            </Box>
             {/* <Alert
               icon={false}
               sx={{

@@ -225,7 +225,7 @@ const LoginPage = () => {
                 Veuillez vous connecter à votre compte
               </Typography>
             </Box>
-            {/* <Alert
+            <Alert
               icon={false}
               sx={{
                 py: 3,
@@ -234,14 +234,14 @@ const LoginPage = () => {
                 "& .MuiAlert-message": { p: 0 },
               }}
             >
-              <Typography
+              {/* <Typography
                 variant="caption"
                 sx={{ mb: 0, display: "block", color: "primary.main" }}
               >
                 Admin: <strong>admin@gmail.com</strong> / Pass:{" "}
                 <strong>123456</strong>
-              </Typography>
-            </Alert> */}
+              </Typography> */}
+            </Alert>
             <form
               noValidate
               autoComplete="off"

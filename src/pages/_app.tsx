@@ -91,16 +91,13 @@ if (themeConfig.routingLoader) {
 }
 
 const Guard = ({ children, authGuard, guestGuard }: GuardProps) => {
-  console.log("guestGuard", guestGuard);
-  console.log("authGuard", authGuard);
-  return <>hello</>;
-  // if (guestGuard) {
-  //   return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>;
-  // } else if (!guestGuard && !authGuard) {
-  //   return <>{children}</>;
-  // } else {
-  //   return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>;
-  // }
+  if (guestGuard) {
+    return <GuestGuard fallback={<Spinner />}>{children}</GuestGuard>;
+  } else if (!guestGuard && !authGuard) {
+    return <>{children}</>;
+  } else {
+    return <AuthGuard fallback={<Spinner />}>{children}</AuthGuard>;
+  }
 };
 
 // ** Configure JSS & ClassName

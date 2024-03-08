@@ -125,7 +125,7 @@ const MailLog = (props: MailLogType) => {
 
   // ** Store Vars
   const userId = useSelector(
-    (state: RootState) => state.teachers.selectedUserId
+    (state: RootState) => state.teachers.teacherUserId
   ); // Replace 'yourSlice' with the name of your slice
 
   // ** Vars
@@ -441,7 +441,7 @@ const MailLog = (props: MailLogType) => {
                           alignItems: "center",
                         }}
                       >
-                        <IconButton
+                        {/* <IconButton
                           size="small"
                           onClick={(e) =>
                             handleStarMail(e, mail.id, !mail.isStarred)
@@ -457,7 +457,7 @@ const MailLog = (props: MailLogType) => {
                           }}
                         >
                           <Icon icon="mdi:star-outline" />
-                        </IconButton>
+                        </IconButton> */}
                         {routeParams.folder !== "sent" && (
                           <Avatar
                             alt={mail.sender.senderData?.firstName}

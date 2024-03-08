@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -26,6 +26,7 @@ import { useEffect } from "react";
 import { fetchTeacher } from "src/store/apps/teachers";
 import { TeachersType } from "src/types/apps/teacherTypes";
 import EmailAppLayout from "src/views/apps/teacher/overview/mail/Mail";
+import EditIcon from "@mui/icons-material/Edit";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
@@ -48,8 +49,11 @@ import { AppDispatch, RootState } from "src/store";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { updateTeacher } from "src/store/apps/teachers";
 import { Controller, useForm } from "react-hook-form";
-import { FormHelperText } from "@mui/material";
+import { FormHelperText, IconButton } from "@mui/material";
 import { formatDate } from "src/@core/utils/format";
+import { UserType } from "src/types/apps/UserType";
+import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
+import { MailFolderType } from "src/types/apps/mailTypes";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -76,11 +80,16 @@ const schema = yup.object().shape({
 const UserViewLeft = () => {
   const router = useRouter();
   const { folder } = router.query;
+  const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
+
   const selectedId = useSelector(
     (state: RootState) => state.teachers.teacherId
   );
+  const selectedUserId = useSelector(
+    (state: RootState) => state.teachers.teacherUserId
+  );
   const id = selectedId;
-  const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
+  const userId = selectedUserId;
   const {
     reset,
     control,
@@ -92,14 +101,24 @@ const UserViewLeft = () => {
   });
 
   const teacherStore = useSelector((state: RootState) => state.teachers);
+  const userStore = useSelector((state: RootState) => state.users);
+
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [userData, setUserData] = useState<TeachersType | null>(null);
+  const [userIdData, setUserIdData] = useState<UserType | null>(null);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>("auto");
+  const [isHovered, setIsHovered] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
+
+  const handleEditClick = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleEditSubmit = (data: UpdateTeacherDto) => {
     // Ensure id is a number
@@ -127,6 +146,36 @@ const UserViewLeft = () => {
     reset();
   };
 
+  const handleHover = () => {
+    setIsHovered(true);
+  };
+
+  const handleLeave = () => {
+    setIsHovered(false);
+  };
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+
+      try {
+        const response = await dispatch(
+          uploadProfileImage({ id: userId!, file })
+        ).unwrap();
+
+        console.log("Profile image uploaded successfully:", response);
+
+        if (userIdData) {
+          const imageUrl = response.profileImage;
+          setUserIdData({ ...userIdData, profileImage: imageUrl });
+        }
+      } catch (error) {
+        console.error("Error uploading profile image:", error);
+      }
+      e.target.value = "";
+    }
+  };
+
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
       dispatch(fetchTeacher(Number(id)) as any);
@@ -148,6 +197,22 @@ const UserViewLeft = () => {
     }
   }, [teacherStore.data]);
 
+  useEffect(() => {
+    if (userId && !isNaN(Number(userId))) {
+      dispatch(fetchUserById(Number(userId)) as any);
+    }
+    return () => {
+      setUserData(null);
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    // Update state when the data is updated
+    if (userStore.data && userStore.data.length > 0) {
+      setUserIdData(userStore.data[0]);
+    }
+  }, [userStore.data]);
+
   if (userData) {
     return (
       <Grid container spacing={3}>
@@ -166,11 +231,64 @@ const UserViewLeft = () => {
                 flexDirection: "column",
               }}
             >
-              <Avatar
-                alt="John Doe"
-                sx={{ width: 80, height: 80 }}
-                src="/images/avatars/1.png"
-              />{" "}
+              <div
+                onMouseEnter={handleHover}
+                onMouseLeave={handleLeave}
+                style={{ position: "relative" }}
+              >
+                {userId && userIdData?.profileImage ? (
+                  <>
+                    <Avatar
+                      alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
+                      src={`http://localhost:8000/uploads/${userIdData.profileImage}`}
+                      sx={{ width: 80, height: 80 }}
+                    />
+                    {isHovered && (
+                      <IconButton
+                        onClick={handleEditClick}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          backgroundColor: "rgba(244, 245, 250, 0.8)",
+                          padding: "4px",
+                        }}
+                      >
+                        <EditIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <Avatar
+                      alt="John Doe"
+                      sx={{ width: 80, height: 80 }}
+                      src='/images/avatars/1.png'
+                    />
+
+                    {isHovered && (
+                      <IconButton
+                        onClick={handleEditClick}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          backgroundColor: "rgba(244, 245, 250, 0.8)",
+                          padding: "2px",
+                        }}
+                      >
+                        <EditIcon sx={{ fontSize: 18 }} />
+                      </IconButton>
+                    )}
+                  </>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: "none" }}
+                  onChange={handleFileChange}
+                />
+              </div>
               <Typography variant="h6" sx={{ mb: 4 }}>
                 {userData.firstName} {userData.lastName}
               </Typography>
@@ -181,29 +299,6 @@ const UserViewLeft = () => {
                 sx={{ textTransform: "capitalize" }}
               />
             </CardContent>
-
-            {/* <CardContent sx={{ my: 1 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Box sx={{ mr: 8, display: 'flex', alignItems: 'center' }}>
-                  <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4, width: 44, height: 44 }}>
-                    <Icon icon='mdi:check' />
-                  </CustomAvatar>
-                  <div>
-                    <Typography variant='h6'>1.23k</Typography>
-                    <Typography variant='body2'> Done</Typography>
-                  </div>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <CustomAvatar skin='light' variant='rounded' sx={{ mr: 4, width: 44, height: 44 }}>
-                    <Icon icon='mdi:star-outline' />
-                  </CustomAvatar>
-                  <div>
-                    <Typography variant='h6'>568</Typography>
-                    <Typography variant='body2'>Project Done</Typography>
-                  </div>
-                </Box>
-              </Box>
-            </CardContent> */}
 
             <CardContent>
               <Typography variant="h6">Details</Typography>
@@ -479,7 +574,7 @@ const UserViewLeft = () => {
         </Grid>
         {userData.userId !== null && (
           <Grid item xs={12} md={7} sx={{ display: "flex" }}>
-            <EmailAppLayout folder={folder as string} />
+            <EmailAppLayout folder={folder as MailFolderType} />
           </Grid>
         )}
       </Grid>

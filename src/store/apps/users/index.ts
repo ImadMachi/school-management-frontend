@@ -41,11 +41,12 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
-export const fetchUserById = createAsyncThunk( "appUsers/fetchUserById", async (id
-: number) => {
-  const response = await axios.get(`${HOST}/users/${id}`);
-  return response.data;
-}
+export const fetchUserById = createAsyncThunk(
+  "appUsers/fetchUserById",
+  async (id: number) => {
+    const response = await axios.get(`${HOST}/users/${id}`);
+    return response.data;
+  }
 );
 
 // export const deleteUser = createAsyncThunk(
@@ -63,6 +64,21 @@ export const fetchUserById = createAsyncThunk( "appUsers/fetchUserById", async (
 //         return response.data;
 //     }
 // );
+
+export const uploadProfileImage = createAsyncThunk(
+  "appUsers/uploadProfileImage",
+  async ({ id, file }: { id: number; file: File }) => {
+    const formData = new FormData();
+    formData.append("profile-images", file);
+
+    const response = await axios.post<UserType>(
+      `${HOST}/users/${id}/update-profile-image`,
+      formData
+    );
+
+    return response.data;
+  }
+);
 
 export const appUsersSlice = createSlice({
   name: "appUsers",
@@ -82,7 +98,10 @@ export const appUsersSlice = createSlice({
           User.email.toLowerCase().includes(filterValue)
       );
     },
- setSelectedId: (state, action: PayloadAction<{ id: number | null; role: string | null }>) => {
+    setSelectedId: (
+      state,
+      action: PayloadAction<{ id: number | null; role: string | null }>
+    ) => {
       state.selectedId = action.payload;
     },
   },

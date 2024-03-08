@@ -164,13 +164,14 @@ const columns = [
       const userStore = useSelector((state: RootState) => state.users);
 
       useEffect(() => {
-        dispatch(fetchUserById(row.userId) as any);
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
       }, [row.userId]);
 
       useEffect(() => {
         const user = userStore.data.find((user) => user.id === row.userId);
         setUserData(user || null);
-        console.log("userStore.data", userStore.data);
       }, [userStore.data, row.userId]);
 
       return (
@@ -194,7 +195,7 @@ const columns = [
             >
               {getInitials(`${row.firstName} ${row.lastName}`)}
             </CustomAvatar>
-          )}{" "}
+          )}
           <Box
             sx={{
               display: "flex",
@@ -203,14 +204,13 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/enseignants/overview/index"
+              href="/apps/enseignants/overview/inbox"
               onClick={() => {
                 dispatch(setTeacherId(row.id));
                 dispatch(setTeacherUserId(row.userId));
-                console.log("id", row.id);
               }}
             >
-              {row.firstName} {row.lastName}
+              {firstName} {lastName}
             </StyledLink>
           </Box>
         </Box>

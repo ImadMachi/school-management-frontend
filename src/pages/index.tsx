@@ -36,7 +36,7 @@ const Home = () => {
       router.replace(homeRoute);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, auth.user]);
+  }, []);
 
   return <Spinner />;
 };

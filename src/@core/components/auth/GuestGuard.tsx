@@ -33,7 +33,8 @@ const GuestGuard = (props: GuestGuardProps) => {
     return fallback;
   }
 
-  return <>{children}</>;
+  // return <>{children}</>;
+  return <div>Test</div>;
 };
 
 export default GuestGuard;

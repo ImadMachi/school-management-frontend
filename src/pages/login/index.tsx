@@ -224,7 +224,7 @@ const LoginPage = () => {
               <Typography variant="body2">
                 Veuillez vous connecter à votre compte
               </Typography>
-            </Box>
+            </Box> */}
             <Alert
               icon={false}
               sx={{
@@ -241,7 +241,7 @@ const LoginPage = () => {
                 Admin: <strong>admin@gmail.com</strong> / Pass:{" "}
                 <strong>123456</strong>
               </Typography>
-            </Alert> */}
+            </Alert>
             <form
               noValidate
               autoComplete="off"

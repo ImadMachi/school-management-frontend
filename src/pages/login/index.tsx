@@ -151,7 +151,7 @@ const LoginPage = () => {
   };
   return (
     <Box className="content-right">
-      {/* {!hidden ? (
+      {!hidden ? (
         <Box
           sx={{
             flex: 1,
@@ -169,7 +169,7 @@ const LoginPage = () => {
             />
           </LoginIllustrationWrapper>
         </Box>
-      ) : null} */}
+      ) : null}
       <RightWrapper
         sx={
           skin === "bordered" && !hidden

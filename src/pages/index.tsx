@@ -21,26 +21,24 @@ export const getHomeRoute = (role: string) => {
 
 const Home = () => {
   // ** Hooks
-  const auth = useAuth();
-  const router = useRouter();
+  // const auth = useAuth()
+  // const router = useRouter()
 
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!router.isReady) {
+  //     return
+  //   }
 
-    if (auth.user && auth.user.role) {
-      const homeRoute = getHomeRoute(auth.user.role);
+  //   if (auth.user && auth.user.role) {
+  //     const homeRoute = getHomeRoute(auth.user.role)
 
-      // Redirect user to Home URL
-      router.replace(homeRoute);
-    } else {
-      router.replace("/login");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return <Spinner />;
+  //     // Redirect user to Home URL
+  //     router.replace(homeRoute)
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
+  return <div>Home</div>;
+  // return <Spinner />
 };
 
 export default Home;

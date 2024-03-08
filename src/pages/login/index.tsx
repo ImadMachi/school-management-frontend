@@ -151,7 +151,7 @@ const LoginPage = () => {
   };
   return (
     <Box className="content-right">
-      {!hidden ? (
+      {/* {!hidden ? (
         <Box
           sx={{
             flex: 1,
@@ -169,7 +169,7 @@ const LoginPage = () => {
             />
           </LoginIllustrationWrapper>
         </Box>
-      ) : null}
+      ) : null} */}
       <RightWrapper
         sx={
           skin === "bordered" && !hidden
@@ -188,7 +188,7 @@ const LoginPage = () => {
           }}
         >
           <BoxWrapper>
-            <Box
+            {/* <Box
               sx={{
                 top: 30,
                 left: 40,
@@ -241,7 +241,7 @@ const LoginPage = () => {
                 Admin: <strong>admin@gmail.com</strong> / Pass:{" "}
                 <strong>123456</strong>
               </Typography>
-            </Alert>
+            </Alert> */}
             <form
               noValidate
               autoComplete="off"

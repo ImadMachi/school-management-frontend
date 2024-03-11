@@ -174,16 +174,6 @@ export const appUsersSlice = createSlice({
     builder.addCase(uploadProfileImage.rejected, (state, action) => {
       toast.error("Erreur lors de la mise à jour de l'image de profil");
     });
-    // builder.addCase(updateUser.fulfilled, (state, action) => {
-    //     const updateUser = action.payload;
-    //     const index = state.allData.findIndex(User => User.id === updateUser.id);
-
-    //     if (index !== -1) {
-    //         // If the User is found, update the data in both data and allData arrays
-    //         state.data[index] = updateUser;
-    //         state.allData[index] = updateUser;
-    //     }
-    // })
   },
 });
 

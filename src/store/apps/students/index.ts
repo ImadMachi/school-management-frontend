@@ -8,6 +8,7 @@ import {
 
 // ** Axios Imports
 import axios from "axios";
+import toast from "react-hot-toast";
 import { UpdateStudentDto } from "src/pages/apps/etudiants/overview/[folder]";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { CreateStudentDto } from "src/views/apps/student/list/AddStudentDrawer";
@@ -163,11 +164,19 @@ export const appStudentsSlice = createSlice({
       state.allData = state.allData.filter(
         (student) => student.id !== action.payload
       );
+      toast.success("L'élève a été supprimé avec succès");
+    });
+    builder.addCase(deleteStudent.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'élève");
     });
 
     builder.addCase(addStudent.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
+      toast.success("L'élève a été ajouté avec succès");
+    });
+    builder.addCase(addStudent.rejected, (state, action) => {
+      toast.error("Erreur ajoutant l'élève");
     });
     builder.addCase(fetchStudent.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
@@ -195,7 +204,11 @@ export const appStudentsSlice = createSlice({
         // If the administrator is found, update the data in both data and allData arrays
         state.data[index] = updatedStudent;
         state.allData[index] = updatedStudent;
+        toast.success("L'élève a été modifié avec succès");
       }
+    });
+    builder.addCase(updateStudent.rejected, (state, action) => {
+      toast.error("Erreur modifiant l'élève");
     });
   },
 });

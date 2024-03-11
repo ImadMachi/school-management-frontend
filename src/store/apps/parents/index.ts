@@ -8,6 +8,7 @@ import {
 
 // ** Axios Imports
 import axios from "axios";
+import toast from "react-hot-toast";
 import { UpdateParentDto } from "src/pages/apps/parents/overview/[folder]";
 import { ParentsType } from "src/types/apps/parentTypes";
 import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
@@ -161,12 +162,20 @@ export const appParentsSlice = createSlice({
       state.allData = state.allData.filter(
         (addParent) => addParent.id !== action.payload
       );
+      toast.success("Le parent a été supprimé avec succès");
     });
-
+    builder.addCase(deleteParent.rejected, (state, action) => {
+      toast.error("Erreur supprimant le parent");
+    });
     builder.addCase(addParent.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
+      toast.success("Le parent a été ajouté avec succès");
     });
+    builder.addCase(addParent.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le parent");
+    });
+
     builder.addCase(fetchParent.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
@@ -191,7 +200,11 @@ export const appParentsSlice = createSlice({
         // If the Parent is found, update the data in both data and allData arrays
         state.data[index] = updateParent;
         state.allData[index] = updateParent;
+        toast.success("Le parent a été modifié avec succès");
       }
+    });
+    builder.addCase(updateParent.rejected, (state, action) => {
+      toast.error("Erreur modifiant le parent");
     });
   },
 });

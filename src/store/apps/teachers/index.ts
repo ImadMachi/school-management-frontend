@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 
 import axios from "axios";
+import toast from "react-hot-toast";
 import { UpdateTeacherDto } from "src/pages/apps/enseignants/overview/[folder]";
 import { TeachersType } from "src/types/apps/teacherTypes";
 import { CreateTeacherDto } from "src/views/apps/teacher/list/AddTeacherDrawer";
@@ -167,10 +168,18 @@ export const appTeachersSlice = createSlice({
       state.allData = state.allData.filter(
         (teacher) => teacher.id !== action.payload
       );
+      toast.success("enseignant a été supprimé avec succès");
+    });
+    builder.addCase(addTeacher.rejected, (state, action) => {
+      toast.error("Erreur lors de l'ajout de l'enseignant");
     });
     builder.addCase(addTeacher.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
+      toast.success("L'enseignant a été ajouté avec succès");
+    });
+    builder.addCase(deleteTeacher.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'enseignant");
     });
     builder.addCase(fetchTeacher.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
@@ -197,7 +206,11 @@ export const appTeachersSlice = createSlice({
         // If the teacher is found, update the data in both data and allData arrays
         state.data[index] = updateTeacher;
         state.allData[index] = updateTeacher;
+        toast.success("L'enseignant a été modifié avec succès");
       }
+    });
+    builder.addCase(updateTeacher.rejected, (state, action) => {
+      toast.error("Erreur modifiant l'enseignant");
     });
   },
 });

@@ -12,6 +12,8 @@ import { HOST } from "src/store/constants/hostname";
 import { DirectorType } from "src/types/apps/directorTypes";
 import { CreateDirectorDto } from "src/views/apps/directors/list/AddDirectorDrawer";
 import { UpdateDirectorDto } from "src/pages/apps/directeurs/overview/[folder]";
+import toast from "react-hot-toast";
+import { t } from "i18next";
 
 interface Params {
   q: string;
@@ -162,11 +164,18 @@ export const appDirectorsSlice = createSlice({
       state.allData = state.allData.filter(
         (Director) => Director.id !== action.payload
       );
+      toast.success("Le directeur a été supprimé avec succès");
     });
-
+    builder.addCase(deleteDirector.rejected, (state, action) => {
+      toast.error("Erreur supprimant le directeur");
+    });
     builder.addCase(addDirector.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
+      toast.success("Le directeur a été ajouté avec succès");
+    });
+    builder.addCase(addDirector.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le directeur");
     });
     builder.addCase(fetchDirector.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
@@ -194,10 +203,15 @@ export const appDirectorsSlice = createSlice({
         // If the Director is found, update the data in both data and allData arrays
         state.data[index] = updatedDirector;
         state.allData[index] = updatedDirector;
+        toast.success("Le directeur a été modifié avec succès");
       }
+    });
+    builder.addCase(updateDirector.rejected, (state, action) => {
+      toast.error("Erreur modifiant le directeur");
     });
   },
 });
+
 
 export const { setDirectorId } = appDirectorsSlice.actions;
 export const { setDirectorUserId } = appDirectorsSlice.actions;

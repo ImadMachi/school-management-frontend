@@ -57,6 +57,13 @@ const navigation = (): VerticalNavItemsType => {
       title: "Classes",
       icon: "mdi:account-group",
     },
+    {
+      "path": "/apps/niveaux",
+      "action": "manage",
+      "subject": "niveaux",
+      "title": "Niveaux",
+      "icon": "mdi:school-outline"
+    },    
   ];
 };
 

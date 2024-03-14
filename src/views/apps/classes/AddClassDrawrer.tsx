@@ -42,6 +42,7 @@ import { useSelector } from "react-redux";
 import { fetchData as fetchAdministrators } from "src/store/apps/administrator";
 import { fetchData as fetchTeachers } from "src/store/apps/teachers";
 import { fetchData as fetchStudents } from "src/store/apps/students";
+import { fetchData as fetchLevels } from "src/store/apps/levels";
 
 import { getInitials } from "src/@core/utils/get-initials";
 import { addClass, deleteClass, editClass } from "src/store/apps/classes";
@@ -49,6 +50,9 @@ import { AdministratorType } from "src/types/apps/administratorTypes";
 import { TeachersType } from "src/types/apps/teacherTypes";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { ClassType } from "src/types/apps/classTypes";
+import { LevelType } from "src/types/apps/levelTypes";
+import { UserType } from "src/types/apps/UserType";
+import { t } from "i18next";
 
 interface SidebarAddClassType {
   open: boolean;
@@ -60,16 +64,19 @@ export interface CreateClassDto {
   name: string;
   schoolYear: string;
   administrator: number;
+  level: number;
 }
 
 type SelectType = AdministratorType | TeachersType | StudentsType;
+type SelectTypeLevel = LevelType;
 
 const defaultValues = {
   name: "",
   schoolYear: "",
   teachers: [] as TeachersType[],
   students: [] as StudentsType[],
-  administrator: "",
+  administrator: "", 
+  level: "",
 };
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -109,6 +116,12 @@ const schema = yup.object().shape({
     .typeError("Administrateur est requis"),
   teachers: yup.array().min(1, "Au moins un enseignant est requis"),
   students: yup.array().min(1, "Au moins un étudiant est requis"),
+  level: yup
+    .number()
+    .required("Niveau est requis")
+    .positive("Niveau est requis")
+    .integer("Niveau est requis")
+    .typeError("Niveau est requis"),
 });
 
 const SidebarAddClass = (props: SidebarAddClassType) => {
@@ -124,6 +137,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   );
   const teacherStore = useSelector((state: RootState) => state.teachers);
   const studentStore = useSelector((state: RootState) => state.students);
+  const levelStore = useSelector((state: RootState) => state.levels);
 
   const {
     reset,
@@ -145,6 +159,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
       setValue("administrator", `${props.classToEdit.administrator.id}`);
       setValue("teachers", props.classToEdit.teachers);
       setValue("students", props.classToEdit.students);
+      setValue("level", `${props.classToEdit.level.id}`);
     }
   }, [props.classToEdit]);
 
@@ -152,12 +167,14 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     dispatch(fetchAdministrators() as any);
     dispatch(fetchTeachers() as any);
     dispatch(fetchStudents() as any);
+    dispatch(fetchLevels() as any);
   }, []);
 
   const onSubmit = (data: any) => {
     const payload = {
       ...data,
       administrator: { id: data.administrator },
+      level : { id: data.level }
     };
     if (props.classToEdit) {
       dispatch(editClass({ ...payload, id: props.classToEdit.id }) as any);
@@ -196,13 +213,13 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.avatar?.length ? (
+          {/* {option.avatar?.length ? (
             <CustomAvatar
               src={option.avatar}
               alt={option.userData.firstName}
               sx={{ mr: 3, width: 22, height: 22 }}
             />
-          ) : (
+          ) : ( */}
             <CustomAvatar
               skin="light"
               color="primary"
@@ -210,7 +227,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
             >
               {getInitials(`${option.firstName} ${option.lastName}`)}
             </CustomAvatar>
-          )}
           <Typography sx={{ fontSize: "0.875rem" }}>
             {option.firstName} {option.lastName}
           </Typography>
@@ -464,6 +480,42 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
             {errors.students && (
               <FormHelperText sx={{ color: "error.main" }}>
                 {errors.students.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="level"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <>
+                  <InputLabel id="level-select-label">Niveau</InputLabel>
+                  <Select
+                    labelId="level-select-label"
+                    id="level-select"
+                    value={value}
+                    onChange={onChange}
+                    error={Boolean(errors.level)}
+                    label={"Niveau"}
+                    sx={{
+                      "& .MuiOutlinedInput-root": { p: 2 },
+                      "& .MuiSelect-selectMenu": { minHeight: "auto" },
+                    }}
+                  >
+                    {levelStore.data.length > 0 &&
+                      levelStore.data.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.name}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              )}
+            />
+            {errors.level && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.level.message}
               </FormHelperText>
             )}
           </FormControl>

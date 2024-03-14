@@ -22,12 +22,11 @@ const GuestGuard = (props: GuestGuardProps) => {
       return;
     }
 
-    if (auth.user) {
+    if (window.localStorage.getItem("userData")) {
       router.replace("/");
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth.user, router.isReady]);
+  }, [router.route]);
 
   if (auth.loading || (!auth.loading && auth.user !== null)) {
     return fallback;

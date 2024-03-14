@@ -51,6 +51,11 @@ const navigation = (): VerticalNavItemsType => {
       icon: "mdi:email",
     },
     {
+      path: "/apps/mail-parametres",
+      title: "Paramètres de messagerie",
+      icon: "mdi:email-edit",
+    },
+    {
       path: "/apps/classes",
       action: "manage",
       subject: "classes",

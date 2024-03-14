@@ -5,6 +5,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import administrator from "./apps/administrator";
 import teachers from "./apps/teachers";
 import mail from "./apps/mail";
+import templates from "./apps/templates";
 import students from "./apps/students";
 import parents from "./apps/parents";
 import directors from "./apps/directors";
@@ -17,6 +18,7 @@ export const store = configureStore({
     administrator,
     teachers,
     mail,
+    templates,
     students,
     parents,
     directors,

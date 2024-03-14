@@ -51,15 +51,21 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { sendMail } from "src/store/apps/mail";
-import { FormHelperText, Select } from "@mui/material";
+import { FormHelperText, Grid, Select } from "@mui/material";
 import { useSelector } from "react-redux";
 import { fetchData } from "src/store/apps/users";
 import { fetchData as fetchCategoryData } from "src/store/apps/categories";
 import { fetchData as fetchClassesData } from "src/store/apps/classes";
+import { fetchData as fetchTemplatesData } from "src/store/apps/templates";
 import { UserRole, UserType } from "src/types/apps/UserType";
 import { useRouter } from "next/router";
 import { ClassType } from "src/types/apps/classTypes";
 import toast from "react-hot-toast";
+import CardSnippet from "src/@core/components/card-snippet";
+import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
+import { useSettings } from "src/@core/hooks/useSettings";
+import * as source from "src/views/components/swiper/SwiperSourceCode";
+import { TemplateType } from "src/types/apps/templateTypes";
 
 type ToUserType = UserType;
 
@@ -92,9 +98,15 @@ const ComposePopup = (props: MailComposeType) => {
   const userStore = useSelector((state: RootState) => state.users);
   const categoryStore = useSelector((state: RootState) => state.categories);
   const classStore = useSelector((state: RootState) => state.classes);
+  const templateStore = useSelector((state: RootState) => state.templates);
 
   // ** Router
   const router = useRouter();
+
+  // ** Settings
+  const {
+    settings: { direction },
+  } = useSettings();
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -102,6 +114,7 @@ const ComposePopup = (props: MailComposeType) => {
     dispatch(fetchData() as any);
     dispatch(fetchCategoryData() as any);
     dispatch(fetchClassesData() as any);
+    dispatch(fetchTemplatesData() as any);
   }, []);
 
   useEffect(() => {
@@ -361,6 +374,12 @@ const ComposePopup = (props: MailComposeType) => {
     return filteredOptions;
   };
 
+  const handleSelectTemplate = (template: TemplateType) => {
+    setSubjectValue(template.subject);
+    setMessageValue(template.body);
+    setCategory(template.category.id);
+  };
+
   return (
     <Drawer
       hideBackdrop
@@ -402,6 +421,27 @@ const ComposePopup = (props: MailComposeType) => {
             <Icon icon="mdi:close" fontSize={20} />
           </IconButton>
         </Box>
+      </Box>
+
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        {templateStore.data.length > 0 && (
+          <Grid item xs={12} sx={{ width: "100%" }}>
+            <SwiperThumbnails
+              direction={direction}
+              templates={templateStore.data}
+              handleSelectTemplate={handleSelectTemplate}
+            />
+          </Grid>
+        )}
       </Box>
       <Box
         sx={{

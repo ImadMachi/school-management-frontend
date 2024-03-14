@@ -23,7 +23,7 @@ const AuthGuard = (props: AuthGuardProps) => {
         return;
       }
 
-      if (auth.user === null) {
+      if (auth.user === null && !window.localStorage.getItem("userData")) {
         if (router.asPath !== "/") {
           router.replace({
             pathname: "/login",
@@ -35,7 +35,7 @@ const AuthGuard = (props: AuthGuardProps) => {
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [auth.user, router.isReady]
+    [router.route]
   );
 
   if (auth.loading || auth.user === null) {

@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 
 import axios from "axios";
+import toast from "react-hot-toast";
 import { UserRole, UserType } from "src/types/apps/UserType";
 const HOST = process.env.NEXT_PUBLIC_API_URL;
 
@@ -49,21 +50,16 @@ export const fetchUserById = createAsyncThunk(
   }
 );
 
-// export const deleteUser = createAsyncThunk(
-//     'appUsers/deleteUsers',
-//     async (id: number, { getState, dispatch }: Redux) => {
-//         await axios.delete(`${HOST}/Users/${id}`)
-//         return id
-//     })
-
-// export const updateUser = createAsyncThunk(
-//     'appUsers/updateUser',
-//     async (payload: { id: number, updateUserDto: UpdateUserDto }, { getState, dispatch }: Redux) => {
-//         const { id, updateUserDto } = payload;
-//         const response = await axios.patch(`${HOST}/Users/${id}`, updateUserDto);
-//         return response.data;
-//     }
-// );
+export const updatePassword = createAsyncThunk(
+  "appUsers/updatePassword",
+  async ({ id, newPassword }: { id: number; newPassword: string }) => {
+    const response = await axios.post<void>(
+      `${HOST}/users/${id}/change-password`,
+      { newPassword }
+    );
+    return response.data;
+  }
+);
 
 export const uploadProfileImage = createAsyncThunk(
   "appUsers/uploadProfileImage",
@@ -141,39 +137,43 @@ export const appUsersSlice = createSlice({
     builder.addCase(fetchUser.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
-      // Filter out the existing user data with the same ID
       state.data = state.data.filter((User) => User.id !== userIdToDelete);
       state.allData = state.allData.filter(
         (User) => User.id !== userIdToDelete
       );
 
-      // Add the updated user data to the beginning of the arrays
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
     builder.addCase(fetchUserById.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
-      // Filter out the existing user data with the same ID
       state.data = state.data.filter((User) => User.id !== userIdToDelete);
       state.allData = state.allData.filter(
         (User) => User.id !== userIdToDelete
       );
-
-      // Add the updated user data to the beginning of the arrays
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
-    // builder.addCase(updateUser.fulfilled, (state, action) => {
-    //     const updateUser = action.payload;
-    //     const index = state.allData.findIndex(User => User.id === updateUser.id);
+    builder.addCase(updatePassword.fulfilled, (state, action) => {
+      toast.success("Le mot de passe a été mis à jour avec succès");
+    });
+    builder.addCase(updatePassword.rejected, (state, action) => {
+      toast.error("Erreur lors de la mise à jour du mot de passe");
+    });
+    builder.addCase(uploadProfileImage.fulfilled, (state, action) => {
+      const updateUser = action.payload;
+      const index = state.allData.findIndex((User) => User.id === updateUser.id);
 
-    //     if (index !== -1) {
-    //         // If the User is found, update the data in both data and allData arrays
-    //         state.data[index] = updateUser;
-    //         state.allData[index] = updateUser;
-    //     }
-    // })
+      if (index !== -1) {
+        state.data[index] = updateUser;
+        state.allData[index] = updateUser;
+        toast.success("L'image de profil a été mise à jour avec succès");
+      }
+    });
+    builder.addCase(uploadProfileImage.rejected, (state, action) => {
+      toast.error("Erreur lors de la mise à jour de l'image de profil");
+    });
   },
 });
 

@@ -11,7 +11,8 @@ import directors from "./apps/directors";
 import users from "./apps/users";
 import categories from "./apps/categories";
 import classes from "./apps/classes";
-import levels from "./apps/levels";  
+import levels from "./apps/levels";
+import cycles from "./apps/cycles";
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     categories,
     classes,
     levels,
+    cycles,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

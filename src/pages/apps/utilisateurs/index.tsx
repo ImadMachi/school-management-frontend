@@ -1,5 +1,12 @@
 // ** React Imports
-import { useState, useEffect, MouseEvent, useCallback } from "react";
+import {
+  useState,
+  useEffect,
+  MouseEvent,
+  useCallback,
+  ChangeEvent,
+  useRef,
+} from "react";
 
 // ** Next Imports
 import Link from "next/link";
@@ -19,6 +26,8 @@ import CustomChip from "src/@core/components/mui/chip";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import EditIcon from "@mui/icons-material/Edit";
 
 import * as yup from "yup";
 
@@ -33,7 +42,13 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
-import { fetchData, fetchUserById, filterData } from "src/store/apps/users";
+import {
+  fetchData,
+  fetchUserById,
+  filterData,
+  updatePassword,
+  uploadProfileImage,
+} from "src/store/apps/users";
 // ** Types Imports
 import { UserRole, UserType } from "src/types/apps/UserType";
 // ** Custom Table Components Imports
@@ -43,11 +58,13 @@ import { ThemeColor } from "src/@core/layouts/types";
 import {
   Avatar,
   Button,
+  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   FormControl,
+  InputAdornment,
   TextField,
 } from "@mui/material";
 import EditUserPopup from "src/views/apps/user/list/EditUserPopup";
@@ -112,6 +129,9 @@ const RowOptions = ({ id }: { id: number }) => {
     useState<UserType | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+
   const {
     reset,
     control,
@@ -124,13 +144,16 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const rowOptionsOpen = Boolean(anchorEl);
   const userStore = useSelector((state: RootState) => state.users);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Fetch user data when the component mounts
     if (openEdit) {
-      dispatch(fetchUserById(id) as any);
+      const foundUser = userStore.data.find((user) => user.id === id);
+      if (foundUser) {
+        setUserData(foundUser);
+      }
     }
-  }, [openEdit, dispatch, id]);
+  }, [openEdit, id, userStore.data]);
 
   useEffect(() => {
     // Update state when the data is updated
@@ -140,7 +163,10 @@ const RowOptions = ({ id }: { id: number }) => {
   }, [userStore.data]);
 
   const handleEditClick = () => {
-    // dispatch(setSelectedId(id));
+    // Trigger the file input click
+    fileInputRef.current?.click();
+
+    // Set other state variables as needed
     setOpenEdit(true);
   };
 
@@ -149,11 +175,71 @@ const RowOptions = ({ id }: { id: number }) => {
     setUserData(null);
   };
 
-  const handleEditSubmit = () => {
-    // Implement your logic to update user data here
-    // You can use updateUserById(userData) or similar function
-    // Don't forget to close the dialog after updating
-    handleEditClose();
+  const handleHover = () => {
+    setIsHovered(true);
+  };
+
+  const handleLeave = () => {
+    setIsHovered(false);
+  };
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const userId = id;
+      try {
+        const response = await dispatch(
+          uploadProfileImage({ id: userId, file }) as any
+        ).unwrap();
+
+        console.log("Profile image uploaded successfully:", response);
+
+        if (userData) {
+          const imageUrl = response.profileImage;
+          setUserData({ ...userData, profileImage: imageUrl });
+        }
+      } catch (error) {
+        console.error("Error uploading profile image:", error);
+      }
+      e.target.value = "";
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      // Get the form data using react-hook-form
+      const formData = await handleSubmit();
+
+      // Extract the password and profileImage from the form data
+      const { newPassword, profileImage } = formData as any;
+
+      // Check if the password is provided
+      if (newPassword) {
+        // Call the updatePassword function with the retrieved password and user id
+        await dispatch(updatePassword({ id: id, newPassword: newPassword }) as any);
+      }
+
+      // Check if a new profile image is provided
+      if (profileImage) {
+        // Call the uploadProfileImage function with the retrieved profile image and user id
+        const response = await dispatch(
+          uploadProfileImage({ id, file: profileImage }) as any
+        ).unwrap();
+
+        // Update the user data with the new profile image URL
+        if (userData) {
+          const imageUrl = response.profileImage;
+          setUserData({ ...userData, profileImage: imageUrl });
+        }
+      }
+
+      // Continue with other updates or actions
+
+      // Close the edit dialog
+      handleEditClose();
+    } catch (error) {
+      console.error("Error updating password or profile image:", error);
+    }
   };
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -172,43 +258,9 @@ const RowOptions = ({ id }: { id: number }) => {
 
   return (
     <>
-      <IconButton size="small" onClick={handleRowOptionsClick}>
-        <Icon icon="mdi:dots-vertical" />
+      <IconButton onClick={handleEditClick} sx={{ "& svg": {} }}>
+        <Icon icon="mdi:pencil-outline" fontSize={20} />
       </IconButton>
-      <Menu
-        keepMounted
-        anchorEl={anchorEl}
-        open={rowOptionsOpen}
-        onClose={handleRowOptionsClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{ style: { minWidth: "8rem" } }}
-      >
-        {/* <MenuItem
-          component={Link}
-          sx={{ "& svg": { mr: 2 } }}
-          onClick={handleRowOptionsClose}
-          href="/apps/utili sateurs/overview/index"
-        >
-          <Icon icon="mdi:eye-outline" fontSize={20} />
-          Voir
-        </MenuItem> */}
-        <MenuItem onClick={handleEditClick} sx={{ "& svg": { mr: 2 } }}>
-          <Icon icon="mdi:pencil-outline" fontSize={20} />
-          Modifier
-        </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
-          <Icon icon="mdi:delete-outline" fontSize={20} />
-          Supprimer
-        </MenuItem>
-      </Menu>
-      {/* Edit User Dialog */}
       <Dialog
         open={openEdit}
         onClose={handleEditClose}
@@ -228,52 +280,132 @@ const RowOptions = ({ id }: { id: number }) => {
         >
           Modifier les informations de l'utilisateur
         </DialogTitle>
-        <DialogContent>
-          {/* Display the old profile image */}
-          {userData && userData.profileImage && (
-            <Avatar
-              alt={`Profile Image of ${userData.userData?.firstName} ${userData.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${userData.profileImage}`}
-              sx={{ width: 100, height: 100, margin: "auto", mb: 2 }}
+        <DialogContent
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexDirection: "column",
+          }}
+        >
+          <div
+            onMouseEnter={handleHover}
+            onMouseLeave={handleLeave}
+            style={{ position: "relative" }}
+          >
+            {userData && userData.profileImage && (
+              <>
+                <Avatar
+                  alt={`Profile Image of ${userData.userData?.firstName} ${userData.userData?.lastName}`}
+                  src={`http://localhost:8000/uploads/${userData.profileImage}`}
+                  sx={{ width: 80, height: 80 }}
+                />
+                {isHovered && (
+                  <IconButton
+                    onClick={handleEditClick}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      right: 0,
+                      backgroundColor: "rgba(244, 245, 250, 0.8)",
+                      padding: "4px",
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: 18 }} />
+                  </IconButton>
+                )}
+              </>
+            )}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              style={{ display: "none" }}
             />
-          )}
+          </div>
 
+          <Typography variant="h6" sx={{ mb: 4 }}>
+            {userData?.userData?.firstName} {userData?.userData?.lastName}
+          </Typography>
+          <CustomChip
+            skin="light"
+            size="small"
+            label={userData?.role || ""}
+            sx={{ textTransform: "capitalize", mb: 4 }}
+          />
+          <CustomChip
+            skin="light"
+            size="medium"
+            label={userData?.email || ""}
+            sx={{ textTransform: "capitalize", mb: 4 }}
+          />
           <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 6 }}>
+            <FormControl fullWidth sx={{ mb: 4 }}>
               <Controller
-                name="email"
+                name="password"
                 control={control}
-                defaultValue={userData?.email}
                 rules={{ required: "Contact est requis" }}
                 render={({ field, fieldState }) => (
-                  <FormControl fullWidth sx={{ mb: 6 }}>
+                  <FormControl fullWidth sx={{ mb: 4 }}>
                     <TextField
                       {...field}
-                      label="Email"
+                      type={showPassword ? "text" : "password"}
+                      label="Mot de passe"
                       error={Boolean(fieldState.error)}
                       helperText={fieldState.error?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{ width: "100%" }} // Adjust the width as needed
                     />
                   </FormControl>
                 )}
               />
             </FormControl>
           </Grid>
+
           <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 6 }}>
+            <FormControl fullWidth sx={{ mb: 4 }}>
               <Controller
-                name="password"
+                name="confirmPassword"
                 control={control}
-                defaultValue={userData?.email}
                 rules={{ required: "Contact est requis" }}
                 render={({ field, fieldState }) => (
-                  <FormControl fullWidth sx={{ mb: 6 }}>
+                  <FormControl fullWidth sx={{ mb: 4 }}>
                     <TextField
                       {...field}
-                      type="password"
-                      // value={value}
-                      label="Mot de passe"
+                      type={showPassword ? "text" : "password"}
+                      label="Confirmer le mot de passe"
                       error={Boolean(fieldState.error)}
                       helperText={fieldState.error?.message}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   </FormControl>
                 )}
@@ -285,10 +417,11 @@ const RowOptions = ({ id }: { id: number }) => {
           <Button
             variant="contained"
             sx={{ mr: 1 }}
-            onSubmit={handleEditSubmit}
+            onClick={() => handleSubmit(handleEditSubmit)()}
           >
             Submit
           </Button>
+
           <Button
             variant="outlined"
             color="secondary"
@@ -362,7 +495,7 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLowerCase()}s/overview/index`}
+              ).toLocaleLowerCase()}s/overview/index`}
               onClick={() => {
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
@@ -500,8 +633,6 @@ const UserList = () => {
           />
         </Card>
       </Grid>
-
-      {/* <SidebarAddStudent open={addUserOpen} toggle={toggleAddUserDrawer} /> */}
     </Grid>
   );
 };

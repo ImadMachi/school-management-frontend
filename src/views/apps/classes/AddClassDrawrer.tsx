@@ -356,7 +356,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                       "& .MuiOutlinedInput-root": { p: 2 },
                       "& .MuiSelect-selectMenu": { minHeight: "auto" },
                     }}
-                    disableUnderline={true}
                   >
                     {administratorStore.data.length > 0 &&
                       administratorStore.data.map((option) => (

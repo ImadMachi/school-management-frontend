@@ -13,6 +13,8 @@ import { AdministratorType } from "src/types/apps/administratorTypes";
 import { CreateAdministratorDto } from "src/views/apps/administrators/list/AddAdministratorDrawer";
 import { UpdateAdministratorDto } from "src/pages/apps/administrateurs/overview/[folder]";
 import { fr } from "date-fns/locale";
+import toast from "react-hot-toast";
+import { t } from "i18next";
 
 // Use Record to define the type with known keys
 
@@ -163,24 +165,29 @@ export const appAdministratorsSlice = createSlice({
       state.allData = state.allData.filter(
         (administrator) => administrator.id !== action.payload
       );
+      toast.success("L'administrateur a été supprimé avec succès");
+    });
+    builder.addCase(deleteAdministrator.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'administrateur");
     });
 
     builder.addCase(addAdministrator.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
+      toast.success("La classe a été ajoutée avec succès");
     });
+    builder.addCase(addAdministrator.rejected, (state, action) => {
+      toast.error("Erreur ajoutant la classe");
+    });
+
     builder.addCase(fetchAdministrator.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
-
-      // Filter out the existing user data with the same ID
       state.data = state.data.filter(
         (administrator) => administrator.id !== userIdToDelete
       );
       state.allData = state.allData.filter(
         (administrator) => administrator.id !== userIdToDelete
       );
-
-      // Add the updated user data to the beginning of the arrays
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
@@ -192,10 +199,13 @@ export const appAdministratorsSlice = createSlice({
       );
 
       if (index !== -1) {
-        // If the administrator is found, update the data in both data and allData arrays
         state.data[index] = updatedAdministrator;
         state.allData[index] = updatedAdministrator;
+        toast.success("L'administrateur a été modifié avec succès");
       }
+    });
+    builder.addCase(updateAdministrator.rejected, (state, action) => {
+      toast.error("Erreur modifiant l'administrateur");
     });
   },
 });

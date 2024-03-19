@@ -87,6 +87,17 @@ interface CellType {
 interface AccountStatusType {
   [key: string]: ThemeColor;
 }
+interface UserRoleType {
+  [key: string]: { icon: string; color: string }
+}
+
+const userRoleObj: UserRoleType = {
+  director: { icon: 'mdi:account-tie', color: 'error.main' },
+  administrator: { icon: 'mdi:account-cog', color: 'warning.main' },
+  teacher: { icon: 'mdi:teacher', color: 'info.main' },
+  student: { icon: 'mdi:school', color: 'success.main' },
+  parent: { icon: 'mdi:account-child', color: 'primary.main' }
+}
 
 export interface UpdateUserDto {
   profileImage?: File;

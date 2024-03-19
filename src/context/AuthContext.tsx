@@ -52,7 +52,8 @@ const AuthProvider = ({ children }: Props) => {
             }
           })
           .then(async response => {
-            setUser({ ...response.data })
+           //setUser({ ...response.data })
+           mapUserData(response.data)
             setAccessToken(storedToken)
             setLoading(false)
           })
@@ -87,7 +88,8 @@ const AuthProvider = ({ children }: Props) => {
 
         const returnUrl = router.query.returnUrl
 
-        setUser({ ...response.data.user })
+        //setUser({ ...response.data.user })
+        mapUserData(response.data.user)
         params.rememberMe ? window.localStorage.setItem('userData', JSON.stringify(response.data.user)) : null
 
         const redirectURL = returnUrl && returnUrl !== '/' ? returnUrl : '/'
@@ -97,6 +99,27 @@ const AuthProvider = ({ children }: Props) => {
       .catch(err => {
         if (errorCallback) errorCallback(err)
       })
+  }
+
+  const mapUserData = (data: any) => {
+    if (data.director) {
+      data.userData = data.director;
+      delete data.director;
+    } else if (data.administrator) {
+      data.userData = data.administrator;
+      delete data.administrator;
+    } else if (data.teacher) {
+      data.userData = data.teacher;
+      delete data.teacher;
+    } else if (data.student) {
+      data.userData = data.student;
+      delete data.student;
+    } else if (data.parent) {
+      data.userData = data.parent;
+      delete data.parent;
+    }
+
+    setUser({ ...data })
   }
 
   const handleLogout = () => {

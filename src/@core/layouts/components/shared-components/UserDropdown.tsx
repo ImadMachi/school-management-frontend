@@ -152,16 +152,15 @@ const UserDropdown = (props: Props) => {
           </Box>
         </Box>
         <Divider sx={{ mt: "0 !important" }} />
-        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose()}>
+        <MenuItem sx={{ p: 0 }} onClick={() => handleDropdownClose('/apps/profile')}>
           <Box sx={styles}>
-            <Icon icon="mdi:account-outline" />
+            <Icon icon="mdi:account-outline"/>
             Profile
           </Box>
         </MenuItem>
         <MenuItem
           sx={{ p: 0 }}
-          onClick={() => handleDropdownClose()}
-          href="/apps/mail"
+          onClick={() => handleDropdownClose('/apps/mail')}
         >
           <Box sx={styles}>
             <Icon icon="mdi:email-outline" />

@@ -59,12 +59,12 @@ const navigation = (): VerticalNavItemsType => {
       icon: "mdi:school",
       children: [
         {
-          path: "/apps/niveaux",
-          title: "Les Niveaux",
-        },
-        {
           path: "/apps/cycles",
           title: "Les Cycles",
+        },
+        {
+          path: "/apps/niveaux",
+          title: "Les Niveaux",
         },
         {
           path: "/apps/classes",

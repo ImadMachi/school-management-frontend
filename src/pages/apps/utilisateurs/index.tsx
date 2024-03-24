@@ -88,16 +88,16 @@ interface AccountStatusType {
   [key: string]: ThemeColor;
 }
 interface UserRoleType {
-  [key: string]: { icon: string; color: string }
+  [key: string]: { icon: string; color: string };
 }
-
+  
 const userRoleObj: UserRoleType = {
-  director: { icon: 'mdi:account-tie', color: 'error.main' },
-  administrator: { icon: 'mdi:account-cog', color: 'warning.main' },
-  teacher: { icon: 'mdi:teacher', color: 'info.main' },
-  student: { icon: 'mdi:school', color: 'success.main' },
-  parent: { icon: 'mdi:account-child', color: 'primary.main' }
-}
+  Director: { icon: "mdi:account-tie", color: "error.main" },
+  Administrator: { icon: "mdi:account-cog", color: "warning.main" },
+  Teacher: { icon: "mdi:teacher", color: "info.main" },
+  Student: { icon: "mdi:school", color: "success.main" },
+  Parent: { icon: "mdi:account-child", color: "primary.main" },
+};
 
 export interface UpdateUserDto {
   profileImage?: File;
@@ -227,7 +227,9 @@ const RowOptions = ({ id }: { id: number }) => {
       // Check if the password is provided
       if (newPassword) {
         // Call the updatePassword function with the retrieved password and user id
-        await dispatch(updatePassword({ id: id, newPassword: newPassword }) as any);
+        await dispatch(
+          updatePassword({ id: id, newPassword: newPassword }) as any
+        );
       }
 
       // Check if a new profile image is provided
@@ -541,9 +543,21 @@ const columns = [
     field: "role",
     renderCell: ({ row }: CellType) => {
       return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
-          {mapRoleToFrench(row.role)}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            "& svg": { mr: 3, color: userRoleObj[row.role].color },
+          }}
+        >
+          <Icon icon={userRoleObj[row.role].icon} fontSize={20} />
+          <Typography
+            noWrap
+            sx={{ color: "text.secondary", textTransform: "capitalize" }}
+          >
+            {mapRoleToFrench(row.role)}
+          </Typography>
+        </Box>
       );
     },
   },

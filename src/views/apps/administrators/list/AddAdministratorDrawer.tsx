@@ -326,13 +326,17 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
             </>
           )}
           {/**************  END CREATE ACCOUNT ***************/}
-
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }} mt={5}>
             <Button
               size="large"
               type="submit"
               variant="contained"
-              sx={{ mr: 3 }}
+              sx={{
+                mr: 3,
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+              }}
             >
               Soumettre
             </Button>
@@ -340,6 +344,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
               size="large"
               variant="outlined"
               color="secondary"
+              sx={{ display: "flex", alignItems: "center", width: "100%" }}
               onClick={handleClose}
             >
               Annuler

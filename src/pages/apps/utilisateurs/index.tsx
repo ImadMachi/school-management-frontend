@@ -15,11 +15,9 @@ import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 // ** MUI Imports
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import Menu from "@mui/material/Menu";
 import Grid from "@mui/material/Grid";
 import { DataGrid } from "@mui/x-data-grid";
 import { styled } from "@mui/material/styles";
-import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CustomChip from "src/@core/components/mui/chip";
@@ -44,7 +42,6 @@ import { getInitials } from "src/@core/utils/get-initials";
 // ** Actions Imports
 import {
   fetchData,
-  fetchUserById,
   filterData,
   updatePassword,
   uploadProfileImage,
@@ -67,11 +64,8 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import EditUserPopup from "src/views/apps/user/list/EditUserPopup";
-import select from "src/@core/theme/overrides/select";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Action } from "@reduxjs/toolkit";
 import {
   setAdministratorId,
   setAdministratorUserId,
@@ -135,8 +129,6 @@ const RowOptions = ({ id }: { id: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [editUserPopupOpen, setEditUserPopupOpen] = useState(false);
-  const [selectedUserForEdit, setSelectedUserForEdit] =
     useState<UserType | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
@@ -457,7 +449,7 @@ const mapRoleToFrench = (role: string) => {
     case UserRole.Teacher:
       return "Enseignant";
     case UserRole.Student:
-      return "Etudiant";
+      return "Eleve";
     case UserRole.Parent:
       return "Parent";
     default:

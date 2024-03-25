@@ -135,7 +135,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           component={Link}
           sx={{ "& svg": { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href="/apps/etudiants/overview/inbox"
+          href="/apps/eleves/overview/inbox"
         >
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
@@ -206,7 +206,7 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/etudiants/overview/inbox"
+              href="/apps/eleves/overview/inbox"
               onClick={() => {
                 dispatch(setStudentId(row.id));
                 dispatch(setStudentUserId(row.userId));
@@ -220,8 +220,18 @@ const columns = [
     },
   },
   {
+    flex: 0.1,
+    minWidth: 160,
+    sortable: false,
+    field: "identification",
+    headerName: "Identifient",
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.identification || "-"}</Typography>
+    ),
+  },
+  {
     flex: 0.15,
-    minWidth: 120,
+    minWidth: 70,
     headerName: "Date de Naissance",
     field: "dateOfBirth",
     renderCell: ({ row }: CellType) => (

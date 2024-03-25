@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useRef } from "react";
 
 // ** MUI Components
 import Box from "@mui/material/Box";
@@ -15,6 +15,7 @@ import axios from "axios";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
+import EditIcon from "@mui/icons-material/Edit";
 
 // ** Types
 import { UserDataType } from "src/context/types";
@@ -23,9 +24,11 @@ import { uploadProfileImage } from "src/store/apps/users";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "src/store";
 import { useDispatch, useSelector } from "react-redux";
+import { IconButton } from "@mui/material";
+import { UserType } from "src/types/apps/UserType";
 
 const ProfilePicture = styled("img")(({ theme }) => ({
-  width: 140,
+  width: 120,
   height: 120,
   borderRadius: theme.shape.borderRadius,
   border: `5px solid ${theme.palette.common.white}`,
@@ -42,12 +45,26 @@ const UserProfileHeader = () => {
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
 
   const userId = user?.id;
-  const [userIdData, setUserIdData] = useState<UserDataType | null>(null);
+  const [userIdData, setUserIdData] = useState<UserType | null>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleLogout = () => {
     logout();
   };
 
+  const handleEditClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleHover = () => {
+    setIsHovered(true);
+  };
+
+  const handleLeave = () => {
+    setIsHovered(false);
+  };
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
@@ -70,11 +87,11 @@ const UserProfileHeader = () => {
     }
   };
   useEffect(() => {
-    // Update state when the data is updated
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);
     }
   }, [userStore.data]);
+
   return user !== null ? (
     <Card>
       <CardMedia
@@ -95,10 +112,38 @@ const UserProfileHeader = () => {
           justifyContent: { xs: "center", md: "flex-start" },
         }}
       >
-        <ProfilePicture
-          src={`http://localhost:8000/uploads/${user?.profileImage}`}
-          alt="profile-picture"
-        />
+        <div
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+          style={{ position: "relative" }}
+        >
+          <>
+            <ProfilePicture
+              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              alt="profile-picture"
+            />
+            {isHovered && (
+              <IconButton
+                onClick={handleEditClick}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  backgroundColor: "rgba(244, 245, 250, 0.8)",
+                  padding: "4px",
+                }}
+              >
+                <EditIcon sx={{ fontSize: 18 }} />
+              </IconButton>
+            )}
+          </>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+        </div>
         <Box
           sx={{
             width: "100%",
@@ -131,7 +176,7 @@ const UserProfileHeader = () => {
           <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
             <Button
               variant="contained"
-              startIcon={<Icon icon="mdi:gear" fontSize={20} />}
+              startIcon={<Icon icon="mdi:pencil" fontSize={20} />}
             >
               Modfifier les information
             </Button>

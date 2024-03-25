@@ -173,7 +173,7 @@ const UserViewLeft = () => {
     if (id && !isNaN(Number(id))) {
       dispatch(fetchStudent(Number(id)) as any);
     } else {
-      router.push("/apps/etudiants");
+      router.push("/apps/eleves");
     }
     return () => {
       setUserData(null);
@@ -288,7 +288,7 @@ const UserViewLeft = () => {
               <CustomChip
                 skin="light"
                 size="small"
-                label="Étudiant"
+                label="Élèves"
                 sx={{ textTransform: "capitalize" }}
               />
             </CardContent>

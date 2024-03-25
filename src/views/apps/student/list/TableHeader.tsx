@@ -25,7 +25,7 @@ const TableHeader = (props: TableHeaderProps) => {
 
   return (
     <Box sx={{ p: 5, pb: 3, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-      <CSVLink data={props.generateCSVData()} filename={'étudiants.csv'}>
+      <CSVLink data={props.generateCSVData()} filename={'élèves.csv'}>
         <Button
           sx={{ mr: 4, mb: 2 }}
           color='secondary'
@@ -40,12 +40,12 @@ const TableHeader = (props: TableHeaderProps) => {
           size='small'
           value={value}
           sx={{ mr: 4, mb: 2 }}
-          placeholder='Rechercher étudiant'
+          placeholder='Rechercher élèves'
           onChange={e => handleFilter(e.target.value)}
         />
 
         <Button sx={{ mb: 2 }} onClick={toggle} variant='contained'>
-          Ajouter étudiant
+          Ajouter élèves
         </Button>
       </Box>
     </Box>

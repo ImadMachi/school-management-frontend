@@ -10,7 +10,6 @@ import {
 
 // ** Next Imports
 import Link from "next/link";
-import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -210,37 +209,26 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const handleEditSubmit = async () => {
     try {
-      // Get the form data using react-hook-form
       const formData = await handleSubmit();
 
-      // Extract the password and profileImage from the form data
       const { newPassword, profileImage } = formData as any;
 
-      // Check if the password is provided
       if (newPassword) {
-        // Call the updatePassword function with the retrieved password and user id
         await dispatch(
           updatePassword({ id: id, newPassword: newPassword }) as any
         );
       }
 
-      // Check if a new profile image is provided
       if (profileImage) {
-        // Call the uploadProfileImage function with the retrieved profile image and user id
         const response = await dispatch(
           uploadProfileImage({ id, file: profileImage }) as any
         ).unwrap();
 
-        // Update the user data with the new profile image URL
         if (userData) {
           const imageUrl = response.profileImage;
           setUserData({ ...userData, profileImage: imageUrl });
         }
       }
-
-      // Continue with other updates or actions
-
-      // Close the edit dialog
       handleEditClose();
     } catch (error) {
       console.error("Error updating password or profile image:", error);
@@ -500,8 +488,9 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLocaleLowerCase()}s/overview/index`}
+              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${row.userData?.id}`}
               onClick={() => {
+                
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
                   dispatch(setAdministratorUserId(row.id));

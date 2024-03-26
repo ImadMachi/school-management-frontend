@@ -11,7 +11,7 @@ import axios from "axios";
 import { HOST } from "src/store/constants/hostname";
 import { DirectorType } from "src/types/apps/directorTypes";
 import { CreateDirectorDto } from "src/views/apps/directors/list/AddDirectorDrawer";
-import { UpdateDirectorDto } from "src/pages/apps/directeurs/overview/[folder]";
+import { UpdateDirectorDto } from "src/pages/apps/directeurs/overview/[...params]";
 import toast from "react-hot-toast";
 import { t } from "i18next";
 

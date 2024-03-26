@@ -166,26 +166,16 @@ const columns = [
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
-      const [userData, setUserData] = useState<UserType | null>(null);
-      const userStore = useSelector((state: RootState) => state.users);
-
-      useEffect(() => {
-        if (row.userId) {
-          dispatch(fetchUserById(row.userId) as any);
-        }
-      }, [row.userId]);
-
-      useEffect(() => {
-        const user = userStore.data.find((user) => user.id === row.userId);
-        setUserData(user || null);
-      }, [userStore.data, row.userId]);
+      const user = useSelector((state: RootState) =>
+        state.users.data.find((user) => user.id === row.userId)
+      );
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {userData?.profileImage ? (
+          {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              src={`http://localhost:8000/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

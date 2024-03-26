@@ -11,7 +11,7 @@ import axios from "axios";
 import { HOST } from "src/store/constants/hostname";
 import { AdministratorType } from "src/types/apps/administratorTypes";
 import { CreateAdministratorDto } from "src/views/apps/administrators/list/AddAdministratorDrawer";
-import { UpdateAdministratorDto } from "src/pages/apps/administrateurs/overview/[folder]";
+import { UpdateAdministratorDto } from "src/pages/apps/administrateurs/overview/[id]/[folder]";
 import { fr } from "date-fns/locale";
 import toast from "react-hot-toast";
 import { t } from "i18next";

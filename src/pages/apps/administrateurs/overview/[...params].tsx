@@ -64,17 +64,13 @@ const schema = yup.object().shape({
 
 const UserViewLeft = () => {
   const router = useRouter();
-  const { folder } = router.query;
+  const { params } = router.query;
+  const folder = params ? params[0] : null;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
 
-  const selectedId = useSelector(
-    (state: RootState) => state.administrator.AdministratorId
-  );
-  const selectedUserId = useSelector(
-    (state: RootState) => state.administrator.AdministratorUserId
-  );
-  const id = selectedId;
-  const userId = selectedUserId;
+
   const {
     reset,
     control,
@@ -97,8 +93,6 @@ const UserViewLeft = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
@@ -141,30 +135,28 @@ const UserViewLeft = () => {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-  
+
       try {
-        const response = await dispatch(uploadProfileImage({ id: userId!, file })).unwrap();
-        
+        const response = await dispatch(
+          uploadProfileImage({ id: userId! as unknown as number, file })
+        ).unwrap();
+
         console.log("Profile image uploaded successfully:", response);
-  
+
         if (userIdData) {
-          const imageUrl = response.profileImage; 
+          const imageUrl = response.profileImage;
           setUserIdData({ ...userIdData, profileImage: imageUrl });
         }
-  
       } catch (error) {
         console.error("Error uploading profile image:", error);
-      }  
+      }
       e.target.value = "";
     }
   };
-  
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
       dispatch(fetchAdministrator(Number(id)) as any);
-    } else {
-      router.push("/apps/administrateurs");
     }
     return () => {
       setUserData(null);
@@ -172,7 +164,6 @@ const UserViewLeft = () => {
   }, [id]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (administratorStore.data && administratorStore.data.length > 0) {
       setUserData(administratorStore.data[0]);
       if (administratorStore.data[0]?.userId == null) {
@@ -247,7 +238,7 @@ const UserViewLeft = () => {
                     <Avatar
                       alt="John Doe"
                       sx={{ width: 80, height: 80 }}
-                      src='/images/avatars/1.png'
+                      src="/images/avatars/1.png"
                     />
 
                     {isHovered && (

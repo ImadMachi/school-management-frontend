@@ -139,7 +139,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           component={Link}
           sx={{ "& svg": { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href="/apps/administrateurs/overview/inbox" // Include the id in the URL
+          href={`/apps/administrateurs/overview/inbox/${userId}/${id}`}
         >
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
@@ -210,7 +210,7 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/administrateurs/overview/inbox"
+              href={`/apps/administrateurs/overview/inbox/${row.userId}/${row.id}`}
               onClick={() => {
                 dispatch(setAdministratorId(row.id));
                 dispatch(setAdministratorUserId(row.userId));

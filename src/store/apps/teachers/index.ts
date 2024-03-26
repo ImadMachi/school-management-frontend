@@ -83,15 +83,14 @@ export const addTeacher = createAsyncThunk(
 
     formData.append("createAccount", data.createAccount.toString());
 
-    formData.append("createUserDto[email]", data.createUserDto?.email || "");
-
-    formData.append(
-      "createUserDto[password]",
-      data.createUserDto?.password || ""
-    );
-
-    formData.append("profile-images", data.profileImage || "");
-
+    if (data.createAccount) {
+      formData.append("createUserDto[email]", data.createUserDto?.email || "");
+      formData.append(
+        "createUserDto[password]",
+        data.createUserDto?.password || ""
+      );
+      formData.append("profile-images", data.profileImage || "");
+    }
     const response = await axios.post(
       `${HOST}/teachers?create-account=${data.createAccount}`,
       formData

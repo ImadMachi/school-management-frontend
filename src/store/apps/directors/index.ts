@@ -62,15 +62,14 @@ export const addDirector = createAsyncThunk(
 
     formData.append("createAccount", data.createAccount.toString());
 
-    formData.append("createUserDto[email]", data.createUserDto?.email || "");
-
-    formData.append(
-      "createUserDto[password]",
-      data.createUserDto?.password || ""
-    );
-
-    formData.append("profile-images", data.profileImage || "");
-
+    if (data.createAccount) {
+      formData.append("createUserDto[email]", data.createUserDto?.email || "");
+      formData.append(
+        "createUserDto[password]",
+        data.createUserDto?.password || ""
+      );
+      formData.append("profile-images", data.profileImage || "");
+    }
     const response = await axios.post(
       `${HOST}/directors?create-account=${data.createAccount}`,
       formData
@@ -211,7 +210,6 @@ export const appDirectorsSlice = createSlice({
     });
   },
 });
-
 
 export const { setDirectorId } = appDirectorsSlice.actions;
 export const { setDirectorUserId } = appDirectorsSlice.actions;

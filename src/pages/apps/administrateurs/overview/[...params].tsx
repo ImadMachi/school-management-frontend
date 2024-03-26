@@ -45,6 +45,7 @@ import { IconButton } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
 import { setAdministratorUserId } from "src/store/apps/administrator";
 import { MailFolderType } from "src/types/apps/mailTypes";
+import { set } from "nprogress";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -69,7 +70,6 @@ const UserViewLeft = () => {
   const userId = params ? params[1] : null;
   const id = params ? params[2] : null;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
-
 
   const {
     reset,
@@ -137,15 +137,17 @@ const UserViewLeft = () => {
       const file = e.target.files[0];
 
       try {
-        const response = await dispatch(
-          uploadProfileImage({ id: userId! as unknown as number, file })
-        ).unwrap();
+        if (userId) {
+          const response = await dispatch(
+            uploadProfileImage({ id: userId! as unknown as number, file })
+          ).unwrap();
 
-        console.log("Profile image uploaded successfully:", response);
+          console.log("Profile image uploaded successfully:", response);
 
-        if (userIdData) {
-          const imageUrl = response.profileImage;
-          setUserIdData({ ...userIdData, profileImage: imageUrl });
+          if (userIdData) {
+            const imageUrl = response.profileImage;
+            setUserIdData({ ...userIdData, profileImage: imageUrl });
+          }
         }
       } catch (error) {
         console.error("Error uploading profile image:", error);
@@ -175,14 +177,16 @@ const UserViewLeft = () => {
   useEffect(() => {
     if (userId && !isNaN(Number(userId))) {
       dispatch(fetchUserById(Number(userId)) as any);
+    } else {
+      setUserData(null);
     }
     return () => {
       setUserData(null);
+      console.log(userId);
     };
   }, [userId]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);
     }
@@ -211,7 +215,7 @@ const UserViewLeft = () => {
                 onMouseLeave={handleLeave}
                 style={{ position: "relative" }}
               >
-                {userId && userIdData?.profileImage ? (
+                {userId != null && userIdData && userIdData.profileImage ? (
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
@@ -264,6 +268,7 @@ const UserViewLeft = () => {
                   onChange={handleFileChange}
                 />
               </div>
+
               <Typography variant="h6" sx={{ mb: 4 }}>
                 {userData.firstName} {userData.lastName}
               </Typography>

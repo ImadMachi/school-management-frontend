@@ -78,7 +78,7 @@ const UserProfileHeader = () => {
 
         if (user) {
           const imageUrl = response.profileImage;
-          setUserIdData({ ...userIdData, profileImage: imageUrl });
+          setUserIdData({ ...userIdData!, profileImage: imageUrl });
         }
       } catch (error) {
         console.error("Error uploading profile image:", error);
@@ -86,6 +86,7 @@ const UserProfileHeader = () => {
       e.target.value = "";
     }
   };
+  
   useEffect(() => {
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);

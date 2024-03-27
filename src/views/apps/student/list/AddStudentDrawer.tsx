@@ -46,6 +46,7 @@ interface SidebarAddStudentType {
 export interface CreateStudentDto {
   firstName: string;
   lastName: string;
+  identification: string;
   dateOfBirth: Date;
   sex: string;
   createAccount: boolean;
@@ -67,6 +68,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
+  identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
   createUserDto: yup.object().when("createAccount", {
@@ -94,6 +96,7 @@ const schema = yup.object().shape({
 const defaultValues = {
   firstName: "",
   lastName: "",
+  identification: "",
   dateOfBirth: new Date(),
   sex: "",
   createAccount: false,
@@ -154,7 +157,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant="h6">Ajouter Étudient</Typography>
+        <Typography variant="h6">Ajouter Élèves</Typography>
         <IconButton
           size="small"
           onClick={handleClose}
@@ -204,6 +207,27 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
             {errors.lastName && (
               <FormHelperText sx={{ color: "error.main" }}>
                 {errors.lastName.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="identification"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  value={value}
+                  label="Identifient"
+                  onChange={onChange}
+                  placeholder="Doe"
+                  error={Boolean(errors.identification)}
+                />
+              )}
+            />
+            {errors.identification && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.identification.message}
               </FormHelperText>
             )}
           </FormControl>
@@ -367,12 +391,12 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           )}
           {/**************  END CREATE ACCOUNT ***************/}
 
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: "flex", alignItems: "center"}} mt={5}  >
             <Button
               size="large"
               type="submit"
               variant="contained"
-              sx={{ mr: 3 }}
+              sx={{ mr: 3,  display: "flex", alignItems: "center", width: "100%"}}
             >
               Soumettre
             </Button>
@@ -380,6 +404,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               size="large"
               variant="outlined"
               color="secondary"
+              sx={{ display: "flex", alignItems: "center", width: "100%"}}
               onClick={handleClose}
             >
               Annuler

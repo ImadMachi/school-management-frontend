@@ -11,26 +11,21 @@ import Select from "@mui/material/Select";
 import Switch from "@mui/material/Switch";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
-import MenuItem from "@mui/material/MenuItem";
-import { styled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import InputLabel from "@mui/material/InputLabel";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import FormControl from "@mui/material/FormControl";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import InputAdornment from "@mui/material/InputAdornment";
-import LinearProgress from "@mui/material/LinearProgress";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import DialogContentText from "@mui/material/DialogContentText";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { fetchParent, updateParent } from "src/store/apps/parents";
-import { ParentsType } from "src/types/apps/parentTypes";
-import EmailAppLayout from "src/views/apps/parents/overview/mail/Mail";
+import { fetchTeacher } from "src/store/apps/teachers";
+import { TeachersType } from "src/types/apps/teacherTypes";
+import EmailAppLayout from "src/views/apps/teacher/overview/mail/Mail";
 import EditIcon from "@mui/icons-material/Edit";
 
 // ** Icon Imports
@@ -39,6 +34,7 @@ import Image from "next/image";
 
 // ** Custom Components
 import CustomChip from "src/@core/components/mui/chip";
+import CustomAvatar from "src/@core/components/mui/avatar";
 
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -47,59 +43,66 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { ThemeColor } from "src/@core/layouts/types";
 
 // ** Utils Import
+import { getInitials } from "src/@core/utils/get-initials";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
+import { updateTeacher } from "src/store/apps/teachers";
 import { Controller, useForm } from "react-hook-form";
+import { FormHelperText, IconButton } from "@mui/material";
 import { formatDate } from "src/@core/utils/format";
-import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { UserType } from "src/types/apps/UserType";
+import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { MailFolderType } from "src/types/apps/mailTypes";
-import { IconButton } from "@mui/material";
 
 interface ColorsType {
   [key: string]: ThemeColor;
 }
 
-export interface UpdateParentDto {
+export interface UpdateTeacherDto {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  dateOfBirth?: Date;
+  dateOfEmployment?: Date;
+  sex?: string;
 }
 
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
   phoneNumber: yup.string().required(),
+  dateOfBirth: yup.date().required(),
+  dateOfEmployment: yup.date().required(),
+  sex: yup.string().required(),
 });
 
 const UserViewLeft = () => {
+
   const router = useRouter();
-  const { folder } = router.query;
-  
+  const { params } = router.query;
+  const folder = params ? params[0] : null;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
+
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
-  const selectedId = useSelector((state: RootState) => state.parents.parentId);
-  const selectedUserId = useSelector(
-    (state: RootState) => state.parents.parentUserId
-  );
-  const id = selectedId;
-  const userId = selectedUserId;
+
   const {
     reset,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UpdateParentDto>({
+  } = useForm<UpdateTeacherDto>({
     mode: "onChange",
     resolver: yupResolver(schema),
   });
 
-  const parentStore = useSelector((state: RootState) => state.parents);
+  const teacherStore = useSelector((state: RootState) => state.teachers);
   const userStore = useSelector((state: RootState) => state.users);
 
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
-  const [userData, setUserData] = useState<ParentsType | null>(null);
+  const [userData, setUserData] = useState<TeachersType | null>(null);
   const [userIdData, setUserIdData] = useState<UserType | null>(null);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>("auto");
   const [isHovered, setIsHovered] = useState(false);
@@ -114,28 +117,31 @@ const UserViewLeft = () => {
     fileInputRef.current?.click();
   };
 
-  const handleEditSubmit = (data: UpdateParentDto) => {
+  const handleEditSubmit = (data: UpdateTeacherDto) => {
     // Ensure id is a number
-    const parentId = parseInt(id as unknown as string, 10);
-    const partialUpdateParentDto: Partial<UpdateParentDto> = {};
-    if (data.firstName) partialUpdateParentDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateParentDto.lastName = data.lastName;
-    if (data.phoneNumber) partialUpdateParentDto.phoneNumber = data.phoneNumber;
+    const teacherId = parseInt(id as unknown as string, 10);
+    const partialUpdateTeacherDto: Partial<UpdateTeacherDto> = {};
+    if (data.firstName) partialUpdateTeacherDto.firstName = data.firstName;
+    if (data.lastName) partialUpdateTeacherDto.lastName = data.lastName;
+    if (data.phoneNumber)
+      partialUpdateTeacherDto.phoneNumber = data.phoneNumber;
+    if (data.dateOfBirth)
+      partialUpdateTeacherDto.dateOfBirth = data.dateOfBirth;
+    if (data.dateOfEmployment)
+      partialUpdateTeacherDto.dateOfEmployment = data.dateOfEmployment;
+    if (data.sex) partialUpdateTeacherDto.sex = data.sex;
 
-    // Dispatch the action with both id and UpdateParentDto properties
-    dispatch(updateParent({ id: parentId, updateParentDto: data }))
+    // Dispatch the action with both id and updateteacherDto properties
+    dispatch(updateTeacher({ id: teacherId, updateTeacherDto: data }))
       .then(() => {
-        // Rest of your logic
         reset();
       })
       .catch((error) => {
-        // Handle error if needed
-        console.error("Update Parent failed:", error);
+        console.error("Update teacher failed:", error);
       });
     handleEditClose();
     reset();
   };
-
 
   const handleHover = () => {
     setIsHovered(true);
@@ -148,29 +154,28 @@ const UserViewLeft = () => {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-  
+
       try {
-        const response = await dispatch(uploadProfileImage({ id: userId!, file })).unwrap();
-        
+        const response = await dispatch(
+          uploadProfileImage({ id: userId! as unknown as number, file })
+        ).unwrap();
+
         console.log("Profile image uploaded successfully:", response);
-  
+
         if (userIdData) {
-          const imageUrl = response.profileImage; 
+          const imageUrl = response.profileImage;
           setUserIdData({ ...userIdData, profileImage: imageUrl });
         }
-  
       } catch (error) {
         console.error("Error uploading profile image:", error);
-      }  
+      }
       e.target.value = "";
     }
   };
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
-      dispatch(fetchParent(Number(id)) as any);
-    } else {
-      router.push("/apps/parents");
+      dispatch(fetchTeacher(Number(id)) as any);
     }
     return () => {
       setUserData(null);
@@ -179,16 +184,13 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     // Update state when the data is updated
-    if (parentStore.data && parentStore.data.length > 0) {
-      setUserData(parentStore.data[0]);
+    if (teacherStore.data && teacherStore.data.length > 0) {
+      setUserData(teacherStore.data[0]);
     }
-    if (parentStore.data[0]?.userId == null) {
+    if (teacherStore.data[0]?.userId == null) {
       setSuspendDialogOpen("auto");
     }
-
-    console.log("parentStore.data", parentStore.data);
-  }, [parentStore.data]);
-
+  }, [teacherStore.data]);
 
   useEffect(() => {
     if (userId && !isNaN(Number(userId))) {
@@ -205,7 +207,6 @@ const UserViewLeft = () => {
       setUserIdData(userStore.data[0]);
     }
   }, [userStore.data]);
-
 
   if (userData) {
     return (
@@ -257,7 +258,7 @@ const UserViewLeft = () => {
                     <Avatar
                       alt="John Doe"
                       sx={{ width: 80, height: 80 }}
-                      src='/images/avatars/1.png'
+                      src="/images/avatars/1.png"
                     />
 
                     {isHovered && (
@@ -289,10 +290,11 @@ const UserViewLeft = () => {
               <CustomChip
                 skin="light"
                 size="small"
-                label="Parent"
+                label="Enseignant"
                 sx={{ textTransform: "capitalize" }}
               />
             </CardContent>
+
             <CardContent>
               <Typography variant="h6">Details</Typography>
               <Divider
@@ -325,9 +327,41 @@ const UserViewLeft = () => {
                     {userData.phoneNumber}
                   </Typography>
                 </Box>
-                {/* <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
-                  <Typography variant='body2'>English</Typography>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    La date de naissance:
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatDate(userData.dateOfBirth)}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    La date d'employment:
+                  </Typography>
+                  <Typography variant="body2">
+                    {formatDate(userData.dateOfEmployment)}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Sexe:
+                  </Typography>
+                  <Typography variant="body2">{userData.sex}</Typography>
+                </Box>
+                {/* <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Langue:
+                  </Typography>
+                  <Typography variant="body2">English</Typography>
                 </Box> */}
                 <Box sx={{ display: "flex" }}>
                   <Typography
@@ -437,12 +471,75 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
-
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="dateOfBirth"
+                          control={control}
+                          defaultValue={new Date(
+                            userData.dateOfBirth
+                          ).toLocaleDateString()}
+                          rules={{ required: "date de naissance est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Date de naissance"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="dateOfEmployment"
+                          control={control}
+                          defaultValue={new Date(
+                            userData.dateOfEmployment
+                          ).toLocaleDateString()}
+                          rules={{ required: "Date employement est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Date employement"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="sex"
+                          control={control}
+                          defaultValue={userData.sex}
+                          rules={{ required: "Sexe est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Sexe"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
                     {/* <Grid item xs={12}>
                       <FormControlLabel
-                        label='Use as a billing address?'
+                        label="Use as a billing address?"
                         control={<Switch defaultChecked />}
-                        sx={{ '& .MuiTypography-root': { fontWeight: 500 } }}
+                        sx={{ "& .MuiTypography-root": { fontWeight: 500 } }}
                       />
                     </Grid> */}
                   </Grid>

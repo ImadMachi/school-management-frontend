@@ -10,16 +10,13 @@ import {
 
 // ** Next Imports
 import Link from "next/link";
-import { GetStaticProps, InferGetStaticPropsType } from "next/types";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import Menu from "@mui/material/Menu";
 import Grid from "@mui/material/Grid";
 import { DataGrid } from "@mui/x-data-grid";
 import { styled } from "@mui/material/styles";
-import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import CustomChip from "src/@core/components/mui/chip";
@@ -44,7 +41,6 @@ import { getInitials } from "src/@core/utils/get-initials";
 // ** Actions Imports
 import {
   fetchData,
-  fetchUserById,
   filterData,
   updatePassword,
   uploadProfileImage,
@@ -67,11 +63,8 @@ import {
   InputAdornment,
   TextField,
 } from "@mui/material";
-import EditUserPopup from "src/views/apps/user/list/EditUserPopup";
-import select from "src/@core/theme/overrides/select";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Action } from "@reduxjs/toolkit";
 import {
   setAdministratorId,
   setAdministratorUserId,
@@ -87,6 +80,17 @@ interface CellType {
 interface AccountStatusType {
   [key: string]: ThemeColor;
 }
+interface UserRoleType {
+  [key: string]: { icon: string; color: string };
+}
+  
+const userRoleObj: UserRoleType = {
+  Director: { icon: "mdi:account-tie", color: "error.main" },
+  Administrator: { icon: "mdi:account-cog", color: "warning.main" },
+  Teacher: { icon: "mdi:teacher", color: "info.main" },
+  Student: { icon: "mdi:school", color: "success.main" },
+  Parent: { icon: "mdi:account-child", color: "primary.main" },
+};
 
 export interface UpdateUserDto {
   profileImage?: File;
@@ -124,8 +128,6 @@ const RowOptions = ({ id }: { id: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [editUserPopupOpen, setEditUserPopupOpen] = useState(false);
-  const [selectedUserForEdit, setSelectedUserForEdit] =
     useState<UserType | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
@@ -207,35 +209,26 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const handleEditSubmit = async () => {
     try {
-      // Get the form data using react-hook-form
       const formData = await handleSubmit();
 
-      // Extract the password and profileImage from the form data
       const { newPassword, profileImage } = formData as any;
 
-      // Check if the password is provided
       if (newPassword) {
-        // Call the updatePassword function with the retrieved password and user id
-        await dispatch(updatePassword({ id: id, newPassword: newPassword }) as any);
+        await dispatch(
+          updatePassword({ id: id, newPassword: newPassword }) as any
+        );
       }
 
-      // Check if a new profile image is provided
       if (profileImage) {
-        // Call the uploadProfileImage function with the retrieved profile image and user id
         const response = await dispatch(
           uploadProfileImage({ id, file: profileImage }) as any
         ).unwrap();
 
-        // Update the user data with the new profile image URL
         if (userData) {
           const imageUrl = response.profileImage;
           setUserData({ ...userData, profileImage: imageUrl });
         }
       }
-
-      // Continue with other updates or actions
-
-      // Close the edit dialog
       handleEditClose();
     } catch (error) {
       console.error("Error updating password or profile image:", error);
@@ -444,7 +437,7 @@ const mapRoleToFrench = (role: string) => {
     case UserRole.Teacher:
       return "Enseignant";
     case UserRole.Student:
-      return "Etudiant";
+      return "Eleve";
     case UserRole.Parent:
       return "Parent";
     default:
@@ -495,8 +488,9 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLocaleLowerCase()}s/overview/index`}
+              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${row.userData?.id}`}
               onClick={() => {
+                
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
                   dispatch(setAdministratorUserId(row.id));
@@ -530,9 +524,21 @@ const columns = [
     field: "role",
     renderCell: ({ row }: CellType) => {
       return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
-          {mapRoleToFrench(row.role)}
-        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            "& svg": { mr: 3, color: userRoleObj[row.role].color },
+          }}
+        >
+          <Icon icon={userRoleObj[row.role].icon} fontSize={20} />
+          <Typography
+            noWrap
+            sx={{ color: "text.secondary", textTransform: "capitalize" }}
+          >
+            {mapRoleToFrench(row.role)}
+          </Typography>
+        </Box>
       );
     },
   },

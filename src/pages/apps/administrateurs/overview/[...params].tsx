@@ -7,30 +7,23 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
-import Select from "@mui/material/Select";
-import Switch from "@mui/material/Switch";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
-import MenuItem from "@mui/material/MenuItem";
-import { styled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import InputLabel from "@mui/material/InputLabel";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import FormControl from "@mui/material/FormControl";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
-import InputAdornment from "@mui/material/InputAdornment";
-import LinearProgress from "@mui/material/LinearProgress";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import DialogContentText from "@mui/material/DialogContentText";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { fetchStudent, updateStudent } from "src/store/apps/students";
-import { StudentsType } from "src/types/apps/studentTypes";
-import EmailAppLayout from "src/views/apps/student/overview/mail/Mail";
+import { fetchAdministrator } from "src/store/apps/administrator";
+import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
+import { AdministratorType } from "src/types/apps/administratorTypes";
+import EmailAppLayout from "src/views/apps/administrators/overview/mail/Mail";
 import EditIcon from "@mui/icons-material/Edit";
 
 // ** Custom Components
@@ -46,61 +39,55 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
+import { updateAdministrator } from "src/store/apps/administrator";
 import { Controller, useForm } from "react-hook-form";
-import { formatDate } from "src/@core/utils/format";
-import { UserType } from "src/types/apps/UserType";
-import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { IconButton } from "@mui/material";
+import { UserType } from "src/types/apps/UserType";
+import { setAdministratorUserId } from "src/store/apps/administrator";
 import { MailFolderType } from "src/types/apps/mailTypes";
+import { set } from "nprogress";
 
 interface ColorsType {
   [key: string]: ThemeColor;
 }
 
-export interface UpdateStudentDto {
+export interface UpdateAdministratorDto {
   firstName?: string;
   lastName?: string;
-  dateOfBirth?: Date;
-  sex?: string;
+  phoneNumber?: string;
 }
 
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
-  dateOfBirth: yup.date().required(),
-  sex: yup.string().required(),
+  phoneNumber: yup.string().required(),
 });
 
 const UserViewLeft = () => {
   const router = useRouter();
-  const { folder } = router.query;
-
+  const { params } = router.query;
+  const folder = params ? params[0] : null;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
-  const selectedId = useSelector(
-    (state: RootState) => state.students.studentId
-  );
-  const selectedUserId = useSelector(
-    (state: RootState) => state.students.studentUserId
-  );
-  const id = selectedId;
-  const userId = selectedUserId;
 
   const {
     reset,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UpdateStudentDto>({
+  } = useForm<UpdateAdministratorDto>({
     mode: "onChange",
     resolver: yupResolver(schema),
   });
 
-  const studentStore = useSelector((state: RootState) => state.students);
+  const administratorStore = useSelector(
+    (state: RootState) => state.administrator
+  );
   const userStore = useSelector((state: RootState) => state.users);
-
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
-  const [userData, setUserData] = useState<StudentsType | null>(null);
+  const [userData, setUserData] = useState<AdministratorType | null>(null);
   const [userIdData, setUserIdData] = useState<UserType | null>(null);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>("auto");
   const [isHovered, setIsHovered] = useState(false);
@@ -114,26 +101,24 @@ const UserViewLeft = () => {
   const handleEditClick = () => {
     fileInputRef.current?.click();
   };
-
-  const handleEditSubmit = (data: UpdateStudentDto) => {
+  const handleEditSubmit = (data: UpdateAdministratorDto) => {
     // Ensure id is a number
-    const studentId = parseInt(id as unknown as string, 10);
-    const partialUpdateStudentDto: Partial<UpdateStudentDto> = {};
-    if (data.firstName) partialUpdateStudentDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateStudentDto.lastName = data.lastName;
-    if (data.dateOfBirth)
-      partialUpdateStudentDto.dateOfBirth = data.dateOfBirth;
-    if (data.sex) partialUpdateStudentDto.sex = data.sex;
+    const administratorId = parseInt(id as unknown as string, 10);
+    const partialUpdateAdministratorDto: Partial<UpdateAdministratorDto> = {};
+    if (data.firstName)
+      partialUpdateAdministratorDto.firstName = data.firstName;
+    if (data.lastName) partialUpdateAdministratorDto.lastName = data.lastName;
+    if (data.phoneNumber)
+      partialUpdateAdministratorDto.phoneNumber = data.phoneNumber;
 
-    // Dispatch the action with both id and UpdateStudentDto properties
-    dispatch(updateStudent({ id: studentId, updateStudentDto: data }))
+    dispatch(
+      updateAdministrator({ id: administratorId, updateAdministratorDto: data })
+    )
       .then(() => {
-        // Rest of your logic
         reset();
       })
       .catch((error) => {
-        // Handle error if needed
-        console.error("Update Student failed:", error);
+        console.error("Update Administrator failed:", error);
       });
     handleEditClose();
     reset();
@@ -152,15 +137,17 @@ const UserViewLeft = () => {
       const file = e.target.files[0];
 
       try {
-        const response = await dispatch(
-          uploadProfileImage({ id: userId!, file })
-        ).unwrap();
+        if (userId) {
+          const response = await dispatch(
+            uploadProfileImage({ id: userId! as unknown as number, file })
+          ).unwrap();
 
-        console.log("Profile image uploaded successfully:", response);
+          console.log("Profile image uploaded successfully:", response);
 
-        if (userIdData) {
-          const imageUrl = response.profileImage;
-          setUserIdData({ ...userIdData, profileImage: imageUrl });
+          if (userIdData) {
+            const imageUrl = response.profileImage;
+            setUserIdData({ ...userIdData, profileImage: imageUrl });
+          }
         }
       } catch (error) {
         console.error("Error uploading profile image:", error);
@@ -171,9 +158,7 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
-      dispatch(fetchStudent(Number(id)) as any);
-    } else {
-      router.push("/apps/etudiants");
+      dispatch(fetchAdministrator(Number(id)) as any);
     }
     return () => {
       setUserData(null);
@@ -181,26 +166,27 @@ const UserViewLeft = () => {
   }, [id]);
 
   useEffect(() => {
-    // Update state when the data is updated
-    if (studentStore.data && studentStore.data.length > 0) {
-      setUserData(studentStore.data[0]);
+    if (administratorStore.data && administratorStore.data.length > 0) {
+      setUserData(administratorStore.data[0]);
+      if (administratorStore.data[0]?.userId == null) {
+        setSuspendDialogOpen("auto");
+      }
     }
-    if (studentStore.data[0]?.userId == null) {
-      setSuspendDialogOpen("auto");
-    }
-  }, [studentStore.data]);
+  }, [administratorStore.data]);
 
   useEffect(() => {
     if (userId && !isNaN(Number(userId))) {
       dispatch(fetchUserById(Number(userId)) as any);
+    } else {
+      setUserData(null);
     }
     return () => {
       setUserData(null);
+      console.log(userId);
     };
   }, [userId]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);
     }
@@ -229,7 +215,7 @@ const UserViewLeft = () => {
                 onMouseLeave={handleLeave}
                 style={{ position: "relative" }}
               >
-                {userId && userIdData?.profileImage ? (
+                {userId != null && userIdData && userIdData.profileImage ? (
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
@@ -282,13 +268,14 @@ const UserViewLeft = () => {
                   onChange={handleFileChange}
                 />
               </div>
+
               <Typography variant="h6" sx={{ mb: 4 }}>
                 {userData.firstName} {userData.lastName}
               </Typography>
               <CustomChip
                 skin="light"
                 size="small"
-                label="Étudiant"
+                label="Administrateur"
                 sx={{ textTransform: "capitalize" }}
               />
             </CardContent>
@@ -318,23 +305,11 @@ const UserViewLeft = () => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
-                    La date de naissance:
+                    Contact:
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(userData.dateOfBirth)}
+                    {userData.phoneNumber}
                   </Typography>
-                </Box>
-                {/* <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
-                  <Typography variant='body2'>English</Typography>
-                </Box> */}
-                <Box sx={{ display: "flex", mb: 2 }}>
-                  <Typography
-                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
-                  >
-                    Sexe:
-                  </Typography>
-                  <Typography variant="body2">{userData.sex}</Typography>
                 </Box>
                 <Box sx={{ display: "flex" }}>
                   <Typography
@@ -427,37 +402,15 @@ const UserViewLeft = () => {
                     <Grid item xs={12}>
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name="dateOfBirth"
+                          name="phoneNumber"
                           control={control}
-                          defaultValue={new Date(
-                            userData.dateOfBirth
-                          ).toLocaleDateString()}
-                          rules={{ required: "Date de naissance est requis" }}
+                          defaultValue={userData.phoneNumber}
+                          rules={{ required: "Contact est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label="Date de naissance"
-                                error={Boolean(fieldState.error)}
-                                helperText={fieldState.error?.message}
-                              />
-                            </FormControl>
-                          )}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth sx={{ mb: 6 }}>
-                        <Controller
-                          name="sex"
-                          control={control}
-                          defaultValue={userData.sex}
-                          rules={{ required: "Sexe est requis" }}
-                          render={({ field, fieldState }) => (
-                            <FormControl fullWidth sx={{ mb: 6 }}>
-                              <TextField
-                                {...field}
-                                label="Sexe"
+                                label="Contact"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -468,9 +421,9 @@ const UserViewLeft = () => {
                     </Grid>
                     {/* <Grid item xs={12}>
                       <FormControlLabel
-                        label='Use as a billing address?'
+                        label="Use as a billing address?"
                         control={<Switch defaultChecked />}
-                        sx={{ '& .MuiTypography-root': { fontWeight: 500 } }}
+                        sx={{ "& .MuiTypography-root": { fontWeight: 500 } }}
                       />
                     </Grid> */}
                   </Grid>
@@ -493,9 +446,6 @@ const UserViewLeft = () => {
                 </Button>
               </DialogActions>
             </Dialog>
-            {/* 
-            <UserSuspendDialog open={suspendDialogOpen} setOpen={setSuspendDialogOpen} />
-            <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} /> */}
           </Card>
         </Grid>
         {userData.userId !== null && (

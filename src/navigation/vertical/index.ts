@@ -38,10 +38,10 @@ const navigation = (): VerticalNavItemsType => {
           icon: "mdi:teacher",
         },
         {
-          path: "/apps/etudiants",
+          path: "/apps/eleves",
           action: "manage",
-          subject: "étudiants",
-          title: "Étudients",
+          subject: "Élèves",
+          title: "Élèves",
           icon: "mdi:school",
         },
         {
@@ -59,12 +59,12 @@ const navigation = (): VerticalNavItemsType => {
       icon: "mdi:school",
       children: [
         {
-          path: "/apps/niveaux",
-          title: "Les Niveaux",
-        },
-        {
           path: "/apps/cycles",
           title: "Les Cycles",
+        },
+        {
+          path: "/apps/niveaux",
+          title: "Les Niveaux",
         },
         {
           path: "/apps/classes",

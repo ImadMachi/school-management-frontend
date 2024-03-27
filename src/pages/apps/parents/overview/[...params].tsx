@@ -7,24 +7,35 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import Select from "@mui/material/Select";
+import Switch from "@mui/material/Switch";
 import Avatar from "@mui/material/Avatar";
 import Divider from "@mui/material/Divider";
+import MenuItem from "@mui/material/MenuItem";
+import { styled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import InputLabel from "@mui/material/InputLabel";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
 import DialogTitle from "@mui/material/DialogTitle";
 import FormControl from "@mui/material/FormControl";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import InputAdornment from "@mui/material/InputAdornment";
+import LinearProgress from "@mui/material/LinearProgress";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import DialogContentText from "@mui/material/DialogContentText";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { fetchAdministrator } from "src/store/apps/administrator";
-import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
-import { AdministratorType } from "src/types/apps/administratorTypes";
-import EmailAppLayout from "src/views/apps/administrators/overview/mail/Mail";
+import { fetchParent, updateParent } from "src/store/apps/parents";
+import { ParentsType } from "src/types/apps/parentTypes";
+import EmailAppLayout from "src/views/apps/parents/overview/mail/Mail";
 import EditIcon from "@mui/icons-material/Edit";
+
+// ** Icon Imports
+import Icon from "src/@core/components/icon";
+import Image from "next/image";
 
 // ** Custom Components
 import CustomChip from "src/@core/components/mui/chip";
@@ -39,18 +50,18 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { updateAdministrator } from "src/store/apps/administrator";
 import { Controller, useForm } from "react-hook-form";
-import { IconButton } from "@mui/material";
+import { formatDate } from "src/@core/utils/format";
+import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { UserType } from "src/types/apps/UserType";
-import { setAdministratorUserId } from "src/store/apps/administrator";
 import { MailFolderType } from "src/types/apps/mailTypes";
+import { IconButton } from "@mui/material";
 
 interface ColorsType {
   [key: string]: ThemeColor;
 }
 
-export interface UpdateAdministratorDto {
+export interface UpdateParentDto {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
@@ -63,35 +74,31 @@ const schema = yup.object().shape({
 });
 
 const UserViewLeft = () => {
+
   const router = useRouter();
-  const { folder } = router.query;
+  const { params } = router.query;
+  const folder = params ? params[0] : null;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
+
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
 
-  const selectedId = useSelector(
-    (state: RootState) => state.administrator.AdministratorId
-  );
-  const selectedUserId = useSelector(
-    (state: RootState) => state.administrator.AdministratorUserId
-  );
-  const id = selectedId;
-  const userId = selectedUserId;
   const {
     reset,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UpdateAdministratorDto>({
+  } = useForm<UpdateParentDto>({
     mode: "onChange",
     resolver: yupResolver(schema),
   });
 
-  const administratorStore = useSelector(
-    (state: RootState) => state.administrator
-  );
+  const parentStore = useSelector((state: RootState) => state.parents);
   const userStore = useSelector((state: RootState) => state.users);
+
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
-  const [userData, setUserData] = useState<AdministratorType | null>(null);
+  const [userData, setUserData] = useState<ParentsType | null>(null);
   const [userIdData, setUserIdData] = useState<UserType | null>(null);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState<string>("auto");
   const [isHovered, setIsHovered] = useState(false);
@@ -105,24 +112,24 @@ const UserViewLeft = () => {
   const handleEditClick = () => {
     fileInputRef.current?.click();
   };
-  const handleEditSubmit = (data: UpdateAdministratorDto) => {
-    // Ensure id is a number
-    const administratorId = parseInt(id as unknown as string, 10);
-    const partialUpdateAdministratorDto: Partial<UpdateAdministratorDto> = {};
-    if (data.firstName)
-      partialUpdateAdministratorDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateAdministratorDto.lastName = data.lastName;
-    if (data.phoneNumber)
-      partialUpdateAdministratorDto.phoneNumber = data.phoneNumber;
 
-    dispatch(
-      updateAdministrator({ id: administratorId, updateAdministratorDto: data })
-    )
+  const handleEditSubmit = (data: UpdateParentDto) => {
+    // Ensure id is a number
+    const parentId = parseInt(id as unknown as string, 10);
+    const partialUpdateParentDto: Partial<UpdateParentDto> = {};
+    if (data.firstName) partialUpdateParentDto.firstName = data.firstName;
+    if (data.lastName) partialUpdateParentDto.lastName = data.lastName;
+    if (data.phoneNumber) partialUpdateParentDto.phoneNumber = data.phoneNumber;
+
+    // Dispatch the action with both id and UpdateParentDto properties
+    dispatch(updateParent({ id: parentId, updateParentDto: data }))
       .then(() => {
+        // Rest of your logic
         reset();
       })
       .catch((error) => {
-        console.error("Update Administrator failed:", error);
+        // Handle error if needed
+        console.error("Update Parent failed:", error);
       });
     handleEditClose();
     reset();
@@ -142,7 +149,7 @@ const UserViewLeft = () => {
 
       try {
         const response = await dispatch(
-          uploadProfileImage({ id: userId!, file })
+          uploadProfileImage({ id: userId! as unknown as number , file })
         ).unwrap();
 
         console.log("Profile image uploaded successfully:", response);
@@ -160,9 +167,7 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
-      dispatch(fetchAdministrator(Number(id)) as any);
-    } else {
-      router.push("/apps/administrateurs");
+      dispatch(fetchParent(Number(id)) as any);
     }
     return () => {
       setUserData(null);
@@ -171,13 +176,15 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     // Update state when the data is updated
-    if (administratorStore.data && administratorStore.data.length > 0) {
-      setUserData(administratorStore.data[0]);
-      if (administratorStore.data[0]?.userId == null) {
-        setSuspendDialogOpen("auto");
-      }
+    if (parentStore.data && parentStore.data.length > 0) {
+      setUserData(parentStore.data[0]);
     }
-  }, [administratorStore.data]);
+    if (parentStore.data[0]?.userId == null) {
+      setSuspendDialogOpen("auto");
+    }
+
+    console.log("parentStore.data", parentStore.data);
+  }, [parentStore.data]);
 
   useEffect(() => {
     if (userId && !isNaN(Number(userId))) {
@@ -277,7 +284,7 @@ const UserViewLeft = () => {
               <CustomChip
                 skin="light"
                 size="small"
-                label="Administrateur"
+                label="Parent"
                 sx={{ textTransform: "capitalize" }}
               />
             </CardContent>
@@ -313,6 +320,10 @@ const UserViewLeft = () => {
                     {userData.phoneNumber}
                   </Typography>
                 </Box>
+                {/* <Box sx={{ display: 'flex', mb: 2 }}>
+                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
+                  <Typography variant='body2'>English</Typography>
+                </Box> */}
                 <Box sx={{ display: "flex" }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -421,11 +432,12 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
+
                     {/* <Grid item xs={12}>
                       <FormControlLabel
-                        label="Use as a billing address?"
+                        label='Use as a billing address?'
                         control={<Switch defaultChecked />}
-                        sx={{ "& .MuiTypography-root": { fontWeight: 500 } }}
+                        sx={{ '& .MuiTypography-root': { fontWeight: 500 } }}
                       />
                     </Grid> */}
                   </Grid>
@@ -448,6 +460,9 @@ const UserViewLeft = () => {
                 </Button>
               </DialogActions>
             </Dialog>
+            {/* 
+            <UserSuspendDialog open={suspendDialogOpen} setOpen={setSuspendDialogOpen} />
+            <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} /> */}
           </Card>
         </Grid>
         {userData.userId !== null && (

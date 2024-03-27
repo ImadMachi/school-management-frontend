@@ -135,7 +135,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           component={Link}
           sx={{ "& svg": { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href="/apps/etudiants/overview/inbox"
+          href={`/apps/eleves/overview/inbox/${userId}/${id}`}
         >
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
@@ -162,26 +162,28 @@ const columns = [
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
-      const [userData, setUserData] = useState<UserType | null>(null);
-      const userStore = useSelector((state: RootState) => state.users);
+      const user = useSelector((state: RootState) =>
+        state.users.data.find((user) => user.id === row.userId)
+      );
 
       useEffect(() => {
         if (row.userId) {
           dispatch(fetchUserById(row.userId) as any);
         }
-      }, [row.userId]);
+      }, [dispatch, row.userId]);
 
       useEffect(() => {
-        const user = userStore.data.find((user) => user.id === row.userId);
-        setUserData(user || null);
-      }, [userStore.data, row.userId]);
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
+      }, [dispatch, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {userData?.profileImage ? (
+          {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              src={`http://localhost:8000/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (
@@ -206,7 +208,7 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/etudiants/overview/inbox"
+              href={`/apps/eleves/overview/inbox/${row.userId}/${row.id}`}
               onClick={() => {
                 dispatch(setStudentId(row.id));
                 dispatch(setStudentUserId(row.userId));
@@ -220,8 +222,18 @@ const columns = [
     },
   },
   {
+    flex: 0.1,
+    minWidth: 160,
+    sortable: false,
+    field: "identification",
+    headerName: "Identifient",
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.identification || "-"}</Typography>
+    ),
+  },
+  {
     flex: 0.15,
-    minWidth: 120,
+    minWidth: 70,
     headerName: "Date de Naissance",
     field: "dateOfBirth",
     renderCell: ({ row }: CellType) => (

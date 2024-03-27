@@ -68,17 +68,12 @@ const schema = yup.object().shape({
 
 const UserViewLeft = () => {
   const router = useRouter();
-  const { folder } = router.query;
+  const { params } = router.query;
+  const folder = params ? params[0] : null;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
   const dispatch: ThunkDispatch<RootState, any, AnyAction> = useDispatch();
 
-  const selectedId = useSelector(
-    (state: RootState) => state.directors.directorId
-  );
-  const selectedUserId = useSelector(
-    (state: RootState) => state.directors.directorUserId
-  );
-  const id = selectedId;
-  const userId = selectedUserId;
   const {
     reset,
     control,
@@ -89,9 +84,7 @@ const UserViewLeft = () => {
     resolver: yupResolver(schema),
   });
 
-  const directorStore = useSelector(
-    (state: RootState) => state.directors
-  );
+  const directorStore = useSelector((state: RootState) => state.directors);
   const userStore = useSelector((state: RootState) => state.users);
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
@@ -102,12 +95,10 @@ const UserViewLeft = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
-
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
-  
+
   const handleEditClick = () => {
     fileInputRef.current?.click();
   };
@@ -115,15 +106,12 @@ const UserViewLeft = () => {
     // Ensure id is a number
     const directorId = parseInt(id as unknown as string, 10);
     const partialUpdateDirectorDto: Partial<UpdateDirectorDto> = {};
-    if (data.firstName)
-      partialUpdateDirectorDto.firstName = data.firstName;
+    if (data.firstName) partialUpdateDirectorDto.firstName = data.firstName;
     if (data.lastName) partialUpdateDirectorDto.lastName = data.lastName;
     if (data.phoneNumber)
       partialUpdateDirectorDto.phoneNumber = data.phoneNumber;
 
-    dispatch(
-      updateDirector({ id: directorId, updateDirectorDto: data })
-    )
+    dispatch(updateDirector({ id: directorId, updateDirectorDto: data }))
       .then(() => {
         reset();
       })
@@ -145,30 +133,28 @@ const UserViewLeft = () => {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-  
+
       try {
-        const response = await dispatch(uploadProfileImage({ id: userId!, file })).unwrap();
-        
+        const response = await dispatch(
+          uploadProfileImage({ id: userId! as unknown as number, file })
+        ).unwrap();
+
         console.log("Profile image uploaded successfully:", response);
-  
+
         if (userIdData) {
-          const imageUrl = response.profileImage; 
+          const imageUrl = response.profileImage;
           setUserIdData({ ...userIdData, profileImage: imageUrl });
         }
-  
       } catch (error) {
         console.error("Error uploading profile image:", error);
-      }  
+      }
       e.target.value = "";
     }
   };
-  
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
       dispatch(fetchDirector(Number(id)) as any);
-    } else {
-      router.push("/apps/directeurs");
     }
     return () => {
       setUserData(null);
@@ -188,6 +174,7 @@ const UserViewLeft = () => {
   useEffect(() => {
     if (userId && !isNaN(Number(userId))) {
       dispatch(fetchUserById(Number(userId)) as any);
+      reset();
     }
     return () => {
       setUserData(null);
@@ -251,7 +238,7 @@ const UserViewLeft = () => {
                     <Avatar
                       alt="John Doe"
                       sx={{ width: 80, height: 80 }}
-                      src='/images/avatars/1.png'
+                      src="/images/avatars/1.png"
                     />
 
                     {isHovered && (

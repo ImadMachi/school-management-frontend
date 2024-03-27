@@ -84,7 +84,7 @@ const ClassCards = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="body2">{`${item.students.length} Etudiants`}</Typography>
+              <Typography variant="body2">{`${item.students.length} Élèves`}</Typography>
             </Box>
             <Box
               sx={{

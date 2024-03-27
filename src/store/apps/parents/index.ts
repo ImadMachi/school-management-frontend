@@ -50,24 +50,22 @@ export const addParent = createAsyncThunk(
   async (data: CreateParentDto) => {
     const formData = new FormData();
 
-    // Append createAccount property explicitly
     formData.append("firstName", data.firstName);
 
     formData.append("lastName", data.lastName);
 
     formData.append("phoneNumber", data.phoneNumber);
 
-    formData.append("createAccount", data.createAccount.toString());
+    formData.append("createAccount", data.createAccount.toString() || "");
 
-    formData.append("createUserDto[email]", data.createUserDto?.email || "");
-
-    formData.append(
-      "createUserDto[password]",
-      data.createUserDto?.password || ""
-    );
-
-    formData.append("profile-images", data.profileImage || "");
-
+    if (data.createAccount) {
+      formData.append("createUserDto[email]", data.createUserDto?.email || "");
+      formData.append(
+        "createUserDto[password]",
+        data.createUserDto?.password || ""
+      );
+      formData.append("profile-images", data.profileImage || "");
+    }
     const response = await axios.post(
       `${HOST}/parents?create-account=${data.createAccount}`,
       formData

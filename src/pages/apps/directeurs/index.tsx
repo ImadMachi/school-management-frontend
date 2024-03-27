@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, useEffect, MouseEvent, useCallback } from "react";
+import { useState, useEffect, MouseEvent, useCallback, use } from "react";
 
 // ** Next Imports
 import Link from "next/link";
@@ -137,7 +137,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           component={Link}
           sx={{ "& svg": { mr: 2 } }}
           onClick={handleRowOptionsClose}
-          href="/apps/directeurs/overview/inbox" // Include the id in the URL
+          href={`/apps/directeurs/overview/inbox/${userId}/${id}`}
         >
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
@@ -159,31 +159,33 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: "Utilisateur",
+    headerName: "direccteur",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
-      const { firstName, lastName } = row;
       const dispatch = useDispatch<AppDispatch>();
-      const [userData, setUserData] = useState<UserType | null>(null);
-      const userStore = useSelector((state: RootState) => state.users);
+      const { firstName, lastName } = row;
+      const user = useSelector((state: RootState) =>
+        state.users.data.find((user) => user.id === row.userId)
+      );
 
       useEffect(() => {
         if (row.userId) {
           dispatch(fetchUserById(row.userId) as any);
         }
-      }, [row.userId]);
+      }, [dispatch, row.userId]);
 
       useEffect(() => {
-        const user = userStore.data.find((user) => user.id === row.userId);
-        setUserData(user || null);
-      }, [userStore.data, row.userId]);
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
+      }, [dispatch, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {userData?.profileImage ? (
+          {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              src={`http://localhost:8000/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (
@@ -208,7 +210,7 @@ const columns = [
             }}
           >
             <StyledLink
-              href="/apps/directeurs/overview/inbox"
+              href={`/apps/directeurs/overview/inbox/${row.userId}/${row.id}`}
               onClick={() => {
                 dispatch(setDirectorId(row.id));
                 dispatch(setDirectorUserId(row.userId));

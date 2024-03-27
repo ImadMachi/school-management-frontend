@@ -9,7 +9,7 @@ import {
 // ** Axios Imports
 import axios from "axios";
 import toast from "react-hot-toast";
-import { UpdateStudentDto } from "src/pages/apps/etudiants/overview/[folder]";
+import { UpdateStudentDto } from "src/pages/apps/eleves/overview/[folder]";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { CreateStudentDto } from "src/views/apps/student/list/AddStudentDrawer";
 
@@ -54,20 +54,22 @@ export const addStudent = createAsyncThunk(
 
     formData.append("lastName", data.lastName);
 
+    formData.append("identification", data.identification);
+
     formData.append("dateOfBirth", data.dateOfBirth.toString());
 
     formData.append("sex", data.sex);
 
     formData.append("createAccount", data.createAccount.toString());
 
-    formData.append("createUserDto[email]", data.createUserDto?.email || "");
-
-    formData.append(
-      "createUserDto[password]",
-      data.createUserDto?.password || ""
-    );
-
-    formData.append("profile-images", data.profileImage || "");
+    if (data.createAccount) {
+      formData.append("createUserDto[email]", data.createUserDto?.email || "");
+      formData.append(
+        "createUserDto[password]",
+        data.createUserDto?.password || ""
+      );
+      formData.append("profile-images", data.profileImage || "");
+    }
 
     const response = await axios.post(
       `${HOST}/students?create-account=${data.createAccount}`,
@@ -140,6 +142,7 @@ export const appStudentsSlice = createSlice({
           `${student.firstName} ${student.lastName}`
             .toLowerCase()
             .includes(filterValue) ||
+          student.identification.includes(filterValue) ||
           student.dateOfBirth.toString().toLowerCase().includes(filterValue) ||
           student.sex.toLowerCase().includes(filterValue)
       );

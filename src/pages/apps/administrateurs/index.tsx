@@ -74,19 +74,6 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-// // ** renders client column
-// const renderClient = (row: AdministratorType) => {
-//   return (
-//     <CustomAvatar
-//       skin="light"
-//       color={"primary"}
-//       sx={{ mr: 3, width: 30, height: 30, fontSize: ".875rem" }}
-//     >
-//       {getInitials(`${row.firstName} ${row.lastName}`)}
-//     </CustomAvatar>
-//   );
-// };
-
 const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
@@ -169,6 +156,18 @@ const columns = [
       const user = useSelector((state: RootState) =>
         state.users.data.find((user) => user.id === row.userId)
       );
+
+      useEffect(() => {
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
+      }, [dispatch, row.userId]);
+
+      useEffect(() => {
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
+      }, [dispatch, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>

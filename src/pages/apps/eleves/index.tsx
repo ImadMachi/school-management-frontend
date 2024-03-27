@@ -165,7 +165,18 @@ const columns = [
       const user = useSelector((state: RootState) =>
         state.users.data.find((user) => user.id === row.userId)
       );
-    
+
+      useEffect(() => {
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
+      }, [dispatch, row.userId]);
+
+      useEffect(() => {
+        if (row.userId) {
+          dispatch(fetchUserById(row.userId) as any);
+        }
+      }, [dispatch, row.userId]);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>

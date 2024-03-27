@@ -65,28 +65,27 @@ const UserProfileHeader = () => {
   const handleLeave = () => {
     setIsHovered(false);
   };
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
+  // const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files && e.target.files.length > 0) {
+  //     const file = e.target.files[0];
 
-      try {
-        const response = await dispatch(
-          uploadProfileImage({ id: userId!, file })
-        ).unwrap();
+  //     try {
+  //       const response = await dispatch(
+  //         uploadProfileImage({ id: userId!, file })
+  //       ).unwrap();
 
-        console.log("Profile image uploaded successfully:", response);
+  //       console.log("Profile image uploaded successfully:", response);
 
-        if (user) {
-          const imageUrl = response.profileImage;
-          setUserIdData({ ...userIdData!, profileImage: imageUrl });
-        }
-      } catch (error) {
-        console.error("Error uploading profile image:", error);
-      }
-      e.target.value = "";
-    }
-  };
-  
+  //       if (user) {
+  //         const imageUrl = response.profileImage;
+  //         setUserIdData({ ...userIdData, profileImage: imageUrl });
+  //       }
+  //     } catch (error) {
+  //       console.error("Error uploading profile image:", error);
+  //     }
+  //     e.target.value = "";
+  //   }
+  // };
   useEffect(() => {
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);
@@ -123,7 +122,7 @@ const UserProfileHeader = () => {
               src={`http://localhost:8000/uploads/${user?.profileImage}`}
               alt="profile-picture"
             />
-            {isHovered && (
+            {/* {isHovered && (
               <IconButton
                 onClick={handleEditClick}
                 style={{
@@ -136,14 +135,14 @@ const UserProfileHeader = () => {
               >
                 <EditIcon sx={{ fontSize: 18 }} />
               </IconButton>
-            )}
+            )} */}
           </>
-          <input
+          {/* <input
             type="file"
             ref={fileInputRef}
             style={{ display: "none" }}
             onChange={handleFileChange}
-          />
+          /> */}
         </div>
         <Box
           sx={{
@@ -175,12 +174,12 @@ const UserProfileHeader = () => {
             ></Box>
           </Box>
           <Box sx={{ display: "flex", flexDirection: "row", gap: "10px" }}>
-            <Button
+            {/* <Button
               variant="contained"
               startIcon={<Icon icon="mdi:pencil" fontSize={20} />}
             >
               Modfifier les information
-            </Button>
+            </Button> */}
             <Button
               variant="contained"
               color="error"

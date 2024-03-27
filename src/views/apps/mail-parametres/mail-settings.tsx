@@ -20,6 +20,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Icon from "src/@core/components/icon";
 import TabAccount from "./TabCategory";
 import TabTemplate from "./TabTemplate";
+import TabGroup from "./TabGroup";
 
 const TabList = styled(MuiTabList)<TabListProps>(({ theme }) => ({
   "& .MuiTabs-indicator": {
@@ -66,6 +67,7 @@ const mailSettings = ({ tab }: { tab: string }) => {
   const tabContentList: { [key: string]: ReactElement } = {
     category: <TabAccount />,
     template: <TabTemplate />,
+    group: <TabGroup />,
   };
 
   return (
@@ -107,6 +109,21 @@ const mailSettings = ({ tab }: { tab: string }) => {
                     >
                       <Icon icon="mdi:lock-open-outline" />
                       {!hideText && "templates"}
+                    </Box>
+                  }
+                />
+                <Tab
+                  value="group"
+                  label={
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        ...(!hideText && { "& svg": { mr: 2 } }),
+                      }}
+                    >
+                      <Icon icon="typcn:group-outline" />
+                      {!hideText && "groupes"}
                     </Box>
                   }
                 />

@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import PageHeader from "src/@core/components/page-header";
 
 // ** Components Imports
-import RoleCards from "src/views/apps/classes/ClassCards";
+import ClassCards from "src/views/apps/classes/ClassCards";
 
 const ClassesComponent = () => {
   return (
@@ -15,7 +15,7 @@ const ClassesComponent = () => {
         title={<Typography variant="h5">Liste des classes</Typography>}
       />
       <Grid item xs={12} sx={{ mb: 4 }}>
-        <RoleCards />
+        <ClassCards />
       </Grid>
     </Grid>
   );

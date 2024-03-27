@@ -102,8 +102,8 @@ const ClassCards = () => {
                   sx={{ color: "primary.main" }}
                   onClick={(e: SyntheticEvent) => {
                     e.preventDefault();
-                    setClassToEdit(item);
                     setAddUserOpen(true);
+                    setClassToEdit(item);
                   }}
                 >
                   Modifier la classe
@@ -139,6 +139,7 @@ const ClassCards = () => {
                   onClick={() => {
                     setAddUserOpen(true);
                     setClassToEdit(null);
+                    console.log("add class");
                   }}
                 >
                   Ajouter Classe

@@ -11,6 +11,7 @@ import parents from "./apps/parents";
 import directors from "./apps/directors";
 import users from "./apps/users";
 import categories from "./apps/categories";
+import groups from "./apps/groups";
 import classes from "./apps/classes";
 import levels from "./apps/levels";
 import cycles from "./apps/cycles";
@@ -26,6 +27,7 @@ export const store = configureStore({
     directors,
     users,
     categories,
+    groups,
     classes,
     levels,
     cycles,

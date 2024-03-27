@@ -13,7 +13,6 @@ import {
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import List from "@mui/material/List";
-import Menu from "@mui/material/Menu";
 import Input from "@mui/material/Input";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -33,7 +32,6 @@ import Icon from "src/@core/components/icon";
 import { EditorState } from "draft-js";
 
 // ** Custom Components Imports
-import OptionsMenu from "src/@core/components/option-menu";
 import CustomAvatar from "src/@core/components/mui/avatar";
 import ReactDraftWysiwyg from "src/@core/components/react-draft-wysiwyg";
 
@@ -51,21 +49,27 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { sendMail } from "src/store/apps/mail";
-import { FormHelperText, Grid, Select } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  FormHelperText,
+  Grid,
+  Select,
+} from "@mui/material";
 import { useSelector } from "react-redux";
 import { fetchData } from "src/store/apps/users";
 import { fetchData as fetchCategoryData } from "src/store/apps/categories";
 import { fetchData as fetchClassesData } from "src/store/apps/classes";
 import { fetchData as fetchTemplatesData } from "src/store/apps/templates";
+import { fetchData as fetchGroupsData } from "src/store/apps/groups";
 import { UserRole, UserType } from "src/types/apps/UserType";
 import { useRouter } from "next/router";
 import { ClassType } from "src/types/apps/classTypes";
-import toast from "react-hot-toast";
-import CardSnippet from "src/@core/components/card-snippet";
 import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
 import { useSettings } from "src/@core/hooks/useSettings";
-import * as source from "src/views/components/swiper/SwiperSourceCode";
 import { TemplateType } from "src/types/apps/templateTypes";
+import { GroupType } from "src/types/apps/groupTypes";
 
 type ToUserType = UserType;
 
@@ -75,14 +79,24 @@ const ComposePopup = (props: MailComposeType) => {
 
   // ** States
   const [emailToStudents, setEmailToStudents] = useState<ToUserType[]>([]);
+  const [emailToTeachers, setEmailToTeachers] = useState<ToUserType[]>([]);
   const [emailToParents, setEmailToParents] = useState<ToUserType[]>([]);
   const [emailToClasses, setEmailToClasses] = useState<ClassType[]>([]);
+  const [emailToGroups, setEmailToGroups] = useState<GroupType[]>([]);
   const [subjectValue, setSubjectValue] = useState<string>("");
   const [messageValue, setMessageValue] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [category, setCategory] = useState(-1);
   const [studentUsers, setStudentUsers] = useState<UserType[]>([]);
   const [parentUsers, setParentUsers] = useState<UserType[]>([]);
+  const [teacherUsers, setTeacherUsers] = useState<UserType[]>([]);
+  const [checkedRecipients, setCheckedRecipients] = useState<boolean[]>([
+    true,
+    false,
+    false,
+    true,
+    false,
+  ]);
 
   // ** Errors
   const [emailToError, setEmailToError] = useState<boolean>(false);
@@ -99,6 +113,7 @@ const ComposePopup = (props: MailComposeType) => {
   const categoryStore = useSelector((state: RootState) => state.categories);
   const classStore = useSelector((state: RootState) => state.classes);
   const templateStore = useSelector((state: RootState) => state.templates);
+  const groupStore = useSelector((state: RootState) => state.groups);
 
   // ** Router
   const router = useRouter();
@@ -115,6 +130,7 @@ const ComposePopup = (props: MailComposeType) => {
     dispatch(fetchCategoryData() as any);
     dispatch(fetchClassesData() as any);
     dispatch(fetchTemplatesData() as any);
+    dispatch(fetchGroupsData() as any);
   }, []);
 
   useEffect(() => {
@@ -122,10 +138,16 @@ const ComposePopup = (props: MailComposeType) => {
       (user) => user.role === UserRole.Student
     );
     setStudentUsers(studentUsers);
+
     const parentUsers = userStore.data.filter(
       (user) => user.role === UserRole.Parent
     );
     setParentUsers(parentUsers);
+
+    const teacherUsers = userStore.data.filter(
+      (user) => user.role === UserRole.Teacher
+    );
+    setTeacherUsers(teacherUsers);
   }, [userStore.data]);
 
   useEffect(() => {
@@ -166,7 +188,9 @@ const ComposePopup = (props: MailComposeType) => {
     setEmailToError(false);
     setObjectError(false);
     setMessageError(false);
-    const emailTo = emailToStudents.concat(emailToParents);
+    const emailTo = emailToStudents
+      .concat(emailToParents)
+      .concat(emailToTeachers);
     if (emailToClasses.length) {
       emailToClasses.forEach((cls) => {
         cls.students.forEach((student) => {
@@ -175,6 +199,20 @@ const ComposePopup = (props: MailComposeType) => {
           );
           if (studentUser && !emailTo.includes(studentUser)) {
             emailTo.push(studentUser);
+          }
+        });
+      });
+    }
+    if (emailToGroups.length) {
+      emailToGroups.forEach((group) => {
+        group.users.forEach((user) => {
+          if (!emailTo.includes(user)) {
+            emailTo.push(user);
+          }
+        });
+        group.administratorUsers.forEach((user) => {
+          if (!emailTo.includes(user)) {
+            emailTo.push(user);
           }
         });
       });
@@ -231,6 +269,10 @@ const ComposePopup = (props: MailComposeType) => {
   const handlePopupClose = () => {
     toggleComposeOpen();
     setEmailToStudents([]);
+    setEmailToTeachers([]);
+    setEmailToParents([]);
+    setEmailToClasses([]);
+    setEmailToGroups([]);
     setSubjectValue("");
     setMessageValue("");
     setSelectedFiles([]);
@@ -239,6 +281,10 @@ const ComposePopup = (props: MailComposeType) => {
   const handleMinimize = () => {
     toggleComposeOpen();
     setEmailToStudents(emailToStudents);
+    setEmailToTeachers(emailToTeachers);
+    setEmailToParents(emailToParents);
+    setEmailToClasses(emailToClasses);
+    setEmailToGroups(emailToGroups);
     setMessageValue(messageValue);
     setSubjectValue(subjectValue);
   };
@@ -262,10 +308,10 @@ const ComposePopup = (props: MailComposeType) => {
     ));
   };
   const renderCustomClassChips = (
-    array: ClassType[],
+    array: (GroupType | ClassType)[],
     getTagProps: ({ index }: { index: number }) => {},
-    state: ClassType[],
-    setState: (val: ClassType[]) => void
+    state: (ClassType | GroupType)[],
+    setState: (val: (GroupType | ClassType)[]) => void
   ) => {
     return array.map((item, index) => (
       <Chip
@@ -319,9 +365,9 @@ const ComposePopup = (props: MailComposeType) => {
   };
   const renderClassListItem = (
     props: HTMLAttributes<HTMLLIElement>,
-    option: ClassType,
-    array: ClassType[],
-    setState: (val: ClassType[]) => void
+    option: ClassType | GroupType,
+    array: (ClassType | GroupType)[],
+    setState: (val: (ClassType | GroupType)[]) => void
   ) => {
     return (
       <ListItem
@@ -374,10 +420,28 @@ const ComposePopup = (props: MailComposeType) => {
     return filteredOptions;
   };
 
+  const addNewGroupOption = (
+    options: GroupType[],
+    params: any
+  ): GroupType[] => {
+    const { inputValue } = params;
+    const filteredOptions = options.filter((option) =>
+      option.name.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    // @ts-ignore
+    return filteredOptions;
+  };
+
   const handleSelectTemplate = (template: TemplateType) => {
     setSubjectValue(template.subject);
     setMessageValue(template.body);
     setCategory(template.category.id);
+  };
+
+  const handleChangeCheckedRecipient = (index: number) => {
+    setCheckedRecipients((prevValues) =>
+      prevValues.map((v, i) => (i === index ? !v : v))
+    );
   };
 
   return (
@@ -449,6 +513,66 @@ const ComposePopup = (props: MailComposeType) => {
           px: 4,
           display: "flex",
           alignItems: "center",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <InputLabel sx={{ mr: 3, fontSize: "0.875rem" }}>
+          Destinataires:
+        </InputLabel>
+        <FormGroup sx={{ display: "flex", flexDirection: "row" }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checkedRecipients[0]}
+                onChange={() => handleChangeCheckedRecipient(0)}
+              />
+            }
+            label="Etudiants"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checkedRecipients[1]}
+                onChange={() => handleChangeCheckedRecipient(1)}
+              />
+            }
+            label="Enseignants"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checkedRecipients[2]}
+                onChange={() => handleChangeCheckedRecipient(2)}
+              />
+            }
+            label="Parents"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checkedRecipients[3]}
+                onChange={() => handleChangeCheckedRecipient(3)}
+              />
+            }
+            label="Classes"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checkedRecipients[4]}
+                onChange={() => handleChangeCheckedRecipient(4)}
+              />
+            }
+            label="Groupes"
+          />
+        </FormGroup>
+      </Box>
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: checkedRecipients[0] ? "flex" : "none",
+          alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         }}
@@ -511,7 +635,71 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: "flex",
+          display: checkedRecipients[1] ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+          <div>
+            <InputLabel
+              sx={{ mr: 3, fontSize: "0.875rem" }}
+              htmlFor="email-to-select"
+            >
+              Aux Enseignants:
+            </InputLabel>
+          </div>
+          <Autocomplete
+            multiple
+            freeSolo
+            value={emailToTeachers}
+            clearIcon={false}
+            id="email-to-select"
+            filterSelectedOptions
+            options={teacherUsers}
+            ListboxComponent={List}
+            filterOptions={addNewOption}
+            getOptionLabel={(option) =>
+              `${(option as ToUserType).userData.firstName} ${
+                (option as ToUserType).userData.lastName
+              }`
+            }
+            renderOption={(props, option) =>
+              renderListItem(props, option, emailToTeachers, setEmailToTeachers)
+            }
+            renderTags={(array: ToUserType[], getTagProps) =>
+              renderCustomChips(
+                array,
+                getTagProps,
+                emailToTeachers,
+                setEmailToTeachers
+              )
+            }
+            sx={{
+              width: "100%",
+              "& .MuiOutlinedInput-root": { p: 2 },
+              "& .MuiAutocomplete-endAdornment": { display: "none" },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                autoComplete="new-password"
+                sx={{
+                  border: 0,
+                  "& fieldset": { border: "0 !important" },
+                  "& .MuiOutlinedInput-root": { p: "0 !important" },
+                }}
+              />
+            )}
+          />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: checkedRecipients[2] ? "flex" : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -575,7 +763,7 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: "flex",
+          display: checkedRecipients[3] ? "flex" : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -609,7 +797,7 @@ const ComposePopup = (props: MailComposeType) => {
                 props,
                 option,
                 emailToClasses,
-                setEmailToClasses
+                setEmailToClasses as any
               )
             }
             renderTags={(array: ClassType[], getTagProps) =>
@@ -617,7 +805,75 @@ const ComposePopup = (props: MailComposeType) => {
                 array,
                 getTagProps,
                 emailToClasses,
-                setEmailToClasses
+                setEmailToClasses as any
+              )
+            }
+            sx={{
+              width: "100%",
+              "& .MuiOutlinedInput-root": { p: 2 },
+              "& .MuiAutocomplete-endAdornment": { display: "none" },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                autoComplete="new-password"
+                sx={{
+                  border: 0,
+                  "& fieldset": { border: "0 !important" },
+                  "& .MuiOutlinedInput-root": { p: "0 !important" },
+                }}
+              />
+            )}
+          />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: checkedRecipients[4] ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+          <div>
+            <InputLabel
+              sx={{ mr: 3, fontSize: "0.875rem" }}
+              htmlFor="email-to-select"
+            >
+              Aux Groupes:
+            </InputLabel>
+          </div>
+          <Autocomplete
+            multiple
+            freeSolo
+            value={emailToGroups}
+            clearIcon={false}
+            id="email-to-select"
+            filterSelectedOptions
+            options={groupStore.data}
+            ListboxComponent={List}
+            filterOptions={addNewGroupOption}
+            getOptionLabel={(option) =>
+              `${(option as GroupType).name}
+              }`
+            }
+            renderOption={(props, option) =>
+              renderClassListItem(
+                props,
+                option,
+                emailToGroups,
+                setEmailToGroups as any
+              )
+            }
+            renderTags={(array: GroupType[], getTagProps) =>
+              renderCustomClassChips(
+                array,
+                getTagProps,
+                emailToGroups,
+                setEmailToGroups as any
               )
             }
             sx={{
@@ -742,6 +998,7 @@ const ComposePopup = (props: MailComposeType) => {
           py: 1,
           px: 4,
           display: "flex",
+          flexWrap: "wrap",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         }}
       >

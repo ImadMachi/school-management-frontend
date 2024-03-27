@@ -98,8 +98,6 @@ const UserViewLeft = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
-
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
@@ -141,24 +139,24 @@ const UserViewLeft = () => {
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
-  
+
       try {
-        const response = await dispatch(uploadProfileImage({ id: userId!, file })).unwrap();
-        
+        const response = await dispatch(
+          uploadProfileImage({ id: userId!, file })
+        ).unwrap();
+
         console.log("Profile image uploaded successfully:", response);
-  
+
         if (userIdData) {
-          const imageUrl = response.profileImage; 
+          const imageUrl = response.profileImage;
           setUserIdData({ ...userIdData, profileImage: imageUrl });
         }
-  
       } catch (error) {
         console.error("Error uploading profile image:", error);
-      }  
+      }
       e.target.value = "";
     }
   };
-  
 
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
@@ -247,7 +245,7 @@ const UserViewLeft = () => {
                     <Avatar
                       alt="John Doe"
                       sx={{ width: 80, height: 80 }}
-                      src='/images/avatars/1.png'
+                      src="/images/avatars/1.png"
                     />
 
                     {isHovered && (

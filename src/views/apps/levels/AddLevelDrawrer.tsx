@@ -63,7 +63,6 @@ const defaultValues = {
   name: "",
   schoolYear: "",
   classes: [] as ClassType[],
- 
 };
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -129,7 +128,10 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
       setValue("schoolYear", props.levelToEdit.schoolYear);
       setValue("classes", props.levelToEdit.classes);
     }
-  }, [props.levelToEdit]);
+    return () => {
+      reset();
+    };
+  }, [props.open]);
 
   useEffect(() => {
     dispatch(fetchClasses() as any);
@@ -177,16 +179,14 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.name}`)}
-            </CustomAvatar>
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.name}
-          </Typography>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(`${option.name}`)}
+          </CustomAvatar>
+          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
         </Box>
       </ListItem>
     );
@@ -231,9 +231,7 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
 
     const filteredOptions = options
       .filter((option) =>
-        `${option.name}`
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
+        `${option.name}`.toLowerCase().includes(inputValue.toLowerCase())
       )
       .filter((option) => !value.find((item) => item.id === option.id));
 
@@ -327,9 +325,7 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
                   filterOptions={(options, params) =>
                     filterOptions(options, params, value)
                   }
-                  getOptionLabel={(option) =>
-                    `${(option as SelectType).name}`
-                  }
+                  getOptionLabel={(option) => `${(option as SelectType).name}`}
                   renderOption={(props, option) =>
                     renderUserListItem(props, option, value, onChange)
                   }

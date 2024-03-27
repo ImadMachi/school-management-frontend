@@ -29,6 +29,7 @@ import {
   handleSelectMail,
   handleSelectAllMail,
 } from "src/store/apps/mail";
+import { log } from "console";
 
 // ** Variables
 const labelColors: MailLabelColors = {
@@ -53,8 +54,8 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
   const mdAbove = useMediaQuery(theme.breakpoints.up("md"));
   const smAbove = useMediaQuery(theme.breakpoints.up("sm"));
   const hidden = useMediaQuery(theme.breakpoints.down("lg"));
-  const store = useSelector((state: RootState) => state.mail);
 
+  const store = useSelector((state: RootState) => state.mail);
   // ** Vars
   const leftSidebarWidth = 260;
   const { skin, direction } = settings;
@@ -63,7 +64,6 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
     label: label || "",
     folder: folder || "inbox",
   };
-
   useEffect(() => {
     // @ts-ignore
     dispatch(
@@ -73,7 +73,6 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
       }) as any
     );
   }, [dispatch, query, routeParams.folder, routeParams.label]);
-
   const toggleComposeOpen = () => setComposeOpen(!composeOpen);
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);
 

@@ -3,7 +3,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** Axios Imports
 import axios from "axios";
-import { de } from "date-fns/locale";
 import toast from "react-hot-toast";
 
 // ** Types
@@ -65,6 +64,7 @@ export const fetchMails = createAsyncThunk(
     const response = await axios.get(
       `${HOST}/messages/auth?folder=${entityFolder}`
     );
+
     return { mails: response.data, filter: params };
   }
 );
@@ -239,6 +239,11 @@ export const appEmailSlice = createSlice({
       state.mails = mails;
       state.filter = action.payload.filter;
     });
+
+    builder.addCase(fetchMails.rejected, (state, action) => {
+      toast.error("Erreur lors du chargement des messages");
+    });
+
     builder.addCase(getCurrentMail.fulfilled, (state, action) => {
       const mail = action.payload;
       if (mail.sender.director) {

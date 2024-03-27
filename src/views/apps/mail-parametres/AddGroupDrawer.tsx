@@ -1,5 +1,5 @@
 // ** React Imports
-import { HTMLAttributes, useEffect, useState } from "react";
+import { HTMLAttributes, useEffect, useRef } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -16,7 +16,7 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 // ** Third Party Imports
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
@@ -26,57 +26,37 @@ import { useDispatch } from "react-redux";
 
 // ** Types Imports
 import { AppDispatch, RootState } from "src/store";
-import {
-  Autocomplete,
-  Checkbox,
-  Chip,
-  FormControlLabel,
-  Input,
-  InputLabel,
-  List,
-  ListItem,
-  MenuItem,
-  Select,
-} from "@mui/material";
+
+import { GroupType } from "src/types/apps/groupTypes";
+import { HOST } from "src/store/constants/hostname";
+import { Autocomplete, Avatar, Chip, List, ListItem } from "@mui/material";
+import { addGroup, deleteGroup, editGroup } from "src/store/apps/groups";
+import { fetchData as fetchUsers } from "src/store/apps/users";
 import { useSelector } from "react-redux";
-import { fetchData as fetchAdministrators } from "src/store/apps/administrator";
-import { fetchData as fetchTeachers } from "src/store/apps/teachers";
-import { fetchData as fetchStudents } from "src/store/apps/students";
-import { fetchData as fetchLevels } from "src/store/apps/levels";
-
-import { getInitials } from "src/@core/utils/get-initials";
-import { addClass, deleteClass, editClass } from "src/store/apps/classes";
-import { AdministratorType } from "src/types/apps/administratorTypes";
-import { TeachersType } from "src/types/apps/teacherTypes";
-import { StudentsType } from "src/types/apps/studentTypes";
-import { ClassType } from "src/types/apps/classTypes";
-import { LevelType } from "src/types/apps/levelTypes";
 import { UserType } from "src/types/apps/UserType";
-import { t } from "i18next";
+import { getInitials } from "src/@core/utils/get-initials";
 
-interface SidebarAddClassType {
+interface SidebarAddGroupType {
   open: boolean;
   toggle: () => void;
-  classToEdit: ClassType | null;
+  groupToEdit: GroupType | null;
+  setGroupToEdit: (group: GroupType | null) => void;
 }
 
-export interface CreateClassDto {
+export interface CreateGroupDto {
   name: string;
-  schoolYear: string;
-  administrator: number;
-  level: number;
+  description: string;
+  image: File | null;
+  administratorUsers: UserType[];
+  users: UserType[];
 }
 
-type SelectType = AdministratorType | TeachersType | StudentsType;
-type SelectTypeLevel = LevelType;
-
-const defaultValues = {
+const defaultValues: CreateGroupDto = {
   name: "",
-  schoolYear: "",
-  teachers: [] as TeachersType[],
-  students: [] as StudentsType[],
-  administrator: "",
-  level: "",
+  description: "",
+  image: null,
+  administratorUsers: [],
+  users: [],
 };
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -89,55 +69,30 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 
 const schema = yup.object().shape({
   id: yup.number(),
-  name: yup.string().required("Nom de la classe est requis"),
-  schoolYear: yup
+  name: yup
     .string()
-    .required("Année scolaire est requise")
-    .matches(
-      /^[0-9]{4}-[0-9]{4}$/,
-      "Année scolaire doit être au format 'YYYY-YYYY'"
-    )
-    .test(
-      "is-valid",
-      "Année fin doit être supérieure à l'année de début ",
-      (value) => {
-        if (value) {
-          const [start, end] = value.split("-").map((v) => parseInt(v));
-          return end - start == 1;
-        }
-        return false;
-      }
-    ),
-  administrator: yup
-    .number()
-    .required("Administrateur est requis")
-    .positive("Administrateur est requis")
-    .integer("Administrateur est requis")
-    .typeError("Administrateur est requis"),
-  teachers: yup.array().min(1, "Au moins un enseignant est requis"),
-  students: yup.array().min(1, "Au moins un étudiant est requis"),
-  level: yup
-    .number()
-    .required("Niveau est requis")
-    .positive("Niveau est requis")
-    .integer("Niveau est requis")
-    .typeError("Niveau est requis"),
+    .required("Nom du groupe est requis")
+    .min(3, "Nom du groupe doit avoir au moins 3 caractères"),
+  description: yup.string(),
+  image: yup.mixed().required("Image est requise"),
+  administratorUsers: yup
+    .array()
+    .min(1, "Au moins un administrateur est requis"),
+  users: yup.array().min(1, "Au moins un utilisateur est requis"),
 });
 
-const SidebarAddClass = (props: SidebarAddClassType) => {
+const AddGroupDrawer = (props: SidebarAddGroupType) => {
   // ** Props
   const { open, toggle } = props;
 
   // ** HooksSidebarAddClass
   const dispatch = useDispatch<AppDispatch>();
 
-  // ** Store
-  const administratorStore = useSelector(
-    (state: RootState) => state.administrator
-  );
-  const teacherStore = useSelector((state: RootState) => state.teachers);
-  const studentStore = useSelector((state: RootState) => state.students);
-  const levelStore = useSelector((state: RootState) => state.levels);
+  // ** Refs
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // ** Stores
+  const usersStore = useSelector((state: RootState) => state.users);
 
   const {
     reset,
@@ -153,37 +108,39 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   });
 
   useEffect(() => {
-    if (props.classToEdit) {
-      setValue("name", props.classToEdit.name);
-      setValue("schoolYear", props.classToEdit.schoolYear);
-      setValue("administrator", `${props.classToEdit.administrator.id}`);
-      setValue("teachers", props.classToEdit.teachers);
-      setValue("students", props.classToEdit.students);
-      setValue("level", `${props.classToEdit.level.id}`);
-    }
-    return () => {
-      reset();
-    };
-  }, [props.open]);
-
-  useEffect(() => {
-    dispatch(fetchAdministrators() as any);
-    dispatch(fetchTeachers() as any);
-    dispatch(fetchStudents() as any);
-    dispatch(fetchLevels() as any);
+    dispatch(fetchUsers() as any);
   }, []);
 
-  const onSubmit = (data: any) => {
+  useEffect(() => {
+    (async () => {
+      if (props.groupToEdit) {
+        setValue("name", props.groupToEdit.name);
+        setValue("description", props.groupToEdit.description);
+
+        const response = await fetch(
+          `${HOST}/uploads/groups/${props.groupToEdit.imagePath}`
+        );
+        const data = await response.blob();
+        const file = new File([data], props.groupToEdit.imagePath);
+        setValue("image", file);
+
+        setValue("administratorUsers", props.groupToEdit.administratorUsers);
+        setValue("users", props.groupToEdit.users);
+      }
+    })();
+  }, [props.open]);
+
+  const onSubmit = async (data: any) => {
     const payload = {
       ...data,
-      administrator: { id: data.administrator },
-      level: { id: data.level },
     };
-    if (props.classToEdit) {
-      dispatch(editClass({ ...payload, id: props.classToEdit.id }) as any);
+
+    if (props.groupToEdit) {
+      dispatch(editGroup({ ...payload, id: props.groupToEdit.id }) as any);
     } else {
-      dispatch(addClass(payload) as any);
+      dispatch(addGroup(payload) as any);
     }
+
     toggle();
     reset();
   };
@@ -193,18 +150,37 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     reset();
   };
 
-  const handleDeleteClass = () => {
-    if (props.classToEdit) {
-      dispatch(deleteClass(props.classToEdit.id) as any);
+  const handleDeleteGroup = () => {
+    if (props.groupToEdit) {
+      dispatch(deleteGroup(props.groupToEdit.id) as any);
       toggle();
       reset();
     }
   };
 
+  const filterOptions = (
+    options: UserType[],
+    params: any,
+    value: UserType[]
+  ): UserType[] => {
+    const { inputValue } = params;
+
+    const filteredOptions = options
+      .filter((option) =>
+        `${option.userData.firstName} ${option.userData.lastName}`
+          .toLowerCase()
+          .includes(inputValue.toLowerCase())
+      )
+      .filter((option) => !value.find((item) => item.id === option.id));
+
+    // @ts-ignore
+    return filteredOptions;
+  };
+
   const renderUserListItem = (
     props: HTMLAttributes<HTMLLIElement>,
-    option: SelectType,
-    array: SelectType[],
+    option: UserType,
+    array: UserType[],
     onChange: (...event: any[]) => void
   ) => {
     return (
@@ -228,39 +204,22 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
             color="primary"
             sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
           >
-            {getInitials(`${option.firstName} ${option.lastName}`)}
+            {getInitials(
+              `${option.userData.firstName} ${option.userData.lastName}`
+            )}
           </CustomAvatar>
           <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.firstName} {option.lastName}
+            {option.userData.firstName} {option.userData.lastName}
           </Typography>
         </Box>
       </ListItem>
     );
   };
 
-  const renderCustomChips = (
-    array: SelectType[],
-    getTagProps: ({ index }: { index: number }) => {},
-    state: SelectType[],
-    onChange: (...event: any[]) => void
-  ) => {
-    return state.map((item, index) => (
-      <Chip
-        size="small"
-        key={item.id}
-        label={`${item.firstName} ${item.lastName}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        //@ts-ignore
-        onDelete={() => handleDeleteChipItem(item.id, state, onChange)}
-      />
-    ));
-  };
-
   const handleDeleteChipItem = (
     value: number,
-    state: SelectType[],
-    setState: (val: SelectType[]) => void
+    state: UserType[],
+    setState: (val: UserType[]) => void
   ) => {
     const arr = state;
     const index = arr.findIndex((i) => i.id === value);
@@ -268,23 +227,23 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     setState([...arr]);
   };
 
-  const filterOptions = (
-    options: SelectType[],
-    params: any,
-    value: SelectType[]
-  ): SelectType[] => {
-    const { inputValue } = params;
-
-    const filteredOptions = options
-      .filter((option) =>
-        `${option.firstName} ${option.lastName}`
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
-      )
-      .filter((option) => !value.find((item) => item.id === option.id));
-
-    // @ts-ignore
-    return filteredOptions;
+  const renderCustomChips = (
+    array: UserType[],
+    getTagProps: ({ index }: { index: number }) => {},
+    state: UserType[],
+    onChange: (...event: any[]) => void
+  ) => {
+    return state.map((item, index) => (
+      <Chip
+        size="small"
+        key={item.id}
+        label={`${item.userData.firstName} ${item.userData.lastName}`}
+        {...(getTagProps({ index }) as {})}
+        deleteIcon={<Icon icon="mdi:close" />}
+        //@ts-ignore
+        onDelete={() => handleDeleteChipItem(item.id, state, onChange)}
+      />
+    ));
   };
 
   return (
@@ -298,7 +257,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     >
       <Header>
         <Typography variant="h6">
-          {!!props.classToEdit ? "Modifier" : "Ajouter"} Classe
+          {!!props.groupToEdit ? "Modifier" : "Ajouter"} Groupe
         </Typography>
         <IconButton
           size="small"
@@ -318,7 +277,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label="Nom de la classe"
+                  label="Nom du groupe"
                   onChange={onChange}
                   error={Boolean(errors.name)}
                 />
@@ -333,69 +292,28 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
 
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="schoolYear"
+              name="description"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label="Année scolaire"
+                  label="Description du groupe"
                   onChange={onChange}
-                  placeholder={`${new Date().getFullYear()}-${
-                    new Date().getFullYear() + 1
-                  }`}
-                  error={Boolean(errors.schoolYear)}
+                  error={Boolean(errors.description)}
                 />
               )}
             />
-            {errors.schoolYear && (
+            {errors.description && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.schoolYear.message}
-              </FormHelperText>
-            )}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="administrator"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <>
-                  <InputLabel id="administrator-select-label">
-                    Administrateur
-                  </InputLabel>
-                  <Select
-                    labelId="administrator-select-label"
-                    id="administrator-select"
-                    value={value}
-                    onChange={onChange}
-                    error={Boolean(errors.administrator)}
-                    label={"Administrateur"}
-                    sx={{
-                      "& .MuiOutlinedInput-root": { p: 2 },
-                      "& .MuiSelect-selectMenu": { minHeight: "auto" },
-                    }}
-                  >
-                    {administratorStore.data.length > 0 &&
-                      administratorStore.data.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {option.firstName} {option.lastName}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
-              )}
-            />
-            {errors.administrator && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.administrator.message}
+                {errors.description.message}
               </FormHelperText>
             )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="teachers"
+              name="administratorUsers"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
@@ -406,21 +324,21 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   clearIcon={false}
                   id="teachers-select"
                   filterSelectedOptions
-                  options={teacherStore.data}
+                  options={usersStore.data}
                   ListboxComponent={List}
                   //@ts-ignore
                   filterOptions={(options, params) =>
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as SelectType).firstName} ${
-                      (option as SelectType).lastName
+                    `${(option as UserType).userData.firstName} ${
+                      (option as UserType).userData.lastName
                     }`
                   }
                   renderOption={(props, option) =>
                     renderUserListItem(props, option, value, onChange)
                   }
-                  renderTags={(array: SelectType[], getTagProps) =>
+                  renderTags={(array: UserType[], getTagProps) =>
                     renderCustomChips(array, getTagProps, value, onChange)
                   }
                   sx={{
@@ -428,21 +346,21 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     "& .MuiSelect-selectMenu": { minHeight: "auto" },
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} label="Enseignants" />
+                    <TextField {...params} label="Administrateurs" />
                   )}
                 />
               )}
             />
-            {errors.teachers && (
+            {errors.administratorUsers && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.teachers.message}
+                {errors.administratorUsers.message}
               </FormHelperText>
             )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="students"
+              name="users"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
@@ -451,23 +369,23 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   freeSolo
                   value={value}
                   clearIcon={false}
-                  id="students-select"
+                  id="teachers-select"
                   filterSelectedOptions
-                  options={studentStore.data}
+                  options={usersStore.data}
                   ListboxComponent={List}
                   //@ts-ignore
                   filterOptions={(options, params) =>
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as StudentsType).firstName} ${
-                      (option as StudentsType).lastName
+                    `${(option as UserType).userData.firstName} ${
+                      (option as UserType).userData.lastName
                     }`
                   }
                   renderOption={(props, option) =>
                     renderUserListItem(props, option, value, onChange)
                   }
-                  renderTags={(array: StudentsType[], getTagProps) =>
+                  renderTags={(array: UserType[], getTagProps) =>
                     renderCustomChips(array, getTagProps, value, onChange)
                   }
                   sx={{
@@ -475,50 +393,70 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     "& .MuiSelect-selectMenu": { minHeight: "auto" },
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} label="Etudiants" />
+                    <TextField {...params} label="Utilisateurs" />
                   )}
                 />
               )}
             />
-            {errors.students && (
+            {errors.users && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.students.message}
+                {errors.users.message}
               </FormHelperText>
             )}
           </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
+
+          <FormControl
+            fullWidth
+            sx={{
+              mb: 6,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
             <Controller
-              name="level"
+              name="image"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <>
-                  <InputLabel id="level-select-label">Niveau</InputLabel>
-                  <Select
-                    labelId="level-select-label"
-                    id="level-select"
-                    value={value}
-                    onChange={onChange}
-                    error={Boolean(errors.level)}
-                    label={"Niveau"}
+                  <Avatar
+                    src={(value ? URL.createObjectURL(value) : null) as any}
+                    alt="Image du groupe"
+                    variant="square"
                     sx={{
-                      "& .MuiOutlinedInput-root": { p: 2 },
-                      "& .MuiSelect-selectMenu": { minHeight: "auto" },
+                      width: 250,
+                      height: "auto",
+                      mr: 3,
+                      cursor: "pointer",
+                      border: "2px solid transparent",
+                      transition: "border 0.3s ease",
                     }}
-                  >
-                    {levelStore.data.length > 0 &&
-                      levelStore.data.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {option.name}
-                        </MenuItem>
-                      ))}
-                  </Select>
+                    onClick={() => fileInputRef.current?.click()}
+                    onMouseEnter={(e: any) =>
+                      (e.currentTarget.style.border = "2px solid #72de95")
+                    }
+                    onMouseLeave={(e: any) =>
+                      (e.currentTarget.style.border = "2px solid transparent")
+                    }
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        return onChange(e.target.files[0]);
+                      }
+                      return onChange(null);
+                    }}
+                  />
                 </>
               )}
             />
-            {errors.level && (
+            {errors.image && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.level.message}
+                {errors.image.message}
               </FormHelperText>
             )}
           </FormControl>
@@ -532,12 +470,12 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
             >
               Soumettre
             </Button>
-            {!!props.classToEdit && (
+            {!!props.groupToEdit && (
               <Button
                 size="large"
                 variant="outlined"
                 color="error"
-                onClick={handleDeleteClass}
+                onClick={handleDeleteGroup}
                 sx={{ mr: 3 }}
               >
                 Supprimer
@@ -558,4 +496,4 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   );
 };
 
-export default SidebarAddClass;
+export default AddGroupDrawer;

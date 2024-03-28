@@ -249,7 +249,7 @@ const MailLog = (props: MailLogType) => {
         q: query || "",
         folder: routeParams.folder as MailFolderType,
         label: routeParams.label as MailLabelType,
-        userId: userId,
+        userId: parseInt(userId ?? ""),
       })
     ); // Replace 'inbox' with the desired folder
     setRefresh(true);

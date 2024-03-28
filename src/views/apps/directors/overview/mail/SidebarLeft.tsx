@@ -27,6 +27,7 @@ import CustomBadge from 'src/@core/components/mui/badge'
 // ** Types
 import { CustomBadgeProps } from 'src/@core/components/mui/badge/types'
 import { MailFolderType, MailLabelType, MailSidebarType } from 'src/types/apps/mailTypes'
+import { useRouter } from 'next/router'
 
 // ** Styled Components
 const ListItemStyled = styled(ListItem)<ListItemProps & { component?: ElementType; href: string }>(({ theme }) => ({
@@ -71,6 +72,12 @@ const SidebarLeft = (props: MailSidebarType) => {
       return null
     }
   }
+
+  const router = useRouter();
+  const { params } = router.query;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
+
 
   const handleActiveItem = (type: 'folder' | 'label', value: MailFolderType | MailLabelType) => {
     if (store && store.filter[type] !== value) {
@@ -131,7 +138,7 @@ const SidebarLeft = (props: MailSidebarType) => {
           <List component='div'>
             <ListItemStyled
               component={Link}
-              href='/apps/directeurs/overview/inbox'
+              href={`/apps/directeurs/overview/inbox/${userId}/${id}`}
               onClick={handleListItemClick}
               sx={{ borderLeftColor: activeInboxCondition ? 'primary.main' : 'transparent' }}
             >
@@ -149,7 +156,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled>
             <ListItemStyled
               component={Link}
-              href='/apps/directeurs/overview/sent'
+              href={`/apps/directeurs/overview/sent/${userId}/${id}`}
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'sent') ? 'primary.main' : 'transparent'
@@ -195,7 +202,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled> */}
             <ListItemStyled
               component={Link}
-              href='/apps/directeurs/overview/trash'
+              href={`/apps/directeurs/overview/trash/${userId}/${id}`}
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem('folder', 'trash') ? 'primary.main' : 'transparent'

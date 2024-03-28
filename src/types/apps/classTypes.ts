@@ -1,6 +1,7 @@
 import { AdministratorType } from "./administratorTypes";
 import { LevelType } from "./levelTypes";
 import { StudentsType } from "./studentTypes";
+import { SubjectType } from "./subjectTypes";
 import { TeachersType } from "./teacherTypes";
 
 export type ClassType = {
@@ -11,4 +12,5 @@ export type ClassType = {
   teachers: TeachersType[];
   administrator: AdministratorType;
   level : LevelType;
+  subjects: SubjectType[];
 };

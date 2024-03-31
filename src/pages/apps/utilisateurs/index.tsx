@@ -73,6 +73,7 @@ import { setDirectorId, setDirectorUserId } from "src/store/apps/directors";
 import { setTeacherId, setTeacherUserId } from "src/store/apps/teachers";
 import { setStudentId, setStudentUserId } from "src/store/apps/students";
 import { setParentId, setParentUserId } from "src/store/apps/parents";
+import { setAgentId, setAgentUserId } from "src/store/apps/agents";
 
 interface CellType {
   row: UserType;
@@ -83,14 +84,16 @@ interface AccountStatusType {
 interface UserRoleType {
   [key: string]: { icon: string; color: string };
 }
-  
+
 const userRoleObj: UserRoleType = {
   Director: { icon: "mdi:account-tie", color: "error.main" },
   Administrator: { icon: "mdi:account-cog", color: "warning.main" },
   Teacher: { icon: "mdi:teacher", color: "info.main" },
   Student: { icon: "mdi:school", color: "success.main" },
   Parent: { icon: "mdi:account-child", color: "primary.main" },
+  Agent: { icon: "mdi:support", color: "secondary.main" }
 };
+
 
 export interface UpdateUserDto {
   profileImage?: File;
@@ -128,7 +131,7 @@ const RowOptions = ({ id }: { id: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    useState<UserType | null>(null);
+  useState<UserType | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -440,6 +443,8 @@ const mapRoleToFrench = (role: string) => {
       return "Eleve";
     case UserRole.Parent:
       return "Parent";
+    case UserRole.Agent:
+      return "Agent";
     default:
       return role;
   }
@@ -488,9 +493,10 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${row.userData?.id}`}
+              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${
+                row.userData?.id
+              }`}
               onClick={() => {
-                
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
                   dispatch(setAdministratorUserId(row.id));
@@ -506,7 +512,10 @@ const columns = [
                 } else if (row.role === "Parent") {
                   dispatch(setParentId(row.userData.id));
                   dispatch(setParentUserId(row.id));
-                }
+                } else if (row.role === "Agent") {
+                  dispatch(setAgentId(row.userData.id));
+                  dispatch(setAgentUserId(row.id));
+                } 
                 console.log("id", row.id);
               }}
             >
@@ -528,10 +537,13 @@ const columns = [
           sx={{
             display: "flex",
             alignItems: "center",
-            "& svg": { mr: 3, color: userRoleObj[row.role].color },
+            "& svg": {
+              mr: 3,
+              color: userRoleObj[row.role]?.color || "inherit",
+            },
           }}
         >
-          <Icon icon={userRoleObj[row.role].icon} fontSize={20} />
+          <Icon icon={userRoleObj[row.role]?.icon || ""} fontSize={20} />{" "}
           <Typography
             noWrap
             sx={{ color: "text.secondary", textTransform: "capitalize" }}

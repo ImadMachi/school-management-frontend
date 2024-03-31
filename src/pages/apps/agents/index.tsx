@@ -276,6 +276,7 @@ const UserList = () => {
 
   useEffect(() => {
     dispatch(fetchData() as any);
+    
   }, []);
 
   useEffect(() => {

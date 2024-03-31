@@ -32,7 +32,9 @@ interface Redux {
 // ** Fetch addAgents
 export const fetchData = createAsyncThunk("appAgents/fetchData", async () => {
   const response = await axios.get(`${HOST}/agents`);
+  console.log(response.data)
   return response.data;
+  
 });
 
 export const fetchAgent = createAsyncThunk(

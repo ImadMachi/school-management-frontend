@@ -51,6 +51,13 @@ const navigation = (): VerticalNavItemsType => {
           title: "Parents",
           icon: "mdi:account-child",
         },
+        {
+          path: "/apps/agents",
+          action: "manage",
+          subject: "agents",
+          title: "Agents",
+          icon: "mdi:support",
+        },
       ],
     },
     {
@@ -69,6 +76,10 @@ const navigation = (): VerticalNavItemsType => {
         {
           path: "/apps/classes",
           title: "Les Classes",
+        },
+        {
+          path: "/apps/matieres",
+          title: "Les Matières",
         },
       ],
     },

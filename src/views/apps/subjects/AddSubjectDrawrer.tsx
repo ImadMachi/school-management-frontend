@@ -62,7 +62,7 @@ export interface CreateSubjectDto {
   teachers: number;
 }
 
-type SelectType = ClassType;
+type SelectType = ClassType | TeachersType;
 
 const defaultValues = {
   name: "",
@@ -155,6 +155,16 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     array: SelectType[],
     onChange: (...event: any[]) => void
   ) => {
+    let name: string;
+
+    // Check if the option is of type TeacherType
+    if ("firstName" in option && "lastName" in option) {
+      name = `${option.firstName} ${option.lastName}`;
+    } else {
+      // Otherwise, assume it's of type ClassType and use its 'name' property
+      name = option.name;
+    }
+
     return (
       <ListItem
         key={option.id}
@@ -169,9 +179,9 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
             color="primary"
             sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
           >
-            {getInitials(`${option.name}`)}
+            {getInitials(name)}
           </CustomAvatar>
-          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+          <Typography sx={{ fontSize: "0.875rem" }}>{name}</Typography>
         </Box>
       </ListItem>
     );
@@ -183,17 +193,27 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     state: SelectType[],
     onChange: (...event: any[]) => void
   ) => {
-    return state.map((item, index) => (
-      <Chip
-        size="small"
-        key={item.id}
-        label={`${item.name}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        //@ts-ignore
-        onDelete={() => handleDeleteChipItem(item.id, state, onChange)}
-      />
-    ));
+    return state.map((item, index) => {
+      let label: string;
+
+      if ("firstName" in item && "lastName" in item) {
+        label = `${item.firstName} ${item.lastName}`;
+      } else {
+        label = item.name;
+      }
+
+      return (
+        <Chip
+          size="small"
+          key={item.id}
+          label={label}
+          {...(getTagProps({ index }) as {})}
+          deleteIcon={<Icon icon="mdi:close" />}
+          //@ts-ignore
+          onDelete={() => handleDeleteChipItem(item.id, state, onChange)}
+        />
+      );
+    });
   };
 
   const handleDeleteChipItem = (
@@ -215,8 +235,17 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     const { inputValue } = params;
 
     const filteredOptions = options
-      .filter((option) =>
-        `${option.name}`.toLowerCase().includes(inputValue.toLowerCase())
+      .filter(
+        (option) =>
+          ("name" in option &&
+            `${option.name}`
+              .toLowerCase()
+              .includes(inputValue.toLowerCase())) ||
+          ("firstName" in option &&
+            "lastName" in option &&
+            `${option.firstName} ${option.lastName}`
+              .toLowerCase()
+              .includes(inputValue.toLowerCase()))
       )
       .filter((option) => !value.find((item) => item.id === option.id));
 
@@ -235,7 +264,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     >
       <Header>
         <Typography variant="h6">
-          {!!props.subjectToEdit ? "Modifier" : "Ajouter"} Niveau
+          {!!props.subjectToEdit ? "Modifier" : "Ajouter"} Matière
         </Typography>
         <IconButton
           size="small"
@@ -269,6 +298,55 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
+              name="classes"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <Autocomplete
+                  multiple
+                  freeSolo
+                  value={value}
+                  clearIcon={false}
+                  id="classes-select"
+                  filterSelectedOptions
+                  options={classStore.data}
+                  ListboxComponent={List}
+                  //@ts-ignore
+                  filterOptions={(options, params) =>
+                    filterOptions(options, params, value)
+                  }
+                  getOptionLabel={(option) => {
+                    if (typeof option === "string") {
+                      return "";
+                    } else {
+                      return option.name; // Return the name property for ClassType
+                    }
+                  }}
+                  renderOption={(props, option) =>
+                    renderUserListItem(props, option, value, onChange)
+                  }
+                  renderTags={(array: SelectType[], getTagProps) =>
+                    renderCustomChips(array, getTagProps, value, onChange)
+                  }
+                  sx={{
+                    "& .MuiOutlinedInput-root": { p: 2 },
+                    "& .MuiSelect-selectMenu": { minHeight: "auto" },
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Classes" />
+                  )}
+                />
+              )}
+            />
+            {errors.classes && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.classes.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+       
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
               name="teachers"
               control={control}
               rules={{ required: true }}
@@ -280,13 +358,21 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
                   clearIcon={false}
                   id="teachers-select"
                   filterSelectedOptions
-                  options={classStore.data}
+                  options={teacherStore.data}
                   ListboxComponent={List}
                   //@ts-ignore
                   filterOptions={(options, params) =>
                     filterOptions(options, params, value)
                   }
-                  getOptionLabel={(option) => `${(option as SelectType).name}`}
+                  getOptionLabel={(option) => {
+                    if (typeof option === 'string') {
+                      return ''; 
+                    } else if ('firstName' in option && 'lastName' in option) {
+                      return `${option.firstName} ${option.lastName}`;
+                    }
+                    return '';
+                  }}
+                  
                   renderOption={(props, option) =>
                     renderUserListItem(props, option, value, onChange)
                   }
@@ -310,48 +396,6 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
             )}
           </FormControl>
 
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="classes"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  value={value}
-                  clearIcon={false}
-                  id="classes-select"
-                  filterSelectedOptions
-                  options={classStore.data}
-                  ListboxComponent={List}
-                  //@ts-ignore
-                  filterOptions={(options, params) =>
-                    filterOptions(options, params, value)
-                  }
-                  getOptionLabel={(option) => `${(option as SelectType).name}`}
-                  renderOption={(props, option) =>
-                    renderUserListItem(props, option, value, onChange)
-                  }
-                  renderTags={(array: SelectType[], getTagProps) =>
-                    renderCustomChips(array, getTagProps, value, onChange)
-                  }
-                  sx={{
-                    "& .MuiOutlinedInput-root": { p: 2 },
-                    "& .MuiSelect-selectMenu": { minHeight: "auto" },
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Classes" />
-                  )}
-                />
-              )}
-            />
-            {errors.classes && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.classes.message}
-              </FormHelperText>
-            )}
-          </FormControl>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button
               size="large"

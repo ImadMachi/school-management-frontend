@@ -75,6 +75,8 @@ const SubjectCards = () => {
               }}
             >
               <Typography variant="body2">{`${item.classes.length} Classes`}</Typography>
+              <Typography variant="body2">{`${item.teachers.length} Enseignants`}</Typography>
+
             </Box>
             <Box
               sx={{
@@ -96,7 +98,7 @@ const SubjectCards = () => {
                     setAddUserOpen(true);
                   }}
                 >
-                  Modifier le Niveau
+                  Modifier le Matière
                 </Typography>
               </Box>
               {/* <IconButton sx={{ color: "text.secondary" }}>
@@ -131,7 +133,7 @@ const SubjectCards = () => {
                     setSubjectToEdit(null);
                   }}
                 >
-                  Ajouter Niveau
+                  Ajouter Matière
                 </Button>
               </Box>
             </CardContent>

@@ -70,6 +70,7 @@ import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
 import { useSettings } from "src/@core/hooks/useSettings";
 import { TemplateType } from "src/types/apps/templateTypes";
 import { GroupType } from "src/types/apps/groupTypes";
+import VoiceRecorder from "./VoiceRecorder";
 
 type ToUserType = UserType;
 
@@ -97,6 +98,9 @@ const ComposePopup = (props: MailComposeType) => {
     true,
     false,
   ]);
+  const [selectedAudios, setSelectedAudios] = useState<
+    { id: number; blob: Blob }[]
+  >([]);
 
   // ** Errors
   const [emailToError, setEmailToError] = useState<boolean>(false);
@@ -238,11 +242,18 @@ const ComposePopup = (props: MailComposeType) => {
       return;
     }
 
+    // Convert audio blob to file
+    const attachments = selectedFiles.concat(
+      selectedAudios.map(
+        (audio) => new File([audio.blob], `audio${audio.id}.wav`)
+      )
+    );
+
     const mail = {
       subject: subjectValue,
       body: messageValue,
       recipients: emailTo,
-      attachments: selectedFiles,
+      attachments,
       category,
     };
 
@@ -992,6 +1003,21 @@ const ComposePopup = (props: MailComposeType) => {
           Le message ne peut pas être vide
         </FormHelperText>
       )}
+
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: "flex",
+          alignItems: "center",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <VoiceRecorder
+          selectedAudios={selectedAudios}
+          setSelectedAudios={setSelectedAudios}
+        />
+      </Box>
 
       <Box
         sx={{

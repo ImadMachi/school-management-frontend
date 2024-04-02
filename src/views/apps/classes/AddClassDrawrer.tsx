@@ -161,10 +161,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
       setValue("students", props.classToEdit.students);
       setValue("level", `${props.classToEdit.level.id}`);
     }
-    return () => {
-      reset();
-    };
-  }, [props.open]);
+  }, [props.classToEdit]);
 
   useEffect(() => {
     dispatch(fetchAdministrators() as any);

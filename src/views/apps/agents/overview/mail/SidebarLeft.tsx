@@ -170,7 +170,7 @@ const SidebarLeft = (props: MailSidebarType) => {
           <List component="div">
             <ListItemStyled
               component={Link}
-              href={`/apps/parents/overview/inbox/${userId}/${id}`}
+              href={`/apps/agents/overview/inbox/${userId}/${id}`}
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: activeInboxCondition
@@ -201,7 +201,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled>
             <ListItemStyled
               component={Link}
-              href={`/apps/parents/overview/sent/${userId}/${id}`}
+              href={`/apps/agents/overview/sent/${userId}/${id}`}
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem("folder", "sent")
@@ -256,7 +256,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             </ListItemStyled> */}
             <ListItemStyled
               component={Link}
-              href={`/apps/parents/overview/trash/${userId}/${id}`}
+              href={`/apps/agents/overview/trash/${userId}/${id}`}
               onClick={handleListItemClick}
               sx={{
                 borderLeftColor: handleActiveItem("folder", "trash")

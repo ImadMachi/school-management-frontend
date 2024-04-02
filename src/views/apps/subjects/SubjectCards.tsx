@@ -8,15 +8,6 @@ import Card from "@mui/material/Card";
 import Link from "@mui/material/Link";
 import Table from "@mui/material/Table";
 import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
-import Dialog from "@mui/material/Dialog";
-import Tooltip from "@mui/material/Tooltip";
-import Checkbox from "@mui/material/Checkbox";
-import TableRow from "@mui/material/TableRow";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
@@ -29,13 +20,12 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
-import { fetchData } from "src/store/apps/classes";
+import { fetchData } from "src/store/apps/subjects";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { useSelector } from "react-redux";
-import SidebarAddClass from "./AddClassDrawrer";
-import { set } from "nprogress";
-import { ClassType } from "src/types/apps/classTypes";
+import SidebarAddSubject from "./AddSubjectDrawrer";
+import { SubjectType } from "src/types/apps/subjectTypes";
 
 interface CardDataType {
   title: string;
@@ -54,16 +44,16 @@ const rolesArr: string[] = [
   "Payroll",
 ];
 
-const ClassCards = () => {
+const SubjectCards = () => {
   // ** States
   const [addUserOpen, setAddUserOpen] = useState<boolean>(false);
-  const [classToEdit, setClassToEdit] = useState<ClassType | null>(null);
+  const [subjectToEdit, setSubjectToEdit] = useState<SubjectType | null>(null);
 
   // ** Dispatch
   const dispatch = useDispatch<AppDispatch>();
 
   // ** Stores
-  const classStore = useSelector((state: RootState) => state.classes);
+  const subjectsStore = useSelector((state: RootState) => state.subjects);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -72,7 +62,7 @@ const ClassCards = () => {
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
   const renderCards = () =>
-    classStore.data.map((item, index: number) => (
+    subjectsStore.data.map((item, index: number) => (
       <Grid item xs={12} sm={6} lg={4} key={index}>
         <Card>
           <CardContent>
@@ -84,7 +74,9 @@ const ClassCards = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="body2">{`${item.students.length} Élèves`}</Typography>
+              <Typography variant="body2">{`${item.classes.length} Classes`}</Typography>
+              <Typography variant="body2">{`${item.teachers.length} Enseignants`}</Typography>
+
             </Box>
             <Box
               sx={{
@@ -102,16 +94,16 @@ const ClassCards = () => {
                   sx={{ color: "primary.main" }}
                   onClick={(e: SyntheticEvent) => {
                     e.preventDefault();
+                    setSubjectToEdit(item);
                     setAddUserOpen(true);
-                    setClassToEdit(item);
                   }}
                 >
-                  Modifier la classe
+                  Modifier le Matière
                 </Typography>
               </Box>
-              <IconButton sx={{ color: "text.secondary" }}>
+              {/* <IconButton sx={{ color: "text.secondary" }}>
                 <Typography variant="body2">{item.schoolYear}</Typography>
-              </IconButton>
+              </IconButton> */}
             </Box>
           </CardContent>
         </Card>
@@ -138,23 +130,23 @@ const ClassCards = () => {
                   sx={{ mb: 3, whiteSpace: "nowrap" }}
                   onClick={() => {
                     setAddUserOpen(true);
-                    setClassToEdit(null);
+                    setSubjectToEdit(null);
                   }}
                 >
-                  Ajouter Classe
+                  Ajouter Matière
                 </Button>
               </Box>
             </CardContent>
           </Grid>
         </Card>
       </Grid>
-      <SidebarAddClass
+      <SidebarAddSubject
         open={addUserOpen}
         toggle={toggleAddUserDrawer}
-        classToEdit={classToEdit}
+        subjectToEdit={subjectToEdit}
       />
     </Grid>
   );
 };
 
-export default ClassCards;
+export default SubjectCards;

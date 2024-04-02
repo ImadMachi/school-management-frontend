@@ -124,11 +124,6 @@ const MailLog = (props: MailLogType) => {
   // ** State
   const [refresh, setRefresh] = useState<boolean>(false);
 
-  // ** Store Vars
-  const userId = useSelector(
-    (state: RootState) => state.directors.directorUserId
-  );
-
   const router = useRouter();
   const { params } = router.query;
   const userId = params ? params[1] : null;

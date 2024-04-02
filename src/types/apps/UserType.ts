@@ -18,4 +18,5 @@ export enum UserRole {
   Teacher = "Teacher",
   Student = "Student",
   Parent = "Parent",
+  Agent = "Agent",
 }

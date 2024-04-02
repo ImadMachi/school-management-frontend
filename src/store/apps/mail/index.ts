@@ -64,7 +64,6 @@ export const fetchMails = createAsyncThunk(
     const response = await axios.get(
       `${HOST}/messages/auth?folder=${entityFolder}`
     );
-
     return { mails: response.data, filter: params };
   }
 );

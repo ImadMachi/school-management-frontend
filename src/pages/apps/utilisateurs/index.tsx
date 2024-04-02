@@ -83,7 +83,7 @@ interface AccountStatusType {
 interface UserRoleType {
   [key: string]: { icon: string; color: string };
 }
-  
+
 const userRoleObj: UserRoleType = {
   Director: { icon: "mdi:account-tie", color: "error.main" },
   Administrator: { icon: "mdi:account-cog", color: "warning.main" },
@@ -128,7 +128,7 @@ const RowOptions = ({ id }: { id: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    useState<UserType | null>(null);
+  useState<UserType | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -488,9 +488,10 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${row.userData?.id}`}
+              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${
+                row.userData?.id
+              }`}
               onClick={() => {
-                
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
                   dispatch(setAdministratorUserId(row.id));

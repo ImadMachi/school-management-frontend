@@ -91,9 +91,8 @@ const userRoleObj: UserRoleType = {
   Teacher: { icon: "mdi:teacher", color: "info.main" },
   Student: { icon: "mdi:school", color: "success.main" },
   Parent: { icon: "mdi:account-child", color: "primary.main" },
-  Agent: { icon: "mdi:support", color: "secondary.main" }
+  Agent: { icon: "mdi:support", color: "secondary.main" },
 };
-
 
 export interface UpdateUserDto {
   profileImage?: File;
@@ -102,9 +101,9 @@ export interface UpdateUserDto {
 }
 
 const schema = yup.object().shape({
-  firstName: yup.string().min(3).required(),
-  lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required(),
+  profileImage: yup.mixed().notRequired(),
+  email: yup.string().email().required(),
+  password: yup.string().required(),
 });
 
 const accountStatusObj: AccountStatusType = {
@@ -212,7 +211,7 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const handleEditSubmit = async () => {
     try {
-      const formData = await handleSubmit();
+      const formData = handleSubmit();
 
       const { newPassword, profileImage } = formData as any;
 
@@ -515,8 +514,7 @@ const columns = [
                 } else if (row.role === "Agent") {
                   dispatch(setAgentId(row.userData.id));
                   dispatch(setAgentUserId(row.id));
-                } 
-                console.log("id", row.id);
+                }
               }}
             >
               {row.userData?.firstName} {row.userData?.lastName}
@@ -592,6 +590,7 @@ const columns = [
     field: "actions",
     headerName: "Actions",
     renderCell: ({ row }: CellType) => <RowOptions id={row.id} />,
+
   },
 ];
 

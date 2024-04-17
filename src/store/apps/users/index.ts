@@ -119,6 +119,9 @@ export const appUsersSlice = createSlice({
         } else if (user.parent) {
           user.userData = user.parent;
           delete user.parent;
+        } else if (user.agent) {
+          user.userData = user.agent;
+          delete user.agent;
         }
       }
 
@@ -163,7 +166,9 @@ export const appUsersSlice = createSlice({
     });
     builder.addCase(uploadProfileImage.fulfilled, (state, action) => {
       const updateUser = action.payload;
-      const index = state.allData.findIndex((User) => User.id === updateUser.id);
+      const index = state.allData.findIndex(
+        (User) => User.id === updateUser.id
+      );
 
       if (index !== -1) {
         state.data[index] = updateUser;

@@ -115,7 +115,7 @@ const schema = yup.object().shape({
     .integer("Administrateur est requis")
     .typeError("Administrateur est requis"),
   teachers: yup.array().min(1, "Au moins un enseignant est requis"),
-  students: yup.array().min(1, "Au moins un étudiant est requis"),
+  students: yup.array().min(1, "Au moins un élève est requis"),
   level: yup
     .number()
     .required("Niveau est requis")

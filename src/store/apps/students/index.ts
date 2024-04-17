@@ -9,7 +9,7 @@ import {
 // ** Axios Imports
 import axios from "axios";
 import toast from "react-hot-toast";
-import { UpdateStudentDto } from "src/pages/apps/eleves/overview/[folder]";
+import { UpdateStudentDto } from "src/pages/apps/eleves/overview/[...params]";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { CreateStudentDto } from "src/views/apps/student/list/AddStudentDrawer";
 

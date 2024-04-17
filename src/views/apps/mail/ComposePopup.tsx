@@ -459,7 +459,7 @@ const ComposePopup = (props: MailComposeType) => {
               sx={{ mr: 3, fontSize: "0.875rem" }}
               htmlFor="email-to-select"
             >
-              Aux Etudiants:
+              Aux Élèves:
             </InputLabel>
           </div>
           <Autocomplete

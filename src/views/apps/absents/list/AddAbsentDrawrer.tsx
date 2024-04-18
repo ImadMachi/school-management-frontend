@@ -47,7 +47,12 @@ import { fetchData as fetchAbsents } from "src/store/apps/absents";
 import { getInitials } from "src/@core/utils/get-initials";
 import { AbsentsType } from "src/types/apps/absentsTypes";
 import { UserType } from "src/types/apps/UserType";
-import { addAbsent, deleteAbsent, fetchAbsent, updateAbsent } from "src/store/apps/absents";
+import {
+  addAbsent,
+  deleteAbsent,
+  fetchAbsent,
+  updateAbsent,
+} from "src/store/apps/absents";
 import { RadioButtonChecked } from "@mui/icons-material";
 
 interface SidebarAddAbsentType {
@@ -125,6 +130,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
 
   // ** Store
   const userStore = useSelector((state: RootState) => state.users);
+  const absentStore = useSelector((state: RootState) => state.absents);
 
   const {
     reset,
@@ -299,12 +305,20 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
                     }}
                   >
                     {userStore.data.length > 0 &&
-                      userStore.data.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {option.userData?.firstName}{" "}
-                          {option.userData?.lastName}
-                        </MenuItem>
-                      ))}
+                      userStore.data.map((option) => {
+                        const isAbsent = absentStore.data.some(
+                          (absent) => absent.absentUser.id === option.id
+                        );
+                        if (!isAbsent) {
+                          return (
+                            <MenuItem key={option.id} value={option.id}>
+                              {option.userData?.firstName}{" "}
+                              {option.userData?.lastName}
+                            </MenuItem>
+                          );
+                        }
+                        return null;
+                      })}
                   </Select>
                 </>
               )}

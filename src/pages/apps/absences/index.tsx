@@ -164,7 +164,7 @@ const RowOptions = ({ id }: { id: number }) => {
   const [teacherUsers, setTeachersUsers] = useState<UserType[]>([]);
   const [agentUsers, setAgentsUsers] = useState<UserType[]>([]);
 
-  const [justified, setJustified] = useState(false);
+  const [justified, setJustified] = useState(true);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [status, setStatus] = useState("traiter");
@@ -236,7 +236,6 @@ const RowOptions = ({ id }: { id: number }) => {
         label={`${item.userData.firstName} ${item.userData.lastName}`}
         {...(getTagProps({ index }) as {})}
         deleteIcon={<Icon icon="mdi:close" />}
-        //@ts-ignore
         onDelete={() => handleMailDelete(item.id, state, setState)}
       />
     ));
@@ -264,17 +263,19 @@ const RowOptions = ({ id }: { id: number }) => {
       (user) => user.role === UserRole.Teacher
     );
     setTeachersUsers(teacherUsers);
+
     const agentUsers = userStore.data.filter(
       (user) => user.role === UserRole.Agent
     );
     setAgentsUsers(agentUsers);
+
+    const Users = userStore.data; 
   }, [userStore.data]);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const rowOptionsOpen = Boolean(anchorEl);
@@ -288,77 +289,23 @@ const RowOptions = ({ id }: { id: number }) => {
   };
 
   const handleDelete = () => {
-    // @ts-ignore
     dispatch(deleteAbsent(id) as any);
     handleRowOptionsClose();
   };
 
-  // const handleEditSubmit = (data: UpdateAbsentDto) => {
-  //   try {
-  //     const formData =  handleSubmit(
-  //       (data) => {
-  //         return { newData: data };
-  //       },
-  //       (errors) => {
-  //         console.error(errors);
-  //       }
-  //     );
-
-  //     const { newData } = formData as any;
-
-  //     if (newData) {
-  //        dispatch(
-  //         updateAbsent({ id: id, updateAbsentDto: newData }) as any
-  //       );
-
-  //       // Prepare data for sending mail
-  //       const recipients = newData.emailToTeachers.concat(
-  //         newData.emailToAgents
-  //       );
-  //       const mailData = {
-  //         subject: newData.title,
-  //         body: newData.body,
-  //         recipients: recipients,
-  //         category: 0,
-  //         attachments: [],
-  //       };
-
-  //       // Dispatch the sendMail action
-  //        dispatch(sendMail(mailData) as any);
-
-  //       // Update justified and status
-  //        dispatch(
-  //         updateAbsent({
-  //           id: id,
-  //           updateAbsentDto: {
-  //             ...newData,
-  //             justified: justified,
-  //             status: status,
-  //           },
-  //         }) as any
-  //       );
-  //     }
-
-  //     handleEditClose();
-  //     reset();
-  //   } catch (error) {
-  //     console.error("Error updating password or profile image:", error);
-  //   }
-  // };
   function handleEditSubmit(data: any) {
     console.log("data", data);
     const partialUpdateAbsentDto: Partial<AbsentsType> = { ...data };
 
     if (id) partialUpdateAbsentDto.id = id;
-    if (data.justified) partialUpdateAbsentDto.justified = justified;
-    if (data.replaceUser)
+    partialUpdateAbsentDto.justified = justified;
       partialUpdateAbsentDto.replaceUser =
         absentData?.absentUser.role === "Teacher"
           ? emailToTeachers
           : emailToAgents;
-    if (data.title) partialUpdateAbsentDto.title = title;
-    if (data.body) partialUpdateAbsentDto.body = body;
-    if (data.status) partialUpdateAbsentDto.status = status;
+    partialUpdateAbsentDto.title = title;
+    partialUpdateAbsentDto.body = body;
+    partialUpdateAbsentDto.status = status;
 
     dispatch(updateAbsent(partialUpdateAbsentDto as AbsentsType) as any)
       .then(() => {
@@ -517,9 +464,7 @@ const RowOptions = ({ id }: { id: number }) => {
           <RadioGroup
             name="justified"
             value={justified.toString()}
-            onChange={(e) =>
-              setJustified(e.target.value === "trusamir@gmail.come")
-            }
+            onChange={(e) => setJustified(e.target.value === "true")}
             row
           >
             <FormControlLabel value="true" control={<Radio />} label="Oui" />
@@ -836,13 +781,14 @@ const columns = [
             }}
           >
             <Typography noWrap>
-              {row.replaceUser.map((user) => (
-                <span key={user.id}>
-                  {user.userData?.firstName}
-                  {"-"}
-                </span>
-              ))}
-              {row.absentUser?.userData?.firstName}
+              {row.replaceUser.length > 0
+                ? row.replaceUser.map((user, index) => (
+                    <span key={user.id}>
+                      {user.userData?.firstName ?? "non spécifié"}
+                      {index !== row.replaceUser.length - 1 && "-"}
+                    </span>
+                  ))
+                : "non spécifié"}
             </Typography>
           </Box>
         </Box>
@@ -854,11 +800,10 @@ const columns = [
     flex: 0.15,
     minWidth: 30,
     headerName: "état",
-    field: "status", // corrected field name
+    field: "status",
     renderCell: ({ row }: CellType) => {
-      let status = "non spécifié"; // default status text
+      let status = "non spécifié";
 
-      // Determine status based on row.status value
       if (row.status === "traiter") {
         status = "traiter";
       } else if (row.status === "encour de traitement") {
@@ -872,7 +817,7 @@ const columns = [
           skin="light"
           size="small"
           label={status}
-          color={statusObj[status]} // Assign color based on status
+          color={statusObj[status]}
           sx={{ textTransform: "capitalize" }}
         />
       );

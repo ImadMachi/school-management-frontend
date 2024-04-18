@@ -290,44 +290,38 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
-                <>
-                  <InputLabel id="absent-select-label">Absent</InputLabel>
-                  <Select
-                    labelId="absent-select-label"
-                    id="absent-select"
-                    value={value}
-                    onChange={onChange}
-                    error={Boolean(errors.absentUser)}
-                    label={"Absent"}
-                    sx={{
-                      "& .MuiOutlinedInput-root": { p: 2 },
-                      "& .MuiSelect-selectMenu": { minHeight: "auto" },
-                    }}
-                  >
-                    {userStore.data.length > 0 &&
-                      userStore.data.map((option) => {
-                        const isAbsent = absentStore.data.some(
-                          (absent) => absent.absentUser.id === option.id
-                        );
-                        if (!isAbsent) {
-                          return (
-                            <MenuItem key={option.id} value={option.id}>
-                              {option.userData?.firstName}{" "}
-                              {option.userData?.lastName}
-                            </MenuItem>
-                          );
-                        }
-                        return null;
-                      })}
-                  </Select>
-                </>
+                <Autocomplete
+                  id="absent-user-autocomplete"
+                  options={userStore.data.filter(
+                    (option) =>
+                      !absentStore.data.some(
+                        (absent) => absent.absentUser.id === option.id
+                      )
+                  )}
+                  getOptionLabel={(option) =>
+                    `${option.userData?.firstName} ${option.userData?.lastName}`
+                  }
+                  value={
+                    value
+                      ? userStore.data.find((user) => user.id === Number(value))
+                      : null
+                  }
+                  onChange={(event, newValue) => {
+                    onChange(newValue?.id || null);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Absent"
+                      error={Boolean(errors.absentUser)}
+                      helperText={
+                        errors.absentUser ? errors.absentUser.message : ""
+                      }
+                    />
+                  )}
+                />
               )}
             />
-            {errors.absentUser && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.absentUser.message}
-              </FormHelperText>
-            )}
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
@@ -349,7 +343,6 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               )}
             />
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="datefin"
@@ -370,7 +363,6 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               )}
             />
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="reason"
@@ -391,7 +383,6 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               )}
             />
           </FormControl>
-
           <FormControl component="fieldset" fullWidth sx={{ mb: 6 }}>
             <FormLabel component="legend">Justifié</FormLabel>
             <Controller
@@ -423,7 +414,6 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button
               size="large"

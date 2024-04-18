@@ -515,10 +515,6 @@ const columns = [
                   dispatch(setAgentId(row.userData.id));
                   dispatch(setAgentUserId(row.id));
                 }
-<<<<<<< HEAD
-                console.log("id", row.id);
-=======
->>>>>>> agent_and_subject_management
               }}
             >
               {row.userData?.firstName} {row.userData?.lastName}
@@ -594,7 +590,6 @@ const columns = [
     field: "actions",
     headerName: "Actions",
     renderCell: ({ row }: CellType) => <RowOptions id={row.id} />,
-
   },
 ];
 

@@ -276,7 +276,6 @@ const UserList = () => {
 
   useEffect(() => {
     dispatch(fetchData() as any);
-    
   }, []);
 
   useEffect(() => {
@@ -313,7 +312,6 @@ const UserList = () => {
             autoHeight
             rows={agentStore.data}
             columns={columns}
-            checkboxSelection
             pageSize={pageSize}
             disableSelectionOnClick
             rowsPerPageOptions={[10, 25, 50]}

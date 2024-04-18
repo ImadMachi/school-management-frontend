@@ -926,7 +926,6 @@ const AbsentList = () => {
             autoHeight
             rows={absentStore.data}
             columns={columns}
-            checkboxSelection
             pageSize={pageSize}
             disableSelectionOnClick
             rowsPerPageOptions={[10, 25, 50]}

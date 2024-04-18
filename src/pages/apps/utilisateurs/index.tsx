@@ -641,7 +641,6 @@ const UserList = () => {
             autoHeight
             rows={userStore.data}
             columns={columns}
-            checkboxSelection
             pageSize={pageSize}
             disableSelectionOnClick
             rowsPerPageOptions={[10, 25, 50]}

@@ -8,6 +8,7 @@ export type AbsentsType = {
   justified: boolean;
   absentUser: UserType;
   replaceUser: UserType[];
+  seance : string;
   title: string;
   body: string;
   status: string;

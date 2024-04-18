@@ -269,7 +269,7 @@ const RowOptions = ({ id }: { id: number }) => {
     );
     setAgentsUsers(agentUsers);
 
-    const Users = userStore.data; 
+    const Users = userStore.data;
   }, [userStore.data]);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -299,10 +299,10 @@ const RowOptions = ({ id }: { id: number }) => {
 
     if (id) partialUpdateAbsentDto.id = id;
     partialUpdateAbsentDto.justified = justified;
-      partialUpdateAbsentDto.replaceUser =
-        absentData?.absentUser.role === "Teacher"
-          ? emailToTeachers
-          : emailToAgents;
+    partialUpdateAbsentDto.replaceUser =
+      absentData?.absentUser.role === "Teacher"
+        ? emailToTeachers
+        : emailToAgents;
     partialUpdateAbsentDto.title = title;
     partialUpdateAbsentDto.body = body;
     partialUpdateAbsentDto.status = status;
@@ -423,23 +423,22 @@ const RowOptions = ({ id }: { id: number }) => {
             sx={{ textTransform: "capitalize", mb: 4 }}
           />
 
-          <Box sx={{ textAlign: "center", mb: 2 }}>
-            <Typography variant="body1">
-              <strong>Raison:</strong>
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                maxWidth: 400,
-                overflowWrap: "break-word",
-                textAlign: "left",
-                marginLeft: "auto",
-                marginRight: "auto",
-              }}
-            >
-              {absentData?.reason}
-            </Typography>
-          </Box>
+          <TextField
+            label="Raison"
+            value={absentData?.reason}
+            variant="outlined"
+            multiline
+            fullWidth
+            disabled
+            sx={{
+              maxWidth: 600,
+              overflowWrap: "break-word",
+              textAlign: "left",
+              marginLeft: "auto",
+              marginRight: "auto",
+              mb: 4,
+            }}
+          />
           <Box
             sx={{
               display: "flex",
@@ -448,16 +447,42 @@ const RowOptions = ({ id }: { id: number }) => {
               mb: 4,
             }}
           >
-            <Typography variant="body1" sx={{ mr: 4 }}>
-              <strong>Date de Début:</strong>{" "}
-              {formatDate(absentData?.datedebut ?? "")}
-            </Typography>
+            <TextField
+              label="Date de Début"
+              value={formatDate(absentData?.datedebut ?? "")}
+              variant="outlined"
+              disabled
+              fullWidth
+              sx={{ mr: 4, flex: 1 }}
+            />
 
-            <Typography variant="body1" sx={{ mr: 4 }}>
-              <strong>Date de Fin:</strong>{" "}
-              {formatDate(absentData?.datefin ?? "")}
-            </Typography>
+            <TextField
+              label="Date de Fin"
+              value={formatDate(absentData?.datefin ?? "")}
+              variant="outlined"
+              disabled
+              fullWidth
+              sx={{ flex: 1 }}
+            />
           </Box>
+
+          <TextField
+            label="Raison"
+            value={absentData?.seance}
+            variant="outlined"
+            multiline
+            fullWidth
+            disabled
+            sx={{
+              maxWidth: 600,
+              overflowWrap: "break-word",
+              textAlign: "left",
+              marginLeft: "auto",
+              marginRight: "auto",
+              mb: 4,
+            }}
+          />
+
           <Typography variant="body1" sx={{ mr: 2 }}>
             <strong>Justifié :</strong>
           </Typography>
@@ -680,7 +705,7 @@ const columns = [
   },
   {
     flex: 0.15,
-    minWidth: 165,
+    minWidth: 145,
     headerName: "Role",
     field: "role",
     renderCell: ({ row }: CellType) => {
@@ -740,10 +765,22 @@ const columns = [
       );
     },
   },
-
   {
     flex: 0.15,
-    minWidth: 40,
+    minWidth: 100,
+    headerName: "Seance",
+    field: "seance",
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Typography noWrap sx={{ textTransform: "capitalize" }}>
+          {row.seance}
+        </Typography>
+      );
+    },
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
     headerName: "Date de Debut",
     field: "datedebut",
     renderCell: ({ row }: CellType) => (

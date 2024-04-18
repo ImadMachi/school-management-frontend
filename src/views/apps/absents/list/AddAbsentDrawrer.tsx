@@ -68,6 +68,7 @@ export interface CreateAbsentDto {
   reason: string;
   justified: boolean;
   replaceUser: UserType[];
+  seance: string;
   title: string;
   body: string;
   status: string;
@@ -82,6 +83,7 @@ const defaultValues = {
   reason: "",
   justified: false,
   replaceUser: [] as UserType[],
+  seance: "",
   title: "",
   body: "",
   status: "non traiter",
@@ -117,6 +119,7 @@ const schema = yup.object().shape({
     .typeError("Raison est requis"),
   justified: yup.boolean().required("Justifié est requis"),
   replaceUser: yup.array(),
+  seance: yup.string(),
   title: yup.string(),
   body: yup.string(),
   status: yup.string(),
@@ -127,6 +130,16 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
   const { open, toggle } = props;
 
   const dispatch = useDispatch<AppDispatch>();
+  const seanceOptions = [
+    "seance 1",
+    "seance 2",
+    "seance 3",
+    "seance 4",
+    "seance 5",
+    "seance 6",
+    "seance 7",
+    "seance 8",
+  ];
 
   // ** Store
   const userStore = useSelector((state: RootState) => state.users);
@@ -153,6 +166,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
       setValue("reason", props.absentToEdit.reason);
       setValue("justified", props.absentToEdit.justified);
       setValue("replaceUser", props.absentToEdit.replaceUser);
+      setValue("seance", props.absentToEdit.seance);
       setValue("title", props.absentToEdit.title);
       setValue("body", props.absentToEdit.body);
       setValue("status", "non traiter");
@@ -320,6 +334,30 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
                     />
                   )}
                 />
+              )}
+            />
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <InputLabel id="seance-select-label">Séance</InputLabel>
+            <Controller
+              name="seance"
+              control={control}
+              defaultValue=""
+              render={({ field: { value, onChange } }) => (
+                <Select
+                  labelId="seance-select-label"
+                  id="seance-select"
+                  value={value}
+                  onChange={onChange}
+                  label="Séance"
+                  sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
+                >
+                  {seanceOptions.map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
               )}
             />
           </FormControl>

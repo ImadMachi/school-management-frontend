@@ -93,6 +93,11 @@ const navigation = (): VerticalNavItemsType => {
       title: "Paramètres de messagerie",
       icon: "mdi:email-edit",
     },
+    {
+      path: "/apps/absences",
+      title: "Gestion des absences",
+      icon: "mdi:calendar-remove",
+    }
   ];
 };
 

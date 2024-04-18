@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { HOST } from "src/store/constants/hostname";
 import { AdministratorType } from "src/types/apps/administratorTypes";
-import { CreateAdministratorDto } from "src/views/apps/administrators/list/AddAdministratorDrawer";
+import { CreateAdministratorDto } from "src/views/apps/absents/list/AddAdministratorDrawer";
 import { UpdateAdministratorDto } from "src/pages/apps/administrateurs/overview/[...params]";
 import toast from "react-hot-toast";
 

@@ -53,6 +53,7 @@ const UserDropdown = (props: Props) => {
 
   const handleDropdownOpen = (event: SyntheticEvent) => {
     setAnchorEl(event.currentTarget);
+    console.log(user);
   };
 
   const handleDropdownClose = (url?: string) => {

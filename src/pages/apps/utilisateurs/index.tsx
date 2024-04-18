@@ -101,9 +101,9 @@ export interface UpdateUserDto {
 }
 
 const schema = yup.object().shape({
-  firstName: yup.string().min(3).required(),
-  lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required(),
+  profileImage: yup.mixed().notRequired(),
+  email: yup.string().email().required(),
+  password: yup.string().required(),
 });
 
 const accountStatusObj: AccountStatusType = {
@@ -211,7 +211,7 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const handleEditSubmit = async () => {
     try {
-      const formData = await handleSubmit();
+      const formData = handleSubmit();
 
       const { newPassword, profileImage } = formData as any;
 
@@ -515,7 +515,10 @@ const columns = [
                   dispatch(setAgentId(row.userData.id));
                   dispatch(setAgentUserId(row.id));
                 }
+<<<<<<< HEAD
                 console.log("id", row.id);
+=======
+>>>>>>> agent_and_subject_management
               }}
             >
               {row.userData?.firstName} {row.userData?.lastName}
@@ -591,6 +594,7 @@ const columns = [
     field: "actions",
     headerName: "Actions",
     renderCell: ({ row }: CellType) => <RowOptions id={row.id} />,
+
   },
 ];
 

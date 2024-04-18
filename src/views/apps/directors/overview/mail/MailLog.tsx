@@ -124,11 +124,6 @@ const MailLog = (props: MailLogType) => {
   // ** State
   const [refresh, setRefresh] = useState<boolean>(false);
 
-  // ** Store Vars
-  const userId = useSelector(
-    (state: RootState) => state.directors.directorUserId
-  );
-
   const router = useRouter();
   const { params } = router.query;
   const userId = params ? params[1] : null;
@@ -254,7 +249,7 @@ const MailLog = (props: MailLogType) => {
         q: query || "",
         folder: routeParams.folder as MailFolderType,
         label: routeParams.label as MailLabelType,
-        userId: parseInt(userId as string),
+        userId: userId ? +userId : null,
       })
     ); // Replace 'inbox' with the desired folder
     setRefresh(true);

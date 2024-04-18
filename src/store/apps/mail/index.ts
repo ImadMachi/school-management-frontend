@@ -64,6 +64,7 @@ export const fetchMails = createAsyncThunk(
     const response = await axios.get(
       `${HOST}/messages/auth?folder=${entityFolder}`
     );
+
     return { mails: response.data, filter: params };
   }
 );
@@ -75,7 +76,7 @@ export const fetchMailsByUserId = createAsyncThunk(
     const response = await axios.get(
       `${HOST}/messages/user/${params.userId}?folder=${entityFolder}`
     );
-    return { mails: response.data, filter: { folder: params.folder } };
+    return { mails: response.data, filter: params };
   }
 );
 
@@ -155,13 +156,16 @@ export const moveFromTrash = createAsyncThunk(
   }
 );
 
-// ** Prev/Next Mails
 export const paginateMail = createAsyncThunk(
   "appEmail/paginateMail",
   async (params: PaginateMailParamsType) => {
-    const response = await axios.get("/apps/email/paginate-email", { params });
+    const entityFolder = mapMailFolderToEntity(params.folder);
 
-    return response.data;
+    const response = await axios.get(
+      `${HOST}/messages/auth?folder=${entityFolder}&offset=${params.offset}`
+    );
+
+    return { mails: response.data, filter: params };
   }
 );
 
@@ -264,9 +268,37 @@ export const appEmailSlice = createSlice({
 
       state.currentMail = mail;
     });
+
     builder.addCase(paginateMail.fulfilled, (state, action) => {
-      state.currentMail = action.payload;
+      const mails = action.payload.mails.map((mail: any) => {
+        if (mail.sender.director) {
+          mail.sender.senderData = mail.sender.director;
+          delete mail.sender.director;
+        } else if (mail.sender.administrator) {
+          mail.sender.senderData = mail.sender.administrator;
+          delete mail.sender.administrator;
+        } else if (mail.sender.teacher) {
+          mail.sender.senderData = mail.sender.teacher;
+          delete mail.sender.teacher;
+        } else if (mail.sender.student) {
+          mail.sender.senderData = mail.sender.student;
+          delete mail.sender.student;
+        } else if (mail.sender.parent) {
+          mail.sender.senderData = mail.sender.parent;
+          delete mail.sender.parent;
+        }
+
+        return mail;
+      });
+
+      state.mails = [...state.mails, ...mails];
+      state.filter = action.payload.filter;
     });
+
+    builder.addCase(paginateMail.rejected, (state, action) => {
+      toast.error("Erreur lors du chargement des messages");
+    });
+
     builder.addCase(sendMail.fulfilled, (state, action) => {
       const mail = action.payload;
       if (mail.sender.director) {

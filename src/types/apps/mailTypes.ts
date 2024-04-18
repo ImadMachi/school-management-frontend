@@ -36,7 +36,6 @@ export type FieldMenuItems = {
 export type FetchMailParamsType = {
   q: string;
   folder: MailFolderType;
-  // label: MailLabelType;
 };
 
 export type FetchMailByUserIdParamsType = {
@@ -55,8 +54,9 @@ export type SendMailParamsType = {
 };
 
 export type PaginateMailParamsType = {
-  dir: "next" | "previous";
-  emailId: number;
+  q: string;
+  offset: number;
+  folder: MailFolderType;
 };
 
 export type UpdateMailParamsType = {

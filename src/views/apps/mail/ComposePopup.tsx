@@ -59,19 +59,12 @@ import {
   Grid,
   Select,
 } from "@mui/material";
-import { FormHelperText, Grid, Select } from "@mui/material";
 import { useSelector } from "react-redux";
 import { fetchData } from "src/store/apps/users";
 import { fetchData as fetchCategoryData } from "src/store/apps/categories";
 import { fetchData as fetchClassesData } from "src/store/apps/classes";
 import { fetchData as fetchTemplatesData } from "src/store/apps/templates";
 import { fetchData as fetchGroupsData } from "src/store/apps/groups";
-import { UserRole, UserType } from "src/types/apps/UserType";
-import { useRouter } from "next/router";
-import { ClassType } from "src/types/apps/classTypes";
-import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
-import { useSettings } from "src/@core/hooks/useSettings";
-import { TemplateType } from "src/types/apps/templateTypes";
 import { GroupType } from "src/types/apps/groupTypes";
 import VoiceRecorder from "./VoiceRecorder";
 import { UserRole, UserType } from "src/types/apps/UserType";

@@ -1,5 +1,11 @@
 // ** React Imports
-import { Fragment, useState, SyntheticEvent, ReactNode } from "react";
+import {
+  Fragment,
+  useState,
+  SyntheticEvent,
+  ReactNode,
+  useEffect,
+} from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -39,13 +45,14 @@ import {
   MailFoldersArrType,
   MailFoldersObjType,
 } from "src/types/apps/mailTypes";
-import { OptionType } from "src/@core/components/option-menu/types";
 import {
   fetchMails,
   markAsStarred,
   markAsUnStarred,
   moveToTrash,
+  paginateMail,
 } from "src/store/apps/mail";
+import { Button } from "@mui/material";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -111,7 +118,6 @@ const MailLog = (props: MailLogType) => {
     direction,
     routeParams,
     labelColors,
-    paginateMail,
     getCurrentMail,
     mailDetailsOpen,
     handleSelectMail,
@@ -122,6 +128,15 @@ const MailLog = (props: MailLogType) => {
 
   // ** State
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [offset, setOffset] = useState(0);
+
+  // ** Effects
+  useEffect(() => {
+    setOffset(0);
+    return () => {
+      setOffset(0);
+    };
+  }, [routeParams.folder]);
 
   // ** Vars
   const folders: MailFoldersArrType[] = [
@@ -208,6 +223,15 @@ const MailLog = (props: MailLogType) => {
     dispatch(handleSelectAllMail(false));
   };
 
+  const handleClickLoad = async () => {
+    if (store?.mails?.length && store.mails.length < 10) return;
+    const newOffset = offset + 10;
+    setOffset(newOffset);
+    await dispatch(
+      paginateMail({ offset: newOffset, folder: routeParams.folder!, q: "" })
+    );
+  };
+
   const handleStarMail = async (
     e: SyntheticEvent,
     id: number,
@@ -249,92 +273,10 @@ const MailLog = (props: MailLogType) => {
       fetchMails({
         q: query || "",
         folder: routeParams.folder!,
-        // label: routeParams.label,
       })
     );
     setRefresh(true);
     setTimeout(() => setRefresh(false), 1000);
-  };
-
-  const handleFoldersMenu = () => {
-    const array: OptionType[] = [];
-
-    if (
-      routeParams &&
-      routeParams.folder &&
-      !routeParams.label &&
-      foldersObj[routeParams.folder]
-    ) {
-      foldersObj[routeParams.folder].map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(store.selectedMails, folder.name);
-              dispatch(handleSelectAllMail(false));
-            },
-          },
-        });
-      });
-    } else if (routeParams && routeParams.label) {
-      folders.map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(store.selectedMails, folder.name);
-              dispatch(handleSelectAllMail(false));
-            },
-          },
-        });
-      });
-    } else {
-      foldersObj["inbox"].map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(store.selectedMails, folder.name);
-              dispatch(handleSelectAllMail(false));
-            },
-          },
-        });
-      });
-    }
-
-    return array;
-  };
-
-  const renderMailLabels = (arr: MailLabelType[]) => {
-    return arr.map((label: MailLabelType, index: number) => {
-      return (
-        <Box
-          key={index}
-          component="span"
-          sx={{ mr: 3, color: `${labelColors[label]}.main` }}
-        >
-          <Icon icon="mdi:circle" fontSize="0.625rem" />
-        </Box>
-      );
-    });
   };
 
   const mailDetailsProps = {
@@ -346,7 +288,6 @@ const MailLog = (props: MailLogType) => {
     // updateMail,
     routeParams,
     labelColors,
-    paginateMail,
     handleStarMail,
     mailDetailsOpen,
     handleLabelUpdate,
@@ -574,6 +515,11 @@ const MailLog = (props: MailLogType) => {
                     </MailItem>
                   );
                 })}
+                <Box sx={{ display: "flex", justifyContent: "center" }}>
+                  <Button onClick={() => handleClickLoad()}>
+                    Charger plus
+                  </Button>
+                </Box>
               </List>
             ) : (
               <Box

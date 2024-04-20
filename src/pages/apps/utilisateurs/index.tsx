@@ -61,6 +61,7 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  FormHelperText,
   InputAdornment,
   Menu,
   MenuItem,
@@ -102,12 +103,23 @@ export interface UpdateUserDto {
   profileImage?: File;
   email?: string;
   password?: string;
+  confirmPassword?: string;
 }
-
 const schema = yup.object().shape({
   profileImage: yup.mixed().notRequired(),
-  email: yup.string().email().required(),
-  password: yup.string().required(),
+  email: yup.string().email().required("L'email est requis"),
+  password: yup
+    .string()
+    .min(6, "Le mot de passe doit contenir au moins 6 caractères")
+    .required("Le mot de passe est requis"),
+  confirmPassword: yup
+    .string()
+    .min(6, "Le mot de passe doit contenir au moins 6 caractères")
+    .oneOf(
+      [yup.ref("password"), null],
+      "Les mots de passe ne correspondent pas"
+    )
+    .required("La confirmation du mot de passe est requise"),
 });
 
 const accountStatusObj: AccountStatusType = {
@@ -161,22 +173,20 @@ const RowOptions = ({ id }: { id: number }) => {
       const foundUser = userStore.data.find((user) => user.id === id);
       if (foundUser) {
         setUserData(foundUser);
+        setPassword(foundUser.password || "");
+        setConfirmPassword(foundUser.password || "");
       }
     }
   }, [openEdit, id, userStore.data]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (userStore.data && userStore.data.length > 0) {
       setUserData(userStore.data[0]);
     }
   }, [userStore.data]);
 
   const handleEditClick = () => {
-    // Trigger the file input click
     fileInputRef.current?.click();
-
-    // Set other state variables as needed
     setOpenEdit(true);
   };
 
@@ -245,28 +255,32 @@ const RowOptions = ({ id }: { id: number }) => {
 
   function handleEditSubmit(data: any) {
     console.log("data", data);
-    const partialUpdatePasswordDto: Partial<UserType> = { ...data };
 
-    if (id) partialUpdatePasswordDto.id = id;
+    const partialUpdatePasswordDto: Partial<UpdateUserDto> = { ...data };
+    const newPassword = confirmPassword;
 
-    partialUpdatePasswordDto.password = password;
-    partialUpdatePasswordDto.password = confirmPassword;
+    // Check if newPassword is not undefined
+    if (typeof newPassword === "string") {
+      dispatch(
+        updatePassword({
+          id: id,
+          newPassword,
+        }) as any
+      )
+        .then(() => {
+          reset();
+          dispatch(fetchData() as any);
+        })
+        .catch((error: Error) => {
+          console.error("Update User failed:", error);
+          // Handle error
+        });
 
-    dispatch(
-      updatePassword(
-        partialUpdatePasswordDto as { id: number; newPassword: string }
-      ) as any
-    )
-      .then(() => {
-        reset();
-      })
-      .catch((error: Error) => {
-        console.error("Update Absent failed:", error);
-      });
-
-    handleEditClose();
-    reset();
-    dispatch(fetchData() as any);
+      handleEditClose();
+    } else {
+      console.error("New password is undefined");
+      // Handle error, maybe display a message to the user
+    }
   }
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -281,19 +295,18 @@ const RowOptions = ({ id }: { id: number }) => {
     if (!userData) {
       return;
     }
-    
+
     const updatedUserData = { ...userData, disabled: true };
-    
+
     try {
       await dispatch(updateUserStatus({ id: id, disabled: true }) as any);
-      
-      await dispatch(fetchData()as any);
+
+      await dispatch(fetchData() as any);
     } catch (error) {
       console.error("Error disabling user:", error);
     }
-      setUserData(updatedUserData);
+    setUserData(updatedUserData);
   };
-  
 
   return (
     <>
@@ -317,7 +330,7 @@ const RowOptions = ({ id }: { id: number }) => {
       >
         <MenuItem onClick={handleEditClick} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:pencil-outline" fontSize={20} />
-          Modifier
+          Changer mot de passe
         </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
@@ -350,19 +363,19 @@ const RowOptions = ({ id }: { id: number }) => {
             flexDirection: "column",
           }}
         >
-          <div
+          {/* <div
             onMouseEnter={handleHover}
             onMouseLeave={handleLeave}
             style={{ position: "relative" }}
           >
             {userData && userData.profileImage && (
-              <>
-                <Avatar
-                  alt={`Profile Image of ${userData.userData?.firstName} ${userData.userData?.lastName}`}
-                  src={`http://localhost:8000/uploads/${userData.profileImage}`}
-                  sx={{ width: 80, height: 80 }}
-                />
-                {isHovered && (
+              <> */}
+          <Avatar
+            alt={`Profile Image of ${userData?.userData?.firstName} ${userData?.userData?.lastName}`}
+            src={`http://localhost:8000/uploads/${userData?.profileImage}`}
+            sx={{ width: 80, height: 80 }}
+          />
+          {/* {isHovered && (
                   <IconButton
                     onClick={handleEditClick}
                     style={{
@@ -384,7 +397,7 @@ const RowOptions = ({ id }: { id: number }) => {
               onChange={handleFileChange}
               style={{ display: "none" }}
             />
-          </div>
+          </div> */}
 
           <Typography variant="h6" sx={{ mb: 4 }}>
             {userData?.userData?.firstName} {userData?.userData?.lastName}
@@ -401,88 +414,88 @@ const RowOptions = ({ id }: { id: number }) => {
             label={userData?.email || ""}
             sx={{ textTransform: "capitalize", mb: 4 }}
           />
-          <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 4 }}>
-              <Controller
-                name="password"
-                control={control}
-                rules={{ required: "Contact est requis" }}
-                render={({ field, fieldState }) => (
-                  <FormControl fullWidth sx={{ mb: 4 }}>
-                    <TextField
-                      {...field}
-                      type={showPassword ? "text" : "password"}
-                      label="Mot de passe"
-                      error={Boolean(fieldState.error)}
-                      helperText={fieldState.error?.message}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                            >
-                              {showPassword ? (
-                                <VisibilityOff />
-                              ) : (
-                                <Visibility />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                      sx={{ width: "100%" }} // Adjust the width as needed
-                    />
-                  </FormControl>
-                )}
-              />
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormControl fullWidth sx={{ mb: 4 }}>
-              <Controller
-                name="confirmPassword"
-                control={control}
-                rules={{ required: "Contact est requis" }}
-                render={({ field, fieldState }) => (
-                  <FormControl fullWidth sx={{ mb: 4 }}>
-                    <TextField
-                      {...field}
-                      type={showPassword ? "text" : "password"}
-                      label="Confirmer le mot de passe"
-                      error={Boolean(fieldState.error)}
-                      helperText={fieldState.error?.message}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                            >
-                              {showPassword ? (
-                                <VisibilityOff />
-                              ) : (
-                                <Visibility />
-                              )}
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </FormControl>
-                )}
-              />
-            </FormControl>
-          </Grid>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="password"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  type="password"
+                  {...field}
+                  label="Mot de passe"
+                  placeholder="********"
+                  error={Boolean(errors.password)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value); // Update input value
+                    setPassword(e.target.value); // Update password state
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+            {errors.password && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.password.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="confirmPassword"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  type="password"
+                  {...field}
+                  label="Confirmer le mot de passe"
+                  placeholder="********"
+                  error={Boolean(errors.confirmPassword)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value); // Update input value
+                    setConfirmPassword(e.target.value); // Update confirmPassword state
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+            {errors.confirmPassword && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.confirmPassword.message}
+              </FormHelperText>
+            )}
+          </FormControl>
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button
             variant="contained"
             sx={{ mr: 1 }}
-            onClick={() => handleSubmit(handleEditSubmit)()}
+            onClick={() => handleEditSubmit(userData)}
           >
-            Submit
+            Soumetre
           </Button>
 
           <Button
@@ -671,8 +684,8 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const userStore = useSelector((state: RootState) => state.users);
-  const activeUsers = userStore.data.filter((user) => !user.disabled); 
-  
+  const activeUsers = userStore.data.filter((user) => !user.disabled);
+
   useEffect(() => {
     dispatch(fetchData() as any);
   }, []);

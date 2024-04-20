@@ -671,8 +671,8 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const userStore = useSelector((state: RootState) => state.users);
-  const activeUsers = userStore.data.filter((user) => !user.disabled); // Filter active users
-
+  const activeUsers = userStore.data.filter((user) => !user.disabled); 
+  
   useEffect(() => {
     dispatch(fetchData() as any);
   }, []);

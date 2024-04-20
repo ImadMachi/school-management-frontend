@@ -264,6 +264,9 @@ const AdministratorList = () => {
 
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
+
+  const userStore = useSelector((state: RootState) => state.users);
+
   const administratorStore = useSelector(
     (state: RootState) => state.administrator
   );
@@ -279,6 +282,16 @@ const AdministratorList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
+
+  const filteredData = administratorStore.data.filter((admin) => {
+    if (admin.userId) {
+      const associatedUser = userStore.data.find(
+        (user) => user.id === admin.userId
+      );
+      return !associatedUser || !associatedUser.disabled;
+    }
+    return true;
+  });
 
   const generateCSVData = () => {
     return administratorStore.allData.map((item) => ({
@@ -303,7 +316,7 @@ const AdministratorList = () => {
           />
           <DataGrid
             autoHeight
-            rows={administratorStore.data}
+            rows={filteredData}
             columns={columns}
             checkboxSelection
             pageSize={pageSize}

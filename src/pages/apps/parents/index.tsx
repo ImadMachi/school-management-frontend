@@ -273,6 +273,7 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const parentStore = useSelector((state: RootState) => state.parents);
+  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -285,6 +286,18 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
+
+
+  const filteredData = parentStore.data.filter((parent) => {
+    if (parent.userId) {
+      const associatedUser = userStore.data.find(
+        (user) => user.id === parent.userId
+      );
+      return !associatedUser || !associatedUser.disabled;
+    }
+    return true;
+  });
+
 
   const generateCSVData = () => {
     return parentStore.data.map((item) => ({
@@ -310,7 +323,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={parentStore.data}
+            rows={filteredData}
             columns={columns}
             checkboxSelection
             pageSize={pageSize}

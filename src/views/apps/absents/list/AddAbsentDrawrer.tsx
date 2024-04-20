@@ -131,14 +131,14 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
 
   const dispatch = useDispatch<AppDispatch>();
   const seanceOptions = [
-    "seance 1",
-    "seance 2",
-    "seance 3",
-    "seance 4",
-    "seance 5",
-    "seance 6",
-    "seance 7",
-    "seance 8",
+    "Seance 1",
+    "Seance 2",
+    "Seance 3",
+    "Seance 4",
+    "Seance 5",
+    "Seance 6",
+    "Seance 7",
+    "Tout la journée"
   ];
 
   // ** Store

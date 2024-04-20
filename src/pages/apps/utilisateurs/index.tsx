@@ -43,6 +43,7 @@ import {
   fetchData,
   filterData,
   updatePassword,
+  updateUserStatus,
   uploadProfileImage,
 } from "src/store/apps/users";
 // ** Types Imports
@@ -61,6 +62,8 @@ import {
   DialogTitle,
   FormControl,
   InputAdornment,
+  Menu,
+  MenuItem,
   TextField,
 } from "@mui/material";
 import { Controller, useForm } from "react-hook-form";
@@ -74,6 +77,7 @@ import { setTeacherId, setTeacherUserId } from "src/store/apps/teachers";
 import { setStudentId, setStudentUserId } from "src/store/apps/students";
 import { setParentId, setParentUserId } from "src/store/apps/parents";
 import { setAgentId, setAgentUserId } from "src/store/apps/agents";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: UserType;
@@ -135,6 +139,8 @@ const RowOptions = ({ id }: { id: number }) => {
   const [userData, setUserData] = useState<UserType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const {
     reset,
@@ -209,33 +215,59 @@ const RowOptions = ({ id }: { id: number }) => {
     }
   };
 
-  const handleEditSubmit = async () => {
-    try {
-      const formData = handleSubmit();
+  // const handleEditSubmit = async () => {
+  //   try {
+  //     const formData = handleSubmit();
 
-      const { newPassword, profileImage } = formData as any;
+  //     const { newPassword, profileImage } = formData as any;
 
-      if (newPassword) {
-        await dispatch(
-          updatePassword({ id: id, newPassword: newPassword }) as any
-        );
-      }
+  //     if (newPassword) {
+  //       await dispatch(
+  //         updatePassword({ id: id, newPassword: newPassword }) as any
+  //       );
+  //     }
 
-      if (profileImage) {
-        const response = await dispatch(
-          uploadProfileImage({ id, file: profileImage }) as any
-        ).unwrap();
+  //     if (profileImage) {
+  //       const response = await dispatch(
+  //         uploadProfileImage({ id, file: profileImage }) as any
+  //       ).unwrap();
 
-        if (userData) {
-          const imageUrl = response.profileImage;
-          setUserData({ ...userData, profileImage: imageUrl });
-        }
-      }
-      handleEditClose();
-    } catch (error) {
-      console.error("Error updating password or profile image:", error);
-    }
-  };
+  //       if (userData) {
+  //         const imageUrl = response.profileImage;
+  //         setUserData({ ...userData, profileImage: imageUrl });
+  //       }
+  //     }
+  //     handleEditClose();
+  //   } catch (error) {
+  //     console.error("Error updating password or profile image:", error);
+  //   }
+  // };
+
+  function handleEditSubmit(data: any) {
+    console.log("data", data);
+    const partialUpdatePasswordDto: Partial<UserType> = { ...data };
+
+    if (id) partialUpdatePasswordDto.id = id;
+
+    partialUpdatePasswordDto.password = password;
+    partialUpdatePasswordDto.password = confirmPassword;
+
+    dispatch(
+      updatePassword(
+        partialUpdatePasswordDto as { id: number; newPassword: string }
+      ) as any
+    )
+      .then(() => {
+        reset();
+      })
+      .catch((error: Error) => {
+        console.error("Update Absent failed:", error);
+      });
+
+    handleEditClose();
+    reset();
+    dispatch(fetchData() as any);
+  }
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     // dispatch(setSelectedId(id));
@@ -245,17 +277,53 @@ const RowOptions = ({ id }: { id: number }) => {
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
   };
-
-  const handleDelete = () => {
-    // dispatch(deleteuser(id) as any)
-    handleRowOptionsClose();
+  const handleDelete = async () => {
+    if (!userData) {
+      return;
+    }
+    
+    const updatedUserData = { ...userData, disabled: true };
+    
+    try {
+      await dispatch(updateUserStatus({ id: id, disabled: true }) as any);
+      
+      await dispatch(fetchData()as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
+      setUserData(updatedUserData);
   };
+  
 
   return (
     <>
-      <IconButton onClick={handleEditClick} sx={{ "& svg": {} }}>
-        <Icon icon="mdi:pencil-outline" fontSize={20} />
+      <IconButton size="small" onClick={handleRowOptionsClick}>
+        <Icon icon="mdi:dots-vertical" />
       </IconButton>
+      <Menu
+        keepMounted
+        anchorEl={anchorEl}
+        open={rowOptionsOpen}
+        onClose={handleRowOptionsClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        PaperProps={{ style: { minWidth: "8rem" } }}
+      >
+        <MenuItem onClick={handleEditClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Modifier
+        </MenuItem>
+        <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:delete-outline" fontSize={20} />
+          Supprimer
+        </MenuItem>
+      </Menu>
       <Dialog
         open={openEdit}
         onClose={handleEditClose}
@@ -603,6 +671,7 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const userStore = useSelector((state: RootState) => state.users);
+  const activeUsers = userStore.data.filter((user) => !user.disabled); // Filter active users
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -639,7 +708,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={userStore.data}
+            rows={activeUsers} // Use filtered active users
             columns={columns}
             checkboxSelection
             pageSize={pageSize}

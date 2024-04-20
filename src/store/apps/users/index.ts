@@ -76,6 +76,19 @@ export const uploadProfileImage = createAsyncThunk(
   }
 );
 
+export const updateUserStatus = createAsyncThunk(
+  "appUsers/updateUserStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<UserType>(`${HOST}/users/${id}/status`, {
+        disabled,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
 export const appUsersSlice = createSlice({
   name: "appUsers",
   initialState,
@@ -178,6 +191,13 @@ export const appUsersSlice = createSlice({
     });
     builder.addCase(uploadProfileImage.rejected, (state, action) => {
       toast.error("Erreur lors de la mise à jour de l'image de profil");
+    });
+    builder.addCase(updateUserStatus.fulfilled, (state, action) => {
+      toast.success("L'utilisateur a été supprimé avec succès");
+    });
+
+    builder.addCase(updateUserStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'utilisateur");
     });
   },
 });

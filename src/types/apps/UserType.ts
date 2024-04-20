@@ -1,6 +1,8 @@
 export type UserType = {
   id: number;
   email: string;
+  password?: string;
+  disabled: boolean;
   isActive: boolean;
   role: string;
   profileImage?: string;

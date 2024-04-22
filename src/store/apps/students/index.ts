@@ -49,19 +49,12 @@ export const addStudent = createAsyncThunk(
   async (data: CreateStudentDto) => {
     const formData = new FormData();
 
-    // Append createAccount property explicitly
     formData.append("firstName", data.firstName);
-
     formData.append("lastName", data.lastName);
-
     formData.append("identification", data.identification);
-
     formData.append("dateOfBirth", data.dateOfBirth.toString());
-
     formData.append("sex", data.sex);
-
-    formData.append("parent", data.parent.toString());
-
+    formData.append("parent[id]", data.parent.id.toString()); // Corrected line
     formData.append("createAccount", data.createAccount.toString());
 
     if (data.createAccount) {

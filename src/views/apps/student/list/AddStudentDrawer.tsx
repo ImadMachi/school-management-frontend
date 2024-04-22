@@ -1,5 +1,11 @@
 // ** React Imports
-import { ChangeEvent, HTMLAttributes, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  HTMLAttributes,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -12,7 +18,6 @@ import Box, { BoxProps } from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
 import CustomAvatar from "src/@core/components/mui/avatar";
-
 
 // ** Third Party Imports
 import * as yup from "yup";
@@ -39,7 +44,8 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { addStudent } from "src/store/apps/students";
+import { addStudent, fetchStudent } from "src/store/apps/students";
+import { fetchData as fetchStudents } from "src/store/apps/students";
 import { on } from "events";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { fetchData } from "src/store/apps/parents";
@@ -49,7 +55,6 @@ import { ParentsType } from "src/types/apps/parentTypes";
 interface SidebarAddStudentType {
   open: boolean;
   toggle: () => void;
-  studentToEdit: StudentsType | null;
 }
 
 export interface CreateStudentDto {
@@ -58,7 +63,9 @@ export interface CreateStudentDto {
   identification: string;
   dateOfBirth: Date;
   sex: string;
-  parent: number;
+  parent: {
+    id: number;
+  };
   createAccount: boolean;
   createUserDto?: {
     email: string;
@@ -81,12 +88,9 @@ const schema = yup.object().shape({
   identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
-  parent: yup
-    .number()
-    .required("Parent est requis")
-    .positive("Parent est requis")
-    .integer("Parent est requis")
-    .typeError("Parent est requis"),
+  parent: yup.object().shape({
+    id: yup.number().required(),
+  }),
   createUserDto: yup.object().when("createAccount", {
     is: true,
     then: yup.object({
@@ -115,7 +119,7 @@ const defaultValues = {
   identification: "",
   dateOfBirth: new Date(),
   sex: "",
-  parent: {},
+  parent: { id: "" },
   createAccount: false,
   createUserDto: {
     email: "",
@@ -160,12 +164,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   });
 
   useEffect(() => {
-    if (props.studentToEdit) {
-      setValue("parent", `${props.studentToEdit.parent.id}`);
-    }
-  }, [props.studentToEdit]);
-
-  useEffect(() => {
     dispatch(fetchData() as any);
   }, []);
 
@@ -175,11 +173,14 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     reset();
   };
 
+
+  useEffect(() => {
+    dispatch(fetchStudents() as any);
+  }, []);
   const handleClose = () => {
     toggle();
     reset();
   };
-
 
   const renderListItem = (
     props: HTMLAttributes<HTMLLIElement>,
@@ -201,9 +202,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               color="primary"
               sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
             >
-              {getInitials(
-                `${option.firstName} ${option.lastName}`
-              )}
+              {getInitials(`${option.firstName} ${option.lastName}`)}
             </CustomAvatar>
           )}
 
@@ -351,41 +350,39 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="parent"
+              name="parent.id"
               control={control}
               rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
+              render={({ field: { onChange, value } }) => (
                 <Autocomplete
-                  id="administrator-user-autocomplete"
+                  id="parent-user-autocomplete"
                   options={parentStore.data}
                   getOptionLabel={(option) =>
                     `${option.firstName} ${option.lastName}`
                   }
                   value={
-                    value
-                      ? parentStore.data.find((user) => user.id === Number(value))
-                      : null
+                    parentStore.data.find(
+                      (user) => user.id === Number(value)
+                    ) || null
                   }
-                  onChange={(event, newValue) => {
-                    onChange(newValue?.id || null);
+                  onChange={(e, newValue) => {
+                    const newValueId = newValue ? newValue.id : null;
+                    onChange(newValueId);
                   }}
-                  renderOption={(props, option) =>
-                    renderListItem(props, option)
-                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Parent"
                       error={Boolean(errors.parent)}
-                      helperText={
-                        errors.parent ? errors.parent.message : ""
-                      }
+                      helperText={errors.parent ? errors.parent.message : ""}
                     />
                   )}
+                  renderOption={(props, option) => renderListItem(props, option)} 
                 />
               )}
             />
           </FormControl>
+
           <FormControlLabel
             control={
               <Controller

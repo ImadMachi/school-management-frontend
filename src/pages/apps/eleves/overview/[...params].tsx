@@ -72,7 +72,6 @@ const schema = yup.object().shape({
 });
 
 const UserViewLeft = () => {
-
   const router = useRouter();
   const { params } = router.query;
   const folder = params ? params[0] : null;
@@ -166,11 +165,7 @@ const UserViewLeft = () => {
   };
 
   useEffect(() => {
-    if (id && !isNaN(Number(id))) {
-      dispatch(fetchStudent(Number(id)) as any);
-    } else {
-      router.push("/apps/eleves");
-    }
+    dispatch(fetchStudent(Number(id)) as any);
     return () => {
       setUserData(null);
     };

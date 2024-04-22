@@ -83,6 +83,7 @@ import { fetchUser } from "src/store/apps/users";
 import { set, status } from "nprogress";
 import { formatDate } from "src/@core/utils/format";
 import { sendMail } from "src/store/apps/mail";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: AbsentsType;
@@ -324,8 +325,21 @@ const RowOptions = ({ id }: { id: number }) => {
         console.error("Update Absent failed:", error);
       });
 
-    handleEditClose();
-    reset();
+        const recipients = emailToTeachers.length > 0 ? emailToTeachers : emailToAgents;
+
+        if (title.trim() !== "" && body.trim() !== "") {
+          const mail = {
+            subject: title,
+            body: body,
+            recipients: recipients,
+            attachments: [],
+            category: 1,
+          }
+
+          dispatch(sendMail(mail) as any)
+        }
+      handleEditClose();
+      reset();
     dispatch(fetchData() as any);
   }
 

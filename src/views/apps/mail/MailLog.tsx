@@ -53,6 +53,8 @@ import {
   paginateMail,
 } from "src/store/apps/mail";
 import { Button } from "@mui/material";
+import { useSelector } from "react-redux";
+import { RootState } from "src/store";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -129,6 +131,12 @@ const MailLog = (props: MailLogType) => {
   // ** State
   const [refresh, setRefresh] = useState<boolean>(false);
   const [offset, setOffset] = useState(0);
+  
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
 
   // ** Effects
   useEffect(() => {
@@ -361,7 +369,9 @@ const MailLog = (props: MailLogType) => {
             {store && store.mails && store.mails.length ? (
               <List sx={{ p: 0 }}>
                 {store.mails.map((mail: MailType) => {
+                const user = findUserDataById(mail.sender.id)
                   return (
+                    
                     <MailItem
                       key={mail.id}
                       sx={{
@@ -410,7 +420,7 @@ const MailLog = (props: MailLogType) => {
                         {routeParams.folder !== "sent" && (
                           <Avatar
                             alt={mail.sender.senderData?.firstName}
-                            src={"./images/avatars/1.png"}
+                            src={`http://localhost:8000/uploads/${user?.profileImage}`}
                             sx={{ mr: 3, width: "2rem", height: "2rem" }}
                           />
                         )}

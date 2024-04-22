@@ -281,6 +281,8 @@ const RowOptions = ({ id }: { id: number }) => {
       console.error("New password is undefined");
       // Handle error, maybe display a message to the user
     }
+
+    
   }
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -354,7 +356,7 @@ const RowOptions = ({ id }: { id: number }) => {
           id="user-view-edit"
           sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
         >
-          Modifier les informations de l'utilisateur
+          Changer le mot de pass 
         </DialogTitle>
         <DialogContent
           sx={{
@@ -423,12 +425,12 @@ const RowOptions = ({ id }: { id: number }) => {
                 <TextField
                   type="password"
                   {...field}
-                  label="Mot de passe"
+                  label="Nouveau mot de passe"
                   placeholder="********"
                   error={Boolean(errors.password)}
                   onChange={(e) => {
-                    field.onChange(e.target.value); // Update input value
-                    setPassword(e.target.value); // Update password state
+                    field.onChange(e.target.value); 
+                    setPassword(e.target.value);
                   }}
                   InputProps={{
                     endAdornment: (
@@ -451,7 +453,7 @@ const RowOptions = ({ id }: { id: number }) => {
               </FormHelperText>
             )}
           </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
+          {/* <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="confirmPassword"
               control={control}
@@ -487,7 +489,7 @@ const RowOptions = ({ id }: { id: number }) => {
                 {errors.confirmPassword.message}
               </FormHelperText>
             )}
-          </FormControl>
+          </FormControl> */}
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button

@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import {
   Autocomplete,
+  Avatar,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -49,6 +50,8 @@ import {
 import { SubjectType } from "src/types/apps/subjectTypes";
 import { ClassType } from "src/types/apps/classTypes";
 import { TeachersType } from "src/types/apps/teacherTypes";
+import { fetchData as fetchTeachers } from "src/store/apps/teachers";
+import { fetchData } from "src/store/apps/users";
 
 interface SidebarAddSubjectType {
   open: boolean;
@@ -97,6 +100,12 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
   const classStore = useSelector((state: RootState) => state.classes);
   const teacherStore = useSelector((state: RootState) => state.teachers);
 
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
+
   const {
     reset,
     control,
@@ -120,12 +129,13 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
 
   useEffect(() => {
     dispatch(fetchClasses() as any);
+    dispatch(fetchTeachers() as any);
+    dispatch(fetchData() as any);
   }, []);
 
   const onSubmit = (data: any) => {
     const payload = {
       ...data,
-      administrator: { id: data.administrator },
     };
     if (props.subjectToEdit) {
       dispatch(editSubject({ ...payload, id: props.subjectToEdit.id }) as any);
@@ -187,6 +197,73 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     );
   };
 
+  const renderClasseListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ClassType,
+    array: ClassType[],
+    onChange: (...event: any[]) => void
+  ) => {
+    return (
+      <ListItem
+        key={option.id}
+        sx={{ cursor: "pointer" }}
+        onClick={() => {
+          onChange({ target: { value: [...array, option] } });
+        }}  
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(`${option.name}`)}
+            </CustomAvatar>
+          <Typography sx={{ fontSize: "0.875rem" }}>
+            {option.name}
+          </Typography>
+        </Box>
+      </ListItem>
+    );
+  };
+  const renderTeacherListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: TeachersType,
+    array: TeachersType[],
+    onChange: (...event: any[]) => void
+  ) => {
+    const user = findUserDataById(option.userId);
+    return (
+      <ListItem
+        key={option.id}
+        sx={{ cursor: "pointer" }}
+        onClick={() => {
+          onChange({ target: { value: [...array, option] } });
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {option.userId ? (
+            <Avatar
+              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(`${option.firstName} ${option.lastName}`)}
+            </CustomAvatar>
+          )}
+          <Typography sx={{ fontSize: "0.875rem" }}>
+            {option.firstName} {option.lastName}
+          </Typography>
+        </Box>
+      </ListItem>
+    );
+  };
   const renderCustomChips = (
     array: SelectType[],
     getTagProps: ({ index }: { index: number }) => {},
@@ -215,6 +292,8 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
       );
     });
   };
+
+
 
   const handleDeleteChipItem = (
     value: number,
@@ -323,7 +402,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
                     }
                   }}
                   renderOption={(props, option) =>
-                    renderUserListItem(props, option, value, onChange)
+                    renderClasseListItem(props, option, value, onChange)
                   }
                   renderTags={(array: SelectType[], getTagProps) =>
                     renderCustomChips(array, getTagProps, value, onChange)
@@ -374,7 +453,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
                   }}
                   
                   renderOption={(props, option) =>
-                    renderUserListItem(props, option, value, onChange)
+                    renderTeacherListItem(props, option, value, onChange)
                   }
                   renderTags={(array: SelectType[], getTagProps) =>
                     renderCustomChips(array, getTagProps, value, onChange)

@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import {
   Autocomplete,
+  Avatar,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -139,6 +140,12 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   const studentStore = useSelector((state: RootState) => state.students);
   const levelStore = useSelector((state: RootState) => state.levels);
 
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
+
   const {
     reset,
     control,
@@ -204,6 +211,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     array: SelectType[],
     onChange: (...event: any[]) => void
   ) => {
+    const user = findUserDataById(option.userId);
     return (
       <ListItem
         key={option.id}
@@ -213,20 +221,55 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* {option.avatar?.length ? (
-            <CustomAvatar
-              src={option.avatar}
-              alt={option.userData.firstName}
-              sx={{ mr: 3, width: 22, height: 22 }}
+          {option.userId ? (
+            <Avatar
+              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
-          ) : ( */}
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(`${option.firstName} ${option.lastName}`)}
-          </CustomAvatar>
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(`${option.firstName} ${option.lastName}`)}
+            </CustomAvatar>
+          )}
+          <Typography sx={{ fontSize: "0.875rem" }}>
+            {option.firstName} {option.lastName}
+          </Typography>
+        </Box>
+      </ListItem>
+    );
+  };
+
+  const renderListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: SelectType
+  ) => {
+    const user = findUserDataById(option.userId);
+    return (
+      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {option.userId ? (
+            <Avatar
+              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(
+                `${option.firstName} ${option.lastName}`
+              )}
+            </CustomAvatar>
+          )}
+
           <Typography sx={{ fontSize: "0.875rem" }}>
             {option.firstName} {option.lastName}
           </Typography>
@@ -327,7 +370,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="schoolYear"
@@ -357,39 +399,37 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
-                <>
-                  <InputLabel id="administrator-select-label">
-                    Administrateur
-                  </InputLabel>
-                  <Select
-                    labelId="administrator-select-label"
-                    id="administrator-select"
-                    value={value}
-                    onChange={onChange}
-                    error={Boolean(errors.administrator)}
-                    label={"Administrateur"}
-                    sx={{
-                      "& .MuiOutlinedInput-root": { p: 2 },
-                      "& .MuiSelect-selectMenu": { minHeight: "auto" },
-                    }}
-                  >
-                    {administratorStore.data.length > 0 &&
-                      administratorStore.data.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {option.firstName} {option.lastName}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
+                <Autocomplete
+                  id="administrator-user-autocomplete"
+                  options={administratorStore.data}
+                  getOptionLabel={(option) =>
+                    `${option.firstName} ${option.lastName}`
+                  }
+                  value={
+                    value
+                      ? administratorStore.data.find((user) => user.id === Number(value))
+                      : null
+                  }
+                  onChange={(event, newValue) => {
+                    onChange(newValue?.id || null);
+                  }}
+                  renderOption={(props, option) =>
+                    renderListItem(props, option)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Administrator"
+                      error={Boolean(errors.administrator)}
+                      helperText={
+                        errors.administrator ? errors.administrator.message : ""
+                      }
+                    />
+                  )}
+                />
               )}
             />
-            {errors.administrator && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.administrator.message}
-              </FormHelperText>
-            )}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="teachers"
@@ -436,7 +476,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="students"
@@ -519,7 +558,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button
               size="large"

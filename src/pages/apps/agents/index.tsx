@@ -271,6 +271,8 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const agentStore = useSelector((state: RootState) => state.agents);
+  const userStore = useSelector((state: RootState) => state.users);
+
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -279,6 +281,16 @@ const UserList = () => {
   useEffect(() => {
     dispatch(filterData(value));
   }, [dispatch, plan, value]);
+
+  const filteredData = agentStore.data.filter((agent) => {
+    if (agent.userId) {
+      const associatedUser = userStore.data.find(
+        (user) => user.id === agent.userId
+      );
+      return !associatedUser || !associatedUser.disabled;
+    }
+    return true;
+  });
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);
@@ -308,7 +320,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={agentStore.data}
+            rows={filteredData}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

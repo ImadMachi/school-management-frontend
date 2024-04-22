@@ -1,8 +1,11 @@
+import { StudentsType } from "./studentTypes"
+
 export type ParentsType = {
-    id: number
-    firstName: string
-    lastName: string
-    phoneNumber: string
-    userId: number
+    id: number;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+    students : StudentsType[];
+    userId: number;
   }
   

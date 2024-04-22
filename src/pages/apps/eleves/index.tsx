@@ -251,6 +251,16 @@ const columns = [
     ),
   },
   {
+    flex: 0.1,
+    minWidth: 160,
+    sortable: false,
+    field: "parent",
+    headerName: "Parent",
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.parent?.firstName || "-"} {row.parent?.lastName || "-"}</Typography>
+    ),
+  },
+  {
     flex: 0.15,
     minWidth: 120,
     headerName: "Compte",
@@ -290,6 +300,7 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const studentStore = useSelector((state: RootState) => state.students);
+  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -302,6 +313,17 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
+
+
+  const filteredData = studentStore.data.filter((student) => {
+    if (student.userId) {
+      const associatedUser = userStore.data.find(
+        (user) => user.id === student.userId
+      );
+      return !associatedUser || !associatedUser.disabled;
+    }
+    return true;
+  });
 
   const generateCSVData = () => {
     return studentStore.allData.map((item) => ({
@@ -328,7 +350,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={studentStore.data}
+            rows={filteredData}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

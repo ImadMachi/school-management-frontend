@@ -276,6 +276,7 @@ const DirectorList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const directorStore = useSelector((state: RootState) => state.directors);
+  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -288,6 +289,17 @@ const DirectorList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
+
+  
+  const filteredData = directorStore.data.filter((director) => {
+    if (director.userId) {
+      const associatedUser = userStore.data.find(
+        (user) => user.id === director.userId
+      );
+      return !associatedUser || !associatedUser.disabled;
+    }
+    return true;
+  });
 
   const generateCSVData = () => {
     return directorStore.allData.map((item) => ({
@@ -312,7 +324,7 @@ const DirectorList = () => {
           />
           <DataGrid
             autoHeight
-            rows={directorStore.data}
+            rows={filteredData}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

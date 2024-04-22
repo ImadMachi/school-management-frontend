@@ -64,6 +64,14 @@ export const editGroup = createAsyncThunk(
     if (data.image) {
       formData.append("image", data.image);
     }
+    data.administratorUsers.forEach((user, i) => {
+      formData.append(`administratorUsers[${i}][id]`, `${user.id}`);
+    });
+
+    data.users.forEach((user, i) => {
+      formData.append(`users[${i}][id]`, `${user.id}`);
+    });
+
     const response = await axios.put(`${HOST}/groups/${data.id}`, formData);
     return response.data;
   }

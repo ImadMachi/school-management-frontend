@@ -122,7 +122,6 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
 
   const onSubmit = (data: CreateAdministratorDto) => {
     dispatch(addAdministrator(data) as any);
-    console.log(data);
     toggle();
     reset();
   };

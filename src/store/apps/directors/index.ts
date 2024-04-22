@@ -74,7 +74,6 @@ export const addDirector = createAsyncThunk(
       `${HOST}/directors?create-account=${data.createAccount}`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

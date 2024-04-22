@@ -196,8 +196,6 @@ const RowOptions = ({ id }: { id: number }) => {
           uploadProfileImage({ id: userId, file }) as any
         ).unwrap();
 
-        console.log("Profile image uploaded successfully:", response);
-
         if (userData) {
           const imageUrl = response.profileImage;
           setUserData({ ...userData, profileImage: imageUrl });
@@ -239,7 +237,6 @@ const RowOptions = ({ id }: { id: number }) => {
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     // dispatch(setSelectedId(id));
-    console.log(id);
     setAnchorEl(event.currentTarget);
   };
   const handleRowOptionsClose = () => {
@@ -430,7 +427,7 @@ const RowOptions = ({ id }: { id: number }) => {
   );
 };
 
-const mapRoleToFrench = (role: string) => {
+export const mapRoleToFrench = (role: string) => {
   switch (role) {
     case UserRole.Director:
       return "Directeur";

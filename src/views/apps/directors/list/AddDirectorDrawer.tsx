@@ -122,7 +122,6 @@ const SidebarAddDirector = (props: SidebarAddDirectorType) => {
 
   const onSubmit = (data: CreateDirectorDto) => {
     dispatch(addDirector(data) as any);
-    console.log(data);
     toggle();
     reset();
   };

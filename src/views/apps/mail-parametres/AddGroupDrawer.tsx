@@ -33,7 +33,7 @@ import { Autocomplete, Avatar, Chip, List, ListItem } from "@mui/material";
 import { addGroup, deleteGroup, editGroup } from "src/store/apps/groups";
 import { fetchData as fetchUsers } from "src/store/apps/users";
 import { useSelector } from "react-redux";
-import { UserType } from "src/types/apps/UserType";
+import { UserRole, UserType } from "src/types/apps/UserType";
 import { getInitials } from "src/@core/utils/get-initials";
 
 interface SidebarAddGroupType {
@@ -181,14 +181,17 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
     props: HTMLAttributes<HTMLLIElement>,
     option: UserType,
     array: UserType[],
-    onChange: (...event: any[]) => void
+    onChange: (...event: any[]) => void,
+    multiple?: boolean
   ) => {
     return (
       <ListItem
         key={option.id}
         sx={{ cursor: "pointer" }}
         onClick={() => {
-          onChange({ target: { value: [...array, option] } });
+          onChange({
+            target: { value: multiple ? [...array, option] : [option] },
+          });
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -324,7 +327,9 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
                   clearIcon={false}
                   id="teachers-select"
                   filterSelectedOptions
-                  options={usersStore.data}
+                  options={usersStore.data.filter(
+                    (user) => user.role === UserRole.Administrator
+                  )}
                   ListboxComponent={List}
                   //@ts-ignore
                   filterOptions={(options, params) =>
@@ -346,7 +351,7 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
                     "& .MuiSelect-selectMenu": { minHeight: "auto" },
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} label="Administrateurs" />
+                    <TextField {...params} label="Administrateur" />
                   )}
                 />
               )}
@@ -383,7 +388,7 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
                     }`
                   }
                   renderOption={(props, option) =>
-                    renderUserListItem(props, option, value, onChange)
+                    renderUserListItem(props, option, value, onChange, true)
                   }
                   renderTags={(array: UserType[], getTagProps) =>
                     renderCustomChips(array, getTagProps, value, onChange)

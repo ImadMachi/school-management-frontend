@@ -1,5 +1,11 @@
 // ** React Imports
-import { Fragment, useState, ReactNode, useEffect } from "react";
+import {
+  Fragment,
+  useState,
+  ReactNode,
+  useEffect,
+  SyntheticEvent,
+} from "react";
 
 // ** MUI Imports
 import List from "@mui/material/List";
@@ -36,10 +42,16 @@ import {
   MailFoldersArrType,
   MailAttachmentType,
 } from "src/types/apps/mailTypes";
-import { Chip } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import Link from "next/link";
 import { HOST } from "src/store/constants/hostname";
-import { markAsRead } from "src/store/apps/mail";
+import {
+  getCurrentMail,
+  handleSelectAllMail,
+  markAsRead,
+  moveFromTrash,
+  moveToTrash,
+} from "src/store/apps/mail";
 
 const HiddenReplyBack = styled(Box)<BoxProps>(({ theme }) => ({
   height: 11,
@@ -107,104 +119,18 @@ const MailDetails = (props: MailDetailsType) => {
     }
   }, [mail]);
 
-  const handleMoveToTrash = () => {
-    // dispatch(updateMail({ emailIds: [mail.id], dataToUpdate: { folder: 'trash' } }))
+  const handleMoveToTrash = (e: SyntheticEvent) => {
+    e.stopPropagation();
+    dispatch(moveToTrash({ id: mail.id, folder: routeParams.folder! }));
+    dispatch(handleSelectAllMail(false));
     setMailDetailsOpen(false);
   };
 
-  const handleReadMail = () => {
-    // dispatch(updateMail({ emailIds: [mail.id], dataToUpdate: { isRead: false } }))
+  const handleMoveFromTrash = (e: SyntheticEvent) => {
+    e.stopPropagation();
+    dispatch(moveFromTrash({ id: mail.id, folder: routeParams.folder! }));
+    dispatch(handleSelectAllMail(false));
     setMailDetailsOpen(false);
-  };
-  const handleLabelsMenu = () => {
-    const array: OptionType[] = [];
-    Object.entries(labelColors).map(([key, value]: string[]) => {
-      array.push({
-        text: (
-          <Typography sx={{ textTransform: "capitalize" }}>{key}</Typography>
-        ),
-        icon: (
-          <Box component="span" sx={{ mr: 2, color: `${value}.main` }}>
-            <Icon icon="mdi:circle" fontSize="0.75rem" />
-          </Box>
-        ),
-        menuItemProps: {
-          onClick: () => {
-            handleLabelUpdate([mail.id], key as MailLabelType);
-            setMailDetailsOpen(false);
-          },
-        },
-      });
-    });
-
-    return array;
-  };
-
-  const handleFoldersMenu = () => {
-    const array: OptionType[] = [];
-
-    if (
-      routeParams &&
-      routeParams.folder &&
-      !routeParams.label &&
-      foldersObj[routeParams.folder]
-    ) {
-      foldersObj[routeParams.folder].map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(mail.id, folder.name);
-              setMailDetailsOpen(false);
-            },
-          },
-        });
-      });
-    } else if (routeParams && routeParams.label) {
-      folders.map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(mail.id, folder.name);
-              setMailDetailsOpen(false);
-            },
-          },
-        });
-      });
-    } else {
-      foldersObj["inbox"].map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(mail.id, folder.name);
-              setMailDetailsOpen(false);
-            },
-          },
-        });
-      });
-    }
-
-    return array;
   };
 
   const prevMailIcon =
@@ -287,22 +213,6 @@ const MailDetails = (props: MailDetailsType) => {
                   <Typography noWrap sx={{ mr: 2, fontWeight: 500 }}>
                     {mail.subject}
                   </Typography>
-                  {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    {mail.labels && mail.labels.length
-                      ? mail.labels.map((label: MailLabelType) => {
-                          return (
-                            <CustomChip
-                              key={label}
-                              size='small'
-                              skin='light'
-                              label={label}
-                              color={labelColors[label] as ThemeColor}
-                              sx={{ textTransform: 'capitalize', '&:not(:last-of-type)': { mr: 2 } }}
-                            />
-                          )
-                        })
-                      : null}
-                  </Box> */}
                 </Box>
               </Box>
             </Box>
@@ -322,24 +232,29 @@ const MailDetails = (props: MailDetailsType) => {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                {routeParams && routeParams.folder !== "trash" ? (
-                  <>
+                <>
+                  {mail.isDeleted ? (
+                    <IconButton size="small" onClick={handleMoveFromTrash}>
+                      <Icon
+                        icon="material-symbols-light:restore-from-trash-outline-rounded"
+                        fontSize="1.375rem"
+                      />
+                    </IconButton>
+                  ) : (
                     <IconButton size="small" onClick={handleMoveToTrash}>
                       <Icon icon="mdi:delete-outline" fontSize="1.375rem" />
                     </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={(e) =>
-                        handleStarMail(e, mail.id, mail.isStarred)
-                      }
-                      sx={{
-                        ...(mail.isStarred ? { color: "warning.main" } : {}),
-                      }}
-                    >
-                      <Icon icon="mdi:star-outline" fontSize="1.375rem" />
-                    </IconButton>
-                  </>
-                ) : null}
+                  )}
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleStarMail(e, mail.id, mail.isStarred)}
+                    sx={{
+                      ...(mail.isStarred ? { color: "warning.main" } : {}),
+                    }}
+                  >
+                    <Icon icon="mdi:star-outline" fontSize="1.375rem" />
+                  </IconButton>
+                </>
               </Box>
             </Box>
           </Box>
@@ -404,6 +319,53 @@ const MailDetails = (props: MailDetailsType) => {
                         </Box>
                       </Box>
                       <Box sx={{ display: "flex", alignItems: "center" }}>
+                        {!!mail.parentMessage && (
+                          <Button
+                            sx={{
+                              mr: 8,
+                              display: "flex",
+                              alignItems: "center",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              dispatch(
+                                getCurrentMail(mail.parentMessage?.id as number)
+                              );
+                              setTimeout(() => {
+                                dispatch(handleSelectAllMail(false));
+                              }, 600);
+                            }}
+                          >
+                            <Icon
+                              icon="ic:baseline-reply"
+                              style={{ marginRight: 4, color: "GrayText" }}
+                            />
+                            <Typography variant="caption">
+                              Ce message est une Réponse
+                            </Typography>
+                          </Button>
+                        )}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            marginRight: "30px",
+                          }}
+                        >
+                          <Avatar
+                            src={`${HOST}/uploads/categories-images/${mail.category.imagepath}`}
+                            alt={mail.category.name}
+                            style={{
+                              borderRadius: "5px",
+                              marginRight: "10px",
+                              height: "30px",
+                              width: "30px",
+                            }}
+                          />
+                          <Typography variant="body2">
+                            {mail.category.name}
+                          </Typography>
+                        </Box>
                         <Typography variant="caption" sx={{ mr: 3 }}>
                           {new Date(mail.createdAt).toLocaleDateString(
                             "fr-FR",

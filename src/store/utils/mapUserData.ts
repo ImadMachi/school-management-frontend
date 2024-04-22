@@ -14,6 +14,9 @@ export function mapSenderData(sender: any) {
   } else if (sender.parent) {
     sender.senderData = sender.parent;
     delete sender.parent;
+  } else if (sender.agent) {
+    sender.senderData = sender.agent;
+    delete sender.agent;
   }
 }
 
@@ -33,5 +36,8 @@ export function mapUserData(user: any) {
   } else if (user.parent) {
     user.userData = user.parent;
     delete user.parent;
+  } else if (user.agent) {
+    user.userData = user.agent;
+    delete user.agent;
   }
 }

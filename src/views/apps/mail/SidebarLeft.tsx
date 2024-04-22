@@ -31,6 +31,13 @@ import {
   MailLabelType,
   MailSidebarType,
 } from "src/types/apps/mailTypes";
+import { useSelector } from "react-redux";
+import { RootState } from "src/store";
+import Image from "next/image";
+import { HOST } from "src/store/constants/hostname";
+import { Avatar } from "@mui/material";
+import { CategoryType } from "src/types/apps/categoryTypes";
+import { GroupType } from "src/types/apps/groupTypes";
 
 // ** Styled Components
 const ListItemStyled = styled(ListItem)<
@@ -65,7 +72,15 @@ const SidebarLeft = (props: MailSidebarType) => {
     setMailDetailsOpen,
     handleSelectAllMail,
     handleLeftSidebarToggle,
+    selectedCategory,
+    setSelectedCategory,
+    selectedGroup,
+    setSelectedGroup,
+    setIsFetching,
   } = props;
+
+  const categoryStore = useSelector((state: RootState) => state.categories);
+  const groupStore = useSelector((state: RootState) => state.groups);
 
   const RenderBadge = (
     folder: "inbox" | "spam",
@@ -103,17 +118,41 @@ const SidebarLeft = (props: MailSidebarType) => {
     }
   };
 
-  const handleListItemClick = () => {
+  const handleListItemClick = (folder: string) => {
+    if (store.filter.folder === folder) {
+      return;
+    }
+
+    setIsFetching(true);
     setMailDetailsOpen(false);
     setTimeout(() => dispatch(handleSelectAllMail(false)), 50);
     handleLeftSidebarToggle();
   };
 
+  const handleCategoryClick = (e: any, id: number) => {
+    e.preventDefault();
+
+    if (selectedCategory == id) {
+      setSelectedCategory(0);
+    } else {
+      setSelectedCategory(id);
+    }
+  };
+
+  const handleGroupeClick = (e: any, id: number) => {
+    e.preventDefault();
+
+    if (selectedGroup == id) {
+      setSelectedGroup(0);
+    } else {
+      setSelectedGroup(id);
+    }
+  };
+
   const activeInboxCondition =
     store &&
     handleActiveItem("folder", "inbox") &&
-    store.filter.folder === "inbox" &&
-    store.filter.label === "";
+    store.filter.folder === "inbox";
 
   const ScrollWrapper = ({ children }: { children: ReactNode }) => {
     if (hidden) {
@@ -166,7 +205,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             <ListItemStyled
               component={Link}
               href="/apps/mail/inbox"
-              onClick={handleListItemClick}
+              onClick={handleListItemClick.bind(null, "inbox")}
               sx={{
                 borderLeftColor: activeInboxCondition
                   ? "primary.main"
@@ -197,7 +236,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             <ListItemStyled
               component={Link}
               href="/apps/mail/sent"
-              onClick={handleListItemClick}
+              onClick={handleListItemClick.bind(null, "sent")}
               sx={{
                 borderLeftColor: handleActiveItem("folder", "sent")
                   ? "primary.main"
@@ -229,7 +268,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             <ListItemStyled
               component={Link}
               href="/apps/mail/starred"
-              onClick={handleListItemClick}
+              onClick={handleListItemClick.bind(null, "starred")}
               sx={{
                 borderLeftColor: handleActiveItem("folder", "starred")
                   ? "primary.main"
@@ -261,7 +300,7 @@ const SidebarLeft = (props: MailSidebarType) => {
             <ListItemStyled
               component={Link}
               href="/apps/mail/trash"
-              onClick={handleListItemClick}
+              onClick={handleListItemClick.bind(null, "trash")}
               sx={{
                 borderLeftColor: handleActiveItem("folder", "trash")
                   ? "primary.main"
@@ -290,6 +329,114 @@ const SidebarLeft = (props: MailSidebarType) => {
                 }}
               />
             </ListItemStyled>
+          </List>
+          <Typography
+            component="h6"
+            variant="caption"
+            sx={{
+              mx: 6,
+              mt: 4,
+              mb: 0,
+              color: "text.disabled",
+              letterSpacing: "0.21px",
+              textTransform: "uppercase",
+            }}
+          >
+            Groupes
+          </Typography>
+          <List component="div">
+            {groupStore.data.map((group: GroupType) => {
+              return (
+                <ListItemStyled
+                  key={group.id}
+                  component={Link}
+                  onClick={(e) => handleGroupeClick(e, group.id)}
+                  href="#"
+                  sx={{
+                    borderLeftColor:
+                      selectedGroup == group.id
+                        ? "primary.main"
+                        : "transparent",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <Avatar
+                    src={`${HOST}/uploads/groups/${group.imagePath}`}
+                    alt={group.name}
+                    style={{
+                      borderRadius: "5px",
+                      marginRight: "10px",
+                    }}
+                  />
+                  <ListItemText
+                    primary={group.name}
+                    primaryTypographyProps={{
+                      noWrap: true,
+                      sx: {
+                        fontWeight: 500,
+                        ...(selectedGroup == group.id && {
+                          color: "primary.main",
+                        }),
+                      },
+                    }}
+                  />
+                </ListItemStyled>
+              );
+            })}
+          </List>
+          <Typography
+            component="h6"
+            variant="caption"
+            sx={{
+              mx: 6,
+              mt: 4,
+              mb: 0,
+              color: "text.disabled",
+              letterSpacing: "0.21px",
+              textTransform: "uppercase",
+            }}
+          >
+            Catégories
+          </Typography>
+          <List component="div">
+            {categoryStore.data.map((category: CategoryType) => {
+              return (
+                <ListItemStyled
+                  key={category.id}
+                  component={Link}
+                  onClick={(e) => handleCategoryClick(e, category.id)}
+                  href="#"
+                  sx={{
+                    borderLeftColor:
+                      selectedCategory == category.id
+                        ? "primary.main"
+                        : "transparent",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <Avatar
+                    src={`${HOST}/uploads/categories-images/${category.imagepath}`}
+                    alt={category.name}
+                    style={{
+                      borderRadius: "5px",
+                      marginRight: "10px",
+                    }}
+                  />
+                  <ListItemText
+                    primary={category.name}
+                    primaryTypographyProps={{
+                      noWrap: true,
+                      sx: {
+                        fontWeight: 500,
+                        ...(selectedCategory == category.id && {
+                          color: "primary.main",
+                        }),
+                      },
+                    }}
+                  />
+                </ListItemStyled>
+              );
+            })}
           </List>
         </Box>
       </ScrollWrapper>

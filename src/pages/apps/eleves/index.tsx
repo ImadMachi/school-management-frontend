@@ -98,8 +98,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setStudentId(id));
     dispatch(setStudentUserId(userId));
-    console.log("id", id);
-    console.log("userId", userId);
     setAnchorEl(event.currentTarget);
   };
   const handleRowOptionsClose = () => {

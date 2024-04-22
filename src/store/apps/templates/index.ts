@@ -33,7 +33,7 @@ interface AddTemplateType {
   description: string;
   subject: string;
   body: string;
-  category: number;
+  category: { id: number };
 }
 export const addTemplate = createAsyncThunk(
   "appTemplates/addTemplate",

@@ -72,7 +72,6 @@ const schema = yup.object().shape({
 });
 
 const UserViewLeft = () => {
-
   const router = useRouter();
   const { params } = router.query;
   const folder = params ? params[0] : null;
@@ -152,7 +151,7 @@ const UserViewLeft = () => {
           uploadProfileImage({ id: userId! as unknown as number, file })
         ).unwrap();
 
-        console.log("Profile image uploaded successfully:", response);
+        "Profile image uploaded successfully:", response;
 
         if (userIdData) {
           const imageUrl = response.profileImage;

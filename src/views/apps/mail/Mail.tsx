@@ -41,9 +41,12 @@ const labelColors: MailLabelColors = {
 const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
   // ** States
   const [query, setQuery] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState(0);
+  const [selectedGroup, setSelectedGroup] = useState(0);
   const [composeOpen, setComposeOpen] = useState<boolean>(false);
   const [mailDetailsOpen, setMailDetailsOpen] = useState<boolean>(false);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   // ** Hooks
   const theme = useTheme();
@@ -66,14 +69,18 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
   };
 
   useEffect(() => {
-    // @ts-ignore
-    dispatch(
-      fetchMails({
-        q: query || "",
-        folder: routeParams.folder,
-      }) as any
-    );
-  }, [dispatch, query, routeParams.folder, routeParams.label]);
+    (async () => {
+      await dispatch(
+        fetchMails({
+          q: query || "",
+          folder: routeParams.folder,
+          selectedCategory,
+          selectedGroup,
+        }) as any
+      );
+      setIsFetching(false);
+    })();
+  }, [dispatch, query, routeParams.folder, selectedCategory, selectedGroup]);
 
   const toggleComposeOpen = () => setComposeOpen(!composeOpen);
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);
@@ -104,6 +111,11 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
         setMailDetailsOpen={setMailDetailsOpen}
         handleSelectAllMail={handleSelectAllMail}
         handleLeftSidebarToggle={handleLeftSidebarToggle}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedGroup={selectedGroup}
+        setSelectedGroup={setSelectedGroup}
+        setIsFetching={setIsFetching}
       />
       <MailLog
         query={query}
@@ -122,6 +134,9 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
         setMailDetailsOpen={setMailDetailsOpen}
         handleSelectAllMail={handleSelectAllMail}
         handleLeftSidebarToggle={handleLeftSidebarToggle}
+        selectedCategory={selectedCategory}
+        selectedGroup={selectedGroup}
+        isFetching={isFetching}
       />
       <ComposePopup
         mdAbove={mdAbove}

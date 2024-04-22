@@ -48,7 +48,7 @@ export interface CreateTemplateDto {
   description: string;
   subject: string;
   body: string;
-  category: number;
+  category: string;
 }
 
 const defaultValues: CreateTemplateDto = {
@@ -56,7 +56,7 @@ const defaultValues: CreateTemplateDto = {
   description: "",
   subject: "",
   body: "",
-  category: 1,
+  category: "",
 };
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -73,7 +73,7 @@ const schema = yup.object().shape({
   description: yup.string().required("La description est requise"),
   subject: yup.string().required("Le sujet est requis"),
   body: yup.string().required("Le corps est requis"),
-  category: yup.number().required("La catégorie est requise"),
+  category: yup.string().required("La catégorie est requise"),
 });
 
 const AddTemplateDrawer = (props: SidebarAddTemplateType) => {
@@ -85,9 +85,6 @@ const AddTemplateDrawer = (props: SidebarAddTemplateType) => {
 
   // ** Stores
   const categoryStore = useSelector((state: RootState) => state.categories);
-
-  // ** Refs
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     reset,
@@ -109,7 +106,7 @@ const AddTemplateDrawer = (props: SidebarAddTemplateType) => {
         setValue("description", props.templateToEdit.description);
         setValue("subject", props.templateToEdit.subject);
         setValue("body", props.templateToEdit.body);
-        setValue("category", props.templateToEdit.category.id);
+        setValue("category", `${props.templateToEdit.category.id}`);
       }
     })();
   }, [props.open]);
@@ -128,11 +125,13 @@ const AddTemplateDrawer = (props: SidebarAddTemplateType) => {
         editTemplate({
           ...payload,
           id: props.templateToEdit.id,
-          category: { id: props.templateToEdit.category.id },
+          category: { id: payload.category },
         }) as any
       );
     } else {
-      dispatch(addTemplate(payload) as any);
+      dispatch(
+        addTemplate({ ...payload, category: { id: payload.category } }) as any
+      );
     }
 
     toggle();

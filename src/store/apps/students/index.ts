@@ -75,7 +75,6 @@ export const addStudent = createAsyncThunk(
       `${HOST}/students?create-account=${data.createAccount}`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

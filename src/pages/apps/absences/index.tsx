@@ -294,7 +294,6 @@ const RowOptions = ({ id }: { id: number }) => {
   };
 
   function handleEditSubmit(data: any) {
-    console.log("data", data);
     const partialUpdateAbsentDto: Partial<AbsentsType> = { ...data };
 
     if (id) partialUpdateAbsentDto.id = id;

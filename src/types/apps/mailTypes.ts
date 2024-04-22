@@ -1,6 +1,7 @@
 // ** Types
 import { Dispatch } from "redux";
 import { ReactElement, SyntheticEvent } from "react";
+import { CategoryType } from "./categoryTypes";
 
 export type MailLabelType = "personal" | "company" | "important" | "private";
 
@@ -36,6 +37,8 @@ export type FieldMenuItems = {
 export type FetchMailParamsType = {
   q: string;
   folder: MailFolderType;
+  selectedCategory: number;
+  selectedGroup: number;
 };
 
 export type FetchMailByUserIdParamsType = {
@@ -57,6 +60,8 @@ export type PaginateMailParamsType = {
   q: string;
   offset: number;
   folder: MailFolderType;
+  selectedCategory: number;
+  selectedGroup: number;
 };
 
 export type UpdateMailParamsType = {
@@ -106,16 +111,14 @@ export type MailType = {
   body: string;
   subject: string;
   sender: SenderType;
-  // isStarred: boolean
   createdAt: Date | string;
-  // replies: MailType[]
-  // hasNextMail?: boolean
   folder: MailFolderType;
-  // labels: MailLabelType[]
-  // hasPreviousMail?: boolean
   attachments: MailAttachmentType[];
   isRead: boolean;
   isStarred: boolean;
+  isDeleted: boolean;
+  category: CategoryType;
+  parentMessage: MailType | null;
 };
 
 export type MailFoldersArrType = {
@@ -157,6 +160,11 @@ export type MailSidebarType = {
   handleLeftSidebarToggle: () => void;
   setMailDetailsOpen: (val: boolean) => void;
   handleSelectAllMail: (val: boolean) => void;
+  selectedCategory: number;
+  setSelectedCategory: (val: number) => void;
+  selectedGroup: number;
+  setSelectedGroup: (val: number) => void;
+  setIsFetching: (val: boolean) => void;
 };
 
 export type MailLogType = {
@@ -178,6 +186,9 @@ export type MailLogType = {
   updateMail: (data: UpdateMailParamsType) => void;
   updateMailLabel: (data: UpdateMailLabelType) => void;
   paginateMail: (data: PaginateMailParamsType) => void;
+  selectedCategory: number;
+  selectedGroup: number;
+  isFetching: boolean;
 };
 
 export type MailDetailsType = {

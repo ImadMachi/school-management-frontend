@@ -61,8 +61,9 @@ export const fetchMails = createAsyncThunk(
   "appEmail/fetchMails",
   async (params: FetchMailParamsType) => {
     const entityFolder = mapMailFolderToEntity(params.folder);
+
     const response = await axios.get(
-      `${HOST}/messages/auth?folder=${entityFolder}`
+      `${HOST}/messages/auth?folder=${entityFolder}&text=${params.q}&categoryId=${params.selectedCategory}&groupId=${params.selectedGroup}`
     );
 
     return { mails: response.data, filter: params };
@@ -162,7 +163,7 @@ export const paginateMail = createAsyncThunk(
     const entityFolder = mapMailFolderToEntity(params.folder);
 
     const response = await axios.get(
-      `${HOST}/messages/auth?folder=${entityFolder}&offset=${params.offset}`
+      `${HOST}/messages/auth?folder=${entityFolder}&offset=${params.offset}&text=${params.q}&categoryId=${params.selectedCategory}&groupId=${params.selectedGroup}`
     );
 
     return { mails: response.data, filter: params };
@@ -370,6 +371,14 @@ export const appEmailSlice = createSlice({
 
     builder.addCase(moveToTrash.fulfilled, (state, action) => {
       if (action.payload.folder != "trash") {
+        state.mails = state.mails.filter(
+          (mail) => mail.id !== action.payload.id
+        );
+      }
+    });
+
+    builder.addCase(moveFromTrash.fulfilled, (state, action) => {
+      if (action.payload.folder == "trash") {
         state.mails = state.mails.filter(
           (mail) => mail.id !== action.payload.id
         );

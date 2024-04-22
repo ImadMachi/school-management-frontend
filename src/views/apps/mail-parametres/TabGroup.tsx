@@ -32,7 +32,6 @@ const TabGroup = () => {
     setAddGroupOpen(!addGroupOpen);
     setGroupToEdit(null);
   };
-  console.log(groupsStore.data[0]);
 
   useEffect(() => {
     dispatch(fetchData() as any);

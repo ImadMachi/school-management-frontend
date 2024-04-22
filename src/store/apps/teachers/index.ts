@@ -95,7 +95,6 @@ export const addTeacher = createAsyncThunk(
       `${HOST}/teachers?create-account=${data.createAccount}`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

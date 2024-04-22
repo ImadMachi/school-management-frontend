@@ -7,6 +7,7 @@ import {
 
 import axios from "axios";
 import toast from "react-hot-toast";
+import { mapUserData } from "src/store/utils/mapUserData";
 import { UserRole, UserType } from "src/types/apps/UserType";
 const HOST = process.env.NEXT_PUBLIC_API_URL;
 
@@ -104,25 +105,7 @@ export const appUsersSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchData.fulfilled, (state, action) => {
       for (let user of action.payload) {
-        if (user.director) {
-          user.userData = user.director;
-          delete user.director;
-        } else if (user.administrator) {
-          user.userData = user.administrator;
-          delete user.administrator;
-        } else if (user.teacher) {
-          user.userData = user.teacher;
-          delete user.teacher;
-        } else if (user.student) {
-          user.userData = user.student;
-          delete user.student;
-        } else if (user.parent) {
-          user.userData = user.parent;
-          delete user.parent;
-        } else if (user.agent) {
-          user.userData = user.agent;
-          delete user.agent;
-        }
+        mapUserData(user);
       }
 
       state.data = action.payload;

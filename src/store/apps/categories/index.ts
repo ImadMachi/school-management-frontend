@@ -43,7 +43,6 @@ export const addCategory = createAsyncThunk(
       formData.append("image", data.image);
     }
     const response = await axios.post(`${HOST}/message-categories`, formData);
-    console.log(response.data);
 
     return response.data;
   }

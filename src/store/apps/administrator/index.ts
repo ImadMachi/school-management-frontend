@@ -73,7 +73,6 @@ export const addAdministrator = createAsyncThunk(
       `${HOST}/administrators?create-account=${data.createAccount}`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

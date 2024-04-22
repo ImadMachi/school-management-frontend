@@ -13,42 +13,8 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { useAuth } from "src/hooks/useAuth";
+import { mapRoleToFrench } from "src/pages/apps/utilisateurs";
 // ** Types
-
-interface Props {
-  about: UserType[];
-  contacts: UserType[];
-}
-
-const renderList = (arr: UserType[]) => {
-  if (arr && arr.length) {
-    return arr.map((item, index) => {
-      return (
-        <Box
-          key={index}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            "&:not(:last-of-type)": { mb: 4 },
-            "& svg": { color: "text.secondary" },
-          }}
-        >
-          <PersonOutlineIcon />
-          <Typography sx={{ mx: 2, fontWeight: 600, color: "text.secondary" }}>
-            Nom complet : {item.userData.firstName} {item.userData.lastName}
-          </Typography>{" "}
-          <StarBorderIcon />
-          <Typography sx={{ mx: 2, fontWeight: 600, color: "text.secondary" }}>
-            Role : {item.role}
-          </Typography>{" "}
-          <Icon icon="PersonOutlineIcon" />
-        </Box>
-      );
-    });
-  } else {
-    return null;
-  }
-};
 
 const AboutOverivew = () => {
   const item = useAuth();
@@ -67,7 +33,7 @@ const AboutOverivew = () => {
                   textTransform: "uppercase",
                 }}
               >
-                About
+                À PROPOS
               </Typography>
               <Box sx={{ mb: 4 }}>
                 <Box
@@ -93,7 +59,7 @@ const AboutOverivew = () => {
                 >
                   <StarBorderIcon />
                   <Typography sx={{ fontWeight: 600, color: "text.secondary" }}>
-                    Role : {item.user?.role}
+                    Rôle : {item.user?.role && mapRoleToFrench(item.user.role)}
                   </Typography>
                 </Box>
               </Box>
@@ -120,7 +86,7 @@ const AboutOverivew = () => {
                 >
                   <LocalPhoneOutlinedIcon />
                   <Typography sx={{ fontWeight: 600, color: "text.secondary" }}>
-                    Tel : {item.user?.userData.phoneNumber}
+                    Tél : {item.user?.userData.phoneNumber}
                   </Typography>
                 </Box>
                 <Box

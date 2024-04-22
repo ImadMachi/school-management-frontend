@@ -70,11 +70,8 @@ import VoiceRecorder from "./VoiceRecorder";
 import { UserRole, UserType } from "src/types/apps/UserType";
 import { useRouter } from "next/router";
 import { ClassType } from "src/types/apps/classTypes";
-import toast from "react-hot-toast";
-import CardSnippet from "src/@core/components/card-snippet";
 import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
 import { useSettings } from "src/@core/hooks/useSettings";
-import * as source from "src/views/components/swiper/SwiperSourceCode";
 import { TemplateType } from "src/types/apps/templateTypes";
 
 type ToUserType = UserType;
@@ -89,6 +86,7 @@ const ComposePopup = (props: MailComposeType) => {
   const [emailToParents, setEmailToParents] = useState<ToUserType[]>([]);
   const [emailToClasses, setEmailToClasses] = useState<ClassType[]>([]);
   const [emailToGroups, setEmailToGroups] = useState<GroupType[]>([]);
+  const [emailToAgents, setEmailToAgents] = useState<ToUserType[]>([]);
   const [subjectValue, setSubjectValue] = useState<string>("");
   const [messageValue, setMessageValue] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -96,11 +94,13 @@ const ComposePopup = (props: MailComposeType) => {
   const [studentUsers, setStudentUsers] = useState<UserType[]>([]);
   const [parentUsers, setParentUsers] = useState<UserType[]>([]);
   const [teacherUsers, setTeacherUsers] = useState<UserType[]>([]);
+  const [agentUsers, setAgentUsers] = useState<UserType[]>([]);
   const [checkedRecipients, setCheckedRecipients] = useState<boolean[]>([
     true,
     false,
     false,
     true,
+    false,
     false,
   ]);
   const [selectedAudios, setSelectedAudios] = useState<
@@ -156,6 +156,11 @@ const ComposePopup = (props: MailComposeType) => {
       (user) => user.role === UserRole.Teacher
     );
     setTeacherUsers(teacherUsers);
+
+    const agentUsers = userStore.data.filter(
+      (user) => user.role === UserRole.Agent
+    );
+    setAgentUsers(agentUsers);
   }, [userStore.data]);
 
   useEffect(() => {
@@ -196,9 +201,11 @@ const ComposePopup = (props: MailComposeType) => {
     setEmailToError(false);
     setObjectError(false);
     setMessageError(false);
+    setCategoryError(false);
     const emailTo = emailToStudents
       .concat(emailToParents)
-      .concat(emailToTeachers);
+      .concat(emailToTeachers)
+      .concat(emailToAgents);
     if (emailToClasses.length) {
       emailToClasses.forEach((cls) => {
         cls.students.forEach((student) => {
@@ -297,6 +304,7 @@ const ComposePopup = (props: MailComposeType) => {
     toggleComposeOpen();
     setEmailToStudents(emailToStudents);
     setEmailToTeachers(emailToTeachers);
+    setEmailToAgents(emailToAgents);
     setEmailToParents(emailToParents);
     setEmailToClasses(emailToClasses);
     setEmailToGroups(emailToGroups);
@@ -579,6 +587,15 @@ const ComposePopup = (props: MailComposeType) => {
               />
             }
             label="Groupes"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={checkedRecipients[5]}
+                onChange={() => handleChangeCheckedRecipient(5)}
+              />
+            }
+            label="Agents"
           />
         </FormGroup>
       </Box>
@@ -889,6 +906,70 @@ const ComposePopup = (props: MailComposeType) => {
                 getTagProps,
                 emailToGroups,
                 setEmailToGroups as any
+              )
+            }
+            sx={{
+              width: "100%",
+              "& .MuiOutlinedInput-root": { p: 2 },
+              "& .MuiAutocomplete-endAdornment": { display: "none" },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                autoComplete="new-password"
+                sx={{
+                  border: 0,
+                  "& fieldset": { border: "0 !important" },
+                  "& .MuiOutlinedInput-root": { p: "0 !important" },
+                }}
+              />
+            )}
+          />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: checkedRecipients[5] ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+          <div>
+            <InputLabel
+              sx={{ mr: 3, fontSize: "0.875rem" }}
+              htmlFor="email-to-select"
+            >
+              Aux Agents:
+            </InputLabel>
+          </div>
+          <Autocomplete
+            multiple
+            freeSolo
+            value={emailToAgents}
+            clearIcon={false}
+            id="email-to-select"
+            filterSelectedOptions
+            options={agentUsers}
+            ListboxComponent={List}
+            filterOptions={addNewOption}
+            getOptionLabel={(option) =>
+              `${(option as ToUserType).userData.firstName} ${
+                (option as ToUserType).userData.lastName
+              }`
+            }
+            renderOption={(props, option) =>
+              renderListItem(props, option, emailToAgents, setEmailToAgents)
+            }
+            renderTags={(array: ToUserType[], getTagProps) =>
+              renderCustomChips(
+                array,
+                getTagProps,
+                emailToAgents,
+                setEmailToAgents
               )
             }
             sx={{

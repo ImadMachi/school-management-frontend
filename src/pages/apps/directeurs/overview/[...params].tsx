@@ -139,8 +139,6 @@ const UserViewLeft = () => {
           uploadProfileImage({ id: userId! as unknown as number, file })
         ).unwrap();
 
-        console.log("Profile image uploaded successfully:", response);
-
         if (userIdData) {
           const imageUrl = response.profileImage;
           setUserIdData({ ...userIdData, profileImage: imageUrl });

@@ -74,8 +74,6 @@ const UserProfileHeader = () => {
   //         uploadProfileImage({ id: userId!, file })
   //       ).unwrap();
 
-  //       console.log("Profile image uploaded successfully:", response);
-
   //       if (user) {
   //         const imageUrl = response.profileImage;
   //         setUserIdData({ ...userIdData, profileImage: imageUrl });

@@ -253,6 +253,16 @@ const columns = [
     ),
   },
   {
+    flex: 0.1,
+    minWidth: 160,
+    sortable: false,
+    field: "parent",
+    headerName: "Parent",
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>{row.parent?.firstName || "-"} {row.parent?.lastName || "-"}</Typography>
+    ),
+  },
+  {
     flex: 0.15,
     minWidth: 120,
     headerName: "Compte",

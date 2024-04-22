@@ -337,7 +337,7 @@ const SidebarAddCycle = (props: SidebarAddCycleType) => {
                     "& .MuiSelect-selectMenu": { minHeight: "auto" },
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} label="Cycle" />
+                    <TextField {...params} label="Niveau" />
                   )}
                 />
               )}

@@ -221,6 +221,37 @@ const columns = [
     },
   },
   {
+    flex: 0.17,
+    minWidth: 40,
+    headerName: "Éléves",
+    field: "éléves",
+    renderCell: ({ row }: CellType) => {
+      const user = row.students;
+      return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "column",
+            }}
+          >
+            <Typography noWrap>
+              {row.students.length > 0
+                ? row.students.map((user, index) => (
+                    <span key={user.id}>
+                      {user.firstName ?? "non spécifié"}
+                      {index !== row.students.length - 1 && "-"}
+                    </span>
+                  ))
+                : "- -"}
+            </Typography>
+          </Box>
+        </Box>
+      );
+    },
+  },
+  {
     flex: 0.15,
     minWidth: 120,
     headerName: "Telephone",

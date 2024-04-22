@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import {
   Autocomplete,
+  Avatar,
   Checkbox,
   Chip,
   FormControlLabel,
@@ -125,6 +126,8 @@ const schema = yup.object().shape({
   status: yup.string(),
 });
 
+type ToUserType = UserType;
+
 const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
   // ** Props
   const { open, toggle } = props;
@@ -138,7 +141,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
     "Seance 5",
     "Seance 6",
     "Seance 7",
-    "Tout la journée"
+    "Tout la journée",
   ];
 
   // ** Store
@@ -194,32 +197,33 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
     reset();
   };
 
-  const renderUserListItem = (
+  const renderListItem = (
     props: HTMLAttributes<HTMLLIElement>,
-    option: SelectType,
-    array: SelectType[],
-    onChange: (...event: any[]) => void
+    option: ToUserType
   ) => {
     return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => {
-          onChange({ target: { value: [...array, option] } });
-        }}
-      >
+      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(
-              `${option.userData?.firstName} ${option.userData?.lastName}`
-            )}
-          </CustomAvatar>
+          {option.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
+              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(
+                `${option.userData?.firstName} ${option.userData?.lastName}`
+              )}
+            </CustomAvatar>
+          )}
+
           <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.userData?.firstName} {option.userData?.lastName}
+            {option.userData.firstName} {option.userData.lastName}
           </Typography>
         </Box>
       </ListItem>
@@ -323,6 +327,9 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
                   onChange={(event, newValue) => {
                     onChange(newValue?.id || null);
                   }}
+                  renderOption={(props, option) =>
+                    renderListItem(props, option)
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -337,6 +344,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               )}
             />
           </FormControl>
+
           <FormControl fullWidth sx={{ mb: 6 }}>
             <InputLabel id="seance-select-label">Séance</InputLabel>
             <Controller

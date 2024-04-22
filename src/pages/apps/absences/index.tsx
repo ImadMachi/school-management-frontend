@@ -206,15 +206,24 @@ const RowOptions = ({ id }: { id: number }) => {
         onClick={() => setState([...array, option])}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(
-              `${option.userData.firstName} ${option.userData.lastName}`
-            )}
-          </CustomAvatar>
+          {option.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
+              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(
+                `${option.userData?.firstName} ${option.userData?.lastName}`
+              )}
+            </CustomAvatar>
+          )}
+
           <Typography sx={{ fontSize: "0.875rem" }}>
             {option.userData.firstName} {option.userData.lastName}
           </Typography>

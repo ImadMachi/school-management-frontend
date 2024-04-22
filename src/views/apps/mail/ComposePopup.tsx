@@ -52,6 +52,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { sendMail } from "src/store/apps/mail";
 import {
+  Avatar,
   Checkbox,
   FormControlLabel,
   FormGroup,
@@ -354,11 +355,11 @@ const ComposePopup = (props: MailComposeType) => {
         onClick={() => setState([...array, option])}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.avatar?.length ? (
-            <CustomAvatar
-              src={option.avatar}
-              alt={option.userData.firstName}
-              sx={{ mr: 3, width: 22, height: 22 }}
+          {option.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
+              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (
             <CustomAvatar
@@ -367,10 +368,11 @@ const ComposePopup = (props: MailComposeType) => {
               sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
             >
               {getInitials(
-                `${option.userData.firstName} ${option.userData.lastName}`
+                `${option.userData?.firstName} ${option.userData?.lastName}`
               )}
             </CustomAvatar>
           )}
+
           <Typography sx={{ fontSize: "0.875rem" }}>
             {option.userData.firstName} {option.userData.lastName}
           </Typography>
@@ -378,6 +380,7 @@ const ComposePopup = (props: MailComposeType) => {
       </ListItem>
     );
   };
+
   const renderClassListItem = (
     props: HTMLAttributes<HTMLLIElement>,
     option: ClassType | GroupType,
@@ -391,13 +394,6 @@ const ComposePopup = (props: MailComposeType) => {
         onClick={() => setState([...array, option])}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.avatar?.length ? (
-            <CustomAvatar
-              src={option.avatar}
-              alt={option.name}
-              sx={{ mr: 3, width: 22, height: 22 }}
-            />
-          ) : (
             <CustomAvatar
               skin="light"
               color="primary"
@@ -405,7 +401,6 @@ const ComposePopup = (props: MailComposeType) => {
             >
               {getInitials(`${option.name}`)}
             </CustomAvatar>
-          )}
           <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
         </Box>
       </ListItem>

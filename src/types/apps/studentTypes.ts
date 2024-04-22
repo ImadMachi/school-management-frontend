@@ -1,3 +1,5 @@
+import { ClassType } from "./classTypes"
+import { ParentsType } from "./parentTypes"
 
 export type StudentsType = {
     id: number
@@ -7,5 +9,7 @@ export type StudentsType = {
     dateOfBirth: Date
     sex: string
     userId: number
+    classe : ClassType
+    parent : ParentsType
   }
   

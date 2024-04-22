@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, HTMLAttributes, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -11,6 +11,8 @@ import Typography from "@mui/material/Typography";
 import Box, { BoxProps } from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
+import CustomAvatar from "src/@core/components/mui/avatar";
+
 
 // ** Third Party Imports
 import * as yup from "yup";
@@ -21,26 +23,33 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import Icon from "src/@core/components/icon";
 
 // ** Store Imports
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // ** Types Imports
-import { AppDispatch } from "src/store";
+import { AppDispatch, RootState } from "src/store";
 import {
+  Autocomplete,
   Avatar,
   Checkbox,
   Chip,
   FormControlLabel,
   Grid,
   InputLabel,
+  ListItem,
   MenuItem,
   Select,
 } from "@mui/material";
 import { addStudent } from "src/store/apps/students";
 import { on } from "events";
+import { StudentsType } from "src/types/apps/studentTypes";
+import { fetchData } from "src/store/apps/parents";
+import { getInitials } from "src/@core/utils/get-initials";
+import { ParentsType } from "src/types/apps/parentTypes";
 
 interface SidebarAddStudentType {
   open: boolean;
   toggle: () => void;
+  studentToEdit: StudentsType | null;
 }
 
 export interface CreateStudentDto {
@@ -49,6 +58,7 @@ export interface CreateStudentDto {
   identification: string;
   dateOfBirth: Date;
   sex: string;
+  parent: number;
   createAccount: boolean;
   createUserDto?: {
     email: string;
@@ -71,6 +81,12 @@ const schema = yup.object().shape({
   identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
+  parent: yup
+    .number()
+    .required("Parent est requis")
+    .positive("Parent est requis")
+    .integer("Parent est requis")
+    .typeError("Parent est requis"),
   createUserDto: yup.object().when("createAccount", {
     is: true,
     then: yup.object({
@@ -99,6 +115,7 @@ const defaultValues = {
   identification: "",
   dateOfBirth: new Date(),
   sex: "",
+  parent: {},
   createAccount: false,
   createUserDto: {
     email: "",
@@ -111,6 +128,12 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   // ** Props  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   const { open, toggle } = props;
+
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ** Hooks
@@ -128,6 +151,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     resolver: yupResolver(schema),
   });
   const [isHovered, setIsHovered] = useState(false);
+  const parentStore = useSelector((state: RootState) => state.parents);
 
   const createAccount = useWatch({
     control,
@@ -135,9 +159,18 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     defaultValue: false,
   });
 
+  useEffect(() => {
+    if (props.studentToEdit) {
+      setValue("parent", `${props.studentToEdit.parent.id}`);
+    }
+  }, [props.studentToEdit]);
+
+  useEffect(() => {
+    dispatch(fetchData() as any);
+  }, []);
+
   const onSubmit = (data: CreateStudentDto) => {
     dispatch(addStudent(data) as any);
-    console.log(data);
     toggle();
     reset();
   };
@@ -145,6 +178,41 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   const handleClose = () => {
     toggle();
     reset();
+  };
+
+
+  const renderListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ParentsType
+  ) => {
+    const user = findUserDataById(option.userId);
+    return (
+      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {option.userId ? (
+            <Avatar
+              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(
+                `${option.firstName} ${option.lastName}`
+              )}
+            </CustomAvatar>
+          )}
+
+          <Typography sx={{ fontSize: "0.875rem" }}>
+            {option.firstName} {option.lastName}
+          </Typography>
+        </Box>
+      </ListItem>
+    );
   };
 
   return (
@@ -167,7 +235,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
         </IconButton>
       </Header>
       <Box sx={{ p: 5 }}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit as any)}>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="firstName"
@@ -281,6 +349,43 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               </FormHelperText>
             )}
           </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="parent"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <Autocomplete
+                  id="administrator-user-autocomplete"
+                  options={parentStore.data}
+                  getOptionLabel={(option) =>
+                    `${option.firstName} ${option.lastName}`
+                  }
+                  value={
+                    value
+                      ? parentStore.data.find((user) => user.id === Number(value))
+                      : null
+                  }
+                  onChange={(event, newValue) => {
+                    onChange(newValue?.id || null);
+                  }}
+                  renderOption={(props, option) =>
+                    renderListItem(props, option)
+                  }
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Parent"
+                      error={Boolean(errors.parent)}
+                      helperText={
+                        errors.parent ? errors.parent.message : ""
+                      }
+                    />
+                  )}
+                />
+              )}
+            />
+          </FormControl>
           <FormControlLabel
             control={
               <Controller
@@ -391,12 +496,17 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           )}
           {/**************  END CREATE ACCOUNT ***************/}
 
-          <Box sx={{ display: "flex", alignItems: "center"}} mt={5}  >
+          <Box sx={{ display: "flex", alignItems: "center" }} mt={5}>
             <Button
               size="large"
               type="submit"
               variant="contained"
-              sx={{ mr: 3,  display: "flex", alignItems: "center", width: "100%"}}
+              sx={{
+                mr: 3,
+                display: "flex",
+                alignItems: "center",
+                width: "100%",
+              }}
             >
               Soumettre
             </Button>
@@ -404,7 +514,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               size="large"
               variant="outlined"
               color="secondary"
-              sx={{ display: "flex", alignItems: "center", width: "100%"}}
+              sx={{ display: "flex", alignItems: "center", width: "100%" }}
               onClick={handleClose}
             >
               Annuler

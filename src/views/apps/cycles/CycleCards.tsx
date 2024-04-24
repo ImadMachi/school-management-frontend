@@ -9,27 +9,15 @@ import Link from "@mui/material/Link";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import FormControl from "@mui/material/FormControl";
-import DialogTitle from "@mui/material/DialogTitle";
 import CardContent from "@mui/material/CardContent";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import TableContainer from "@mui/material/TableContainer";
-import FormControlLabel from "@mui/material/FormControlLabel";
 
 // ** Icon Imports
-import Icon from "src/@core/components/icon";
 import { fetchData } from "src/store/apps/cycles";
 import { useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "src/store";
 import { useSelector } from "react-redux";
 import SidebarAddCycle from "./AddCycleDrawrer";
 import { CycleType } from "src/types/apps/cycleTypes";
-
-interface CardDataType {
-  title: string;
-  totalStudents: number;
-}
 
 const rolesArr: string[] = [
   "User Management",
@@ -98,9 +86,6 @@ const CycleCards = () => {
                   Modifier le Cycle
                 </Typography>
               </Box>
-              <IconButton sx={{ color: "text.secondary" }}>
-                <Typography variant="body2">{item.schoolYear}</Typography>
-              </IconButton>
             </Box>
           </CardContent>
         </Card>

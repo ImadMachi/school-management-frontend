@@ -1,5 +1,5 @@
 // ** React Imports
-import { HTMLAttributes, useEffect, useState } from "react";
+import { HTMLAttributes, useEffect } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -16,7 +16,7 @@ import CustomAvatar from "src/@core/components/mui/avatar";
 // ** Third Party Imports
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
@@ -26,24 +26,14 @@ import { useDispatch } from "react-redux";
 
 // ** Types Imports
 import { AppDispatch, RootState } from "src/store";
-import {
-  Autocomplete,
-  Checkbox,
-  Chip,
-  FormControlLabel,
-  Input,
-  InputLabel,
-  List,
-  ListItem,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { Autocomplete, Chip, List, ListItem } from "@mui/material";
 import { useSelector } from "react-redux";
-import { fetchData as fetchClasses } from "src/store/apps/classes";
+import cycles, { fetchData as fetchCycles } from "src/store/apps/cycles";
 import { getInitials } from "src/@core/utils/get-initials";
 import { addLevel, deleteLevel, editLevel } from "src/store/apps/levels";
 import { LevelType } from "src/types/apps/levelTypes";
 import { ClassType } from "src/types/apps/classTypes";
+import { CycleType } from "src/types/apps/cycleTypes";
 
 interface SidebarAddLevelType {
   open: boolean;
@@ -53,16 +43,12 @@ interface SidebarAddLevelType {
 
 export interface CreateLevelDto {
   name: string;
-  schoolYear: string;
-  classes: number;
+  cycle: number;
 }
-
-type SelectType = ClassType;
 
 const defaultValues = {
   name: "",
-  schoolYear: "",
-  classes: [] as ClassType[],
+  cycle: "",
 };
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -76,26 +62,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const schema = yup.object().shape({
   id: yup.number(),
   name: yup.string().required("Nom de niveau est requis"),
-  schoolYear: yup
-    .string()
-    .required("Année scolaire est requise")
-    .matches(
-      /^[0-9]{4}-[0-9]{4}$/,
-      "Année scolaire doit être au format 'YYYY-YYYY'"
-    )
-    .test(
-      "is-valid",
-      "Année fin doit être supérieure à l'année de début ",
-      (value) => {
-        if (value) {
-          const [start, end] = value.split("-").map((v) => parseInt(v));
-          return end - start == 1;
-        }
-        return false;
-      }
-    ),
-
-  classes: yup.array().min(1, "Au moins un classe est requis"),
+  cycle: yup.number().required("Cycle est requis"),
 });
 
 const SidebarAddLevel = (props: SidebarAddLevelType) => {
@@ -107,7 +74,7 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
 
   // ** Store
 
-  const classStore = useSelector((state: RootState) => state.classes);
+  const cycleStore = useSelector((state: RootState) => state.cycles);
 
   const {
     reset,
@@ -125,8 +92,7 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
   useEffect(() => {
     if (props.levelToEdit) {
       setValue("name", props.levelToEdit.name);
-      setValue("schoolYear", props.levelToEdit.schoolYear);
-      setValue("classes", props.levelToEdit.classes);
+      setValue("cycle", props.levelToEdit.cycle.id.toString());
     }
     return () => {
       reset();
@@ -134,14 +100,15 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
   }, [props.open]);
 
   useEffect(() => {
-    dispatch(fetchClasses() as any);
+    dispatch(fetchCycles() as any);
   }, []);
 
   const onSubmit = (data: any) => {
     const payload = {
       ...data,
-      administrator: { id: data.administrator },
+      cycle: { id: data.cycle },
     };
+
     if (props.levelToEdit) {
       dispatch(editLevel({ ...payload, id: props.levelToEdit.id }) as any);
     } else {
@@ -164,79 +131,17 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
     }
   };
 
-  const renderUserListItem = (
+  const renderListItem = (
     props: HTMLAttributes<HTMLLIElement>,
-    option: SelectType,
-    array: SelectType[],
-    onChange: (...event: any[]) => void
+    option: CycleType
   ) => {
     return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => {
-          onChange({ target: { value: [...array, option] } });
-        }}
-      >
+      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(`${option.name}`)}
-          </CustomAvatar>
           <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
         </Box>
       </ListItem>
     );
-  };
-
-  const renderCustomChips = (
-    array: SelectType[],
-    getTagProps: ({ index }: { index: number }) => {},
-    state: SelectType[],
-    onChange: (...event: any[]) => void
-  ) => {
-    return state.map((item, index) => (
-      <Chip
-        size="small"
-        key={item.id}
-        label={`${item.name}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        //@ts-ignore
-        onDelete={() => handleDeleteChipItem(item.id, state, onChange)}
-      />
-    ));
-  };
-
-  const handleDeleteChipItem = (
-    value: number,
-    state: SelectType[],
-    setState: (val: SelectType[]) => void
-  ) => {
-    const arr = state;
-    const index = arr.findIndex((i) => i.id === value);
-    arr.splice(index, 1);
-    setState([...arr]);
-  };
-
-  const filterOptions = (
-    options: SelectType[],
-    params: any,
-    value: SelectType[]
-  ): SelectType[] => {
-    const { inputValue } = params;
-
-    const filteredOptions = options
-      .filter((option) =>
-        `${option.name}`.toLowerCase().includes(inputValue.toLowerCase())
-      )
-      .filter((option) => !value.find((item) => item.id === option.id));
-
-    // @ts-ignore
-    return filteredOptions;
   };
 
   return (
@@ -282,71 +187,40 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
               </FormHelperText>
             )}
           </FormControl>
-
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="schoolYear"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  value={value}
-                  label="Année scolaire"
-                  onChange={onChange}
-                  placeholder={`${new Date().getFullYear()}-${
-                    new Date().getFullYear() + 1
-                  }`}
-                  error={Boolean(errors.schoolYear)}
-                />
-              )}
-            />
-            {errors.schoolYear && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.schoolYear.message}
-              </FormHelperText>
-            )}
-          </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="classes"
+              name="cycle"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <Autocomplete
-                  multiple
-                  freeSolo
-                  value={value}
-                  clearIcon={false}
-                  id="teachers-select"
-                  filterSelectedOptions
-                  options={classStore.data}
-                  ListboxComponent={List}
-                  //@ts-ignore
-                  filterOptions={(options, params) =>
-                    filterOptions(options, params, value)
+                  id="cycle-autocomplete"
+                  options={cycleStore.data}
+                  getOptionLabel={(option) => `${option.name}`}
+                  value={
+                    value
+                      ? cycleStore.data.find(
+                          (cycle) => cycle.id === Number(value)
+                        )
+                      : null
                   }
-                  getOptionLabel={(option) => `${(option as SelectType).name}`}
-                  renderOption={(props, option) =>
-                    renderUserListItem(props, option, value, onChange)
-                  }
-                  renderTags={(array: SelectType[], getTagProps) =>
-                    renderCustomChips(array, getTagProps, value, onChange)
-                  }
-                  sx={{
-                    "& .MuiOutlinedInput-root": { p: 2 },
-                    "& .MuiSelect-selectMenu": { minHeight: "auto" },
+                  onChange={(event, newValue) => {
+                    onChange(newValue?.id || null);
                   }}
+                  renderOption={(props, option) =>
+                    renderListItem(props, option)
+                  }
                   renderInput={(params) => (
-                    <TextField {...params} label="Classes" />
+                    <TextField
+                      {...params}
+                      label="Cycle"
+                      error={Boolean(errors.cycle)}
+                      helperText={errors.cycle ? errors.cycle.message : ""}
+                    />
                   )}
                 />
               )}
             />
-            {errors.classes && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.classes.message}
-              </FormHelperText>
-            )}
           </FormControl>
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button

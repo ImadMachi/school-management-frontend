@@ -8,12 +8,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
     "start-watch": "WATCHPACK_POLLING=true next start",
     "export": "next export",
     "build:icons": "tsc -b src/iconify-bundle && node src/iconify-bundle/bundle-icons-react.js",
     "list-vscode-extensions": "code --list-extensions > extensions.txt",
-    "install-vscode-extensions": "while read extension; do code --install-extension \"$extension\"; done < extensions.txt"
+    "install-vscode-extensions": "while read extension; do code --install-extension \"$extension\"; done < extensions.txt",
+    "force-install": "rm -rf node_modules && npm install --force"
   },
   "dependencies": {
     "@casl/ability": "6.3.2",

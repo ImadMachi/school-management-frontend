@@ -686,7 +686,6 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const userStore = useSelector((state: RootState) => state.users);
-  const activeUsers = userStore.data.filter((user) => !user.disabled);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -723,7 +722,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={activeUsers} // Use filtered active users
+            rows={userStore.data} 
             columns={columns}
             checkboxSelection
             pageSize={pageSize}

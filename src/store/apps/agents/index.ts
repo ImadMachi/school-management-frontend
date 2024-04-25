@@ -11,6 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateAgentDto } from "src/pages/apps/agents/overview/[...params]";
 import { AgentsType } from "src/types/apps/agentTypes";
+import { CreateAgentAccountDto } from "src/views/apps/agents/list/AddAgentAccountDrawer";
 import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
 
 const HOST = process.env.NEXT_PUBLIC_API_URL;
@@ -32,9 +33,8 @@ interface Redux {
 // ** Fetch addAgents
 export const fetchData = createAsyncThunk("appAgents/fetchData", async () => {
   const response = await axios.get(`${HOST}/agents`);
-  console.log(response.data)
+  console.log(response.data);
   return response.data;
-  
 });
 
 export const fetchAgent = createAsyncThunk(
@@ -77,6 +77,28 @@ export const addAgent = createAsyncThunk(
   }
 );
 
+export const addAgentAccount = createAsyncThunk(
+  "appAgents/addAgentAccount",
+  async (
+    payload: { id: number; data: CreateAgentAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/agents/${id}/create-account`,
+      formData
+    );
+    console.log(response.data);
+    return response.data;
+  }
+);
+
 export const updateAgent = createAsyncThunk(
   "appAgents/updateAgent",
   async (
@@ -84,10 +106,7 @@ export const updateAgent = createAsyncThunk(
     { getState, dispatch }: Redux
   ) => {
     const { id, updateAgentDto } = payload;
-    const response = await axios.patch(
-      `${HOST}/agents/${id}`,
-      updateAgentDto
-    );
+    const response = await axios.patch(`${HOST}/agents/${id}`, updateAgentDto);
     return response.data;
   }
 );

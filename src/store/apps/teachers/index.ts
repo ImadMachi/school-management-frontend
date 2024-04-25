@@ -7,8 +7,9 @@ import {
 
 import axios from "axios";
 import toast from "react-hot-toast";
-import { UpdateTeacherDto } from "src/pages/apps/enseignants/overview/[folder]";
+import { UpdateTeacherDto } from "src/pages/apps/enseignants/overview/[...params]";
 import { TeachersType } from "src/types/apps/teacherTypes";
+import { CreateTeacherAccountDto } from "src/views/apps/teacher/list/AddTeacherAccountDrawer";
 import { CreateTeacherDto } from "src/views/apps/teacher/list/AddTeacherDrawer";
 
 const HOST = process.env.NEXT_PUBLIC_API_URL;
@@ -100,6 +101,29 @@ export const addTeacher = createAsyncThunk(
   }
 );
 
+export const addTeacherAccount = createAsyncThunk(
+  "appAd/addAdministratorAccount",
+  async (
+    payload: { id: number; data: CreateTeacherAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/teachers/${id}/create-account`,
+      formData
+    );
+    console.log(response.data);
+    return response.data;
+  }
+);
+
+
 export const deleteTeacher = createAsyncThunk(
   "appTeachers/deleteTeachers",
   async (id: number, { getState, dispatch }: Redux) => {
@@ -177,6 +201,22 @@ export const appTeachersSlice = createSlice({
       state.allData.unshift(action.payload);
       toast.success("L'enseignant a été ajouté avec succès");
     });
+    builder.addCase(addTeacherAccount.fulfilled, (state, action) => {
+      const updatedTeacher = action.payload;
+      const index = state.allData.findIndex(
+        (administrator) => administrator.id === updatedTeacher.id
+      );
+
+      if (index !== -1) {
+        state.data[index] = updatedTeacher;
+        state.allData[index] = updatedTeacher;
+        toast.success("Le compte a été créé avec succès");
+      }
+    });
+    builder.addCase(addTeacherAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le compte");
+    });
+    
     builder.addCase(deleteTeacher.rejected, (state, action) => {
       toast.error("Erreur supprimant l'enseignant");
     });

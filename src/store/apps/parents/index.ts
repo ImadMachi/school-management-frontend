@@ -9,9 +9,10 @@ import {
 // ** Axios Imports
 import axios from "axios";
 import toast from "react-hot-toast";
-import { UpdateParentDto } from "src/pages/apps/parents/overview/[folder]";
+import { UpdateParentDto } from "src/pages/apps/parents/overview/[...params]";
 import { ParentsType } from "src/types/apps/parentTypes";
 import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
+import { CreateParentAccountDto } from "src/views/apps/parents/list/AddParentAccountDrawer";
 
 const HOST = process.env.NEXT_PUBLIC_API_URL;
 
@@ -68,6 +69,28 @@ export const addParent = createAsyncThunk(
     }
     const response = await axios.post(
       `${HOST}/parents?create-account=${data.createAccount}`,
+      formData
+    );
+    console.log(response.data);
+    return response.data;
+  }
+);
+
+export const addParentAccount = createAsyncThunk(
+  "appParents/addParentAccount",
+  async (
+    payload: { id: number; data: CreateParentAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/parents/${id}/create-account`,
       formData
     );
     console.log(response.data);
@@ -173,11 +196,22 @@ export const appParentsSlice = createSlice({
     builder.addCase(addParent.rejected, (state, action) => {
       toast.error("Erreur ajoutant le parent");
     });
-
+    builder.addCase(addParentAccount.fulfilled, (state, action) => {
+      const userIdToDelete = action.payload.id;
+      state.data = state.data.filter((Parent) => Parent.id !== userIdToDelete);
+      state.allData = state.allData.filter(
+        (Parent) => Parent.id !== userIdToDelete
+      );
+      state.data.unshift(action.payload);
+      state.allData.unshift(action.payload);
+      toast.success("Le parent a été ajouté avec succès");
+    });
+    builder.addCase(addParentAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le parent");
+    });
     builder.addCase(fetchParent.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
-      // Filter out the existing user data with the same ID
       state.data = state.data.filter((Parent) => Parent.id !== userIdToDelete);
       state.allData = state.allData.filter(
         (Parent) => Parent.id !== userIdToDelete

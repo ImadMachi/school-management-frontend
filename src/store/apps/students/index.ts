@@ -11,6 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateStudentDto } from "src/pages/apps/eleves/overview/[...params]";
 import { StudentsType } from "src/types/apps/studentTypes";
+import { CreateStudentAccountDto } from "src/views/apps/student/list/AddStudentAccountDrawer";
 import { CreateStudentDto } from "src/views/apps/student/list/AddStudentDrawer";
 
 const HOST = process.env.NEXT_PUBLIC_API_URL;
@@ -74,6 +75,28 @@ export const addStudent = createAsyncThunk(
     return response.data;
   }
 );
+export const addStudentAccount = createAsyncThunk(
+  "appStudents/addStudentAccount",
+  async (
+    payload: { id: number; data: CreateStudentAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/students/${id}/create-account`,
+      formData
+    );
+    console.log(response.data);
+    return response.data;
+  }
+);
+
 
 export const updateStudent = createAsyncThunk(
   "appStudents/updateStudent",
@@ -176,6 +199,19 @@ export const appStudentsSlice = createSlice({
     builder.addCase(addStudent.rejected, (state, action) => {
       toast.error("Erreur ajoutant l'élève");
     });
+    builder.addCase(addStudentAccount.fulfilled, (state, action) => {
+      const userIdToDelete = action.payload.id;
+      state.data = state.data.filter((student) => student.id !== userIdToDelete);
+      state.allData = state.allData.filter(
+        (Parent) => Parent.id !== userIdToDelete
+      );
+      state.data.unshift(action.payload);
+      state.allData.unshift(action.payload);
+      toast.success("L'élève a été ajouté avec succès");
+    });
+    builder.addCase(addStudentAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant l'élève");
+    });
     builder.addCase(fetchStudent.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
@@ -199,7 +235,6 @@ export const appStudentsSlice = createSlice({
       );
 
       if (index !== -1) {
-        // If the administrator is found, update the data in both data and allData arrays
         state.data[index] = updatedStudent;
         state.allData[index] = updatedStudent;
         toast.success("L'élève a été modifié avec succès");

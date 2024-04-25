@@ -49,6 +49,8 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { fetchUserById } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
+import SidebarAddStudentAccount from "src/views/apps/student/list/AddStudentAccountDrawer";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: StudentsType;
@@ -92,6 +94,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isAddStudentOpen, setIsAddStudentOpen] = useState(false);
+  const [modifyClicked, setModifyClicked] = useState<boolean>(false);
 
   const rowOptionsOpen = Boolean(anchorEl);
 
@@ -101,6 +105,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     console.log("id", id);
     console.log("userId", userId);
     setAnchorEl(event.currentTarget);
+    setModifyClicked(false);
   };
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
@@ -109,6 +114,15 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleDelete = () => {
     dispatch(deleteStudent(id) as any);
     handleRowOptionsClose();
+  };
+
+  const handleModifyClick = () => {
+    if (userId) {
+      toast.error("Cet utilisateur a déjà un compte.");
+    } else {
+      setIsAddStudentOpen(true);
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -140,15 +154,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Modifier
-        </MenuItem> */}
+        <MenuItem onClick={handleModifyClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Créer le compte
+        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
         </MenuItem>
       </Menu>
+      {isAddStudentOpen && (
+        <SidebarAddStudentAccount
+          id={id}
+          open={isAddStudentOpen}
+          toggle={() => setIsAddStudentOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -259,7 +280,9 @@ const columns = [
     field: "parent",
     headerName: "Parent",
     renderCell: ({ row }: CellType) => (
-      <Typography noWrap>{row.parent?.firstName || "-"} {row.parent?.lastName || "-"}</Typography>
+      <Typography noWrap>
+        {row.parent?.firstName || "-"} {row.parent?.lastName || "-"}
+      </Typography>
     ),
   },
   {
@@ -302,7 +325,6 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const studentStore = useSelector((state: RootState) => state.students);
-  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -315,17 +337,6 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
-
-  const filteredData = studentStore.data.filter((student) => {
-    if (student.userId) {
-      const associatedUser = userStore.data.find(
-        (user) => user.id === student.userId
-      );
-      return !associatedUser || !associatedUser.disabled;
-    }
-    return true;
-  });
 
   const generateCSVData = () => {
     return studentStore.allData.map((item) => ({
@@ -352,7 +363,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={filteredData}
+            rows={studentStore.data}
             columns={columns}
             checkboxSelection
             pageSize={pageSize}

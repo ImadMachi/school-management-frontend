@@ -14,6 +14,7 @@ import { CreateDirectorDto } from "src/views/apps/directors/list/AddDirectorDraw
 import { UpdateDirectorDto } from "src/pages/apps/directeurs/overview/[...params]";
 import toast from "react-hot-toast";
 import { t } from "i18next";
+import { CreateDirectorAccountDto } from "src/views/apps/directors/list/AddDirectorAccountDrawer";
 
 interface Params {
   q: string;
@@ -78,6 +79,29 @@ export const addDirector = createAsyncThunk(
     return response.data;
   }
 );
+
+export const addDirectorAccount = createAsyncThunk(
+  "appDirectors/addDirectorAccount",
+  async (
+    payload: { id: number; data: CreateDirectorAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/directors/${id}/create-account`,
+      formData
+    );
+    console.log(response.data);
+    return response.data;
+  }
+);
+
 // ** Delete Director
 interface DeleteProps {
   id: number;
@@ -176,10 +200,23 @@ export const appDirectorsSlice = createSlice({
     builder.addCase(addDirector.rejected, (state, action) => {
       toast.error("Erreur ajoutant le directeur");
     });
+    builder.addCase(addDirectorAccount.fulfilled, (state, action) => {
+      const updatedDirector = action.payload;
+      const index = state.allData.findIndex(
+        (Director) => Director.id === updatedDirector.id
+      );
+
+      if (index !== -1) {
+        state.data[index] = updatedDirector;
+        state.allData[index] = updatedDirector;
+        toast.success("Le compte du directeur a été créé avec succès");
+      }
+    });
+    builder.addCase(addDirectorAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le compte du directeur");
+    });
     builder.addCase(fetchDirector.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
-
-      // Filter out the existing user data with the same ID
       state.data = state.data.filter(
         (Director) => Director.id !== userIdToDelete
       );
@@ -187,7 +224,6 @@ export const appDirectorsSlice = createSlice({
         (Director) => Director.id !== userIdToDelete
       );
 
-      // Add the updated user data to the beginning of the arrays
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });

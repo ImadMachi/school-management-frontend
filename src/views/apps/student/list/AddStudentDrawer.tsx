@@ -173,7 +173,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     reset();
   };
 
-
   useEffect(() => {
     dispatch(fetchStudents() as any);
   }, []);
@@ -187,31 +186,33 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     option: ParentsType
   ) => {
     const user = findUserDataById(option.userId);
-    return (
-      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.userId ? (
-            <Avatar
-              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-              src={`http://localhost:8000/uploads/${user?.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.firstName} ${option.lastName}`)}
-            </CustomAvatar>
-          )}
+    if (user?.disabled === false || option.userId===null) {
+      return (
+        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {option.userId ? (
+              <Avatar
+                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+                src={`http://localhost:8000/uploads/${user?.profileImage}`}
+                sx={{ width: 30, height: 30, marginRight: "10px" }}
+              />
+            ) : (
+              <CustomAvatar
+                skin="light"
+                color="primary"
+                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+              >
+                {getInitials(`${option.firstName} ${option.lastName}`)}
+              </CustomAvatar>
+            )}
 
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.firstName} {option.lastName}
-          </Typography>
-        </Box>
-      </ListItem>
-    );
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.firstName} {option.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
   };
 
   return (
@@ -377,7 +378,9 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                       helperText={errors.parent ? errors.parent.message : ""}
                     />
                   )}
-                  renderOption={(props, option) => renderListItem(props, option)} 
+                  renderOption={(props, option) =>
+                    renderListItem(props, option)
+                  }
                 />
               )}
             />

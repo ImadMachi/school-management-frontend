@@ -247,7 +247,7 @@ const columns = [
     minWidth: 160,
     sortable: false,
     field: "identification",
-    headerName: "Identifient",
+    headerName: "CNE",
     renderCell: ({ row }: CellType) => (
       <Typography noWrap>{row.identification || "-"}</Typography>
     ),

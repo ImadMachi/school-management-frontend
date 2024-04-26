@@ -195,6 +195,22 @@ export const appAgentsSlice = createSlice({
       toast.error("Erreur ajoutant l'agent");
     });
 
+    builder.addCase(addAgentAccount.fulfilled, (state, action) => {
+      const updatedAgent = action.payload;
+      const index = state.allData.findIndex(
+        (agent) => agent.id === updatedAgent.id
+      );
+
+      if (index !== -1) {
+        state.data[index] = updatedAgent;
+        state.allData[index] = updatedAgent;
+        toast.success("Le compte a été créé avec succès");
+      }
+    });
+    builder.addCase(addAgentAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le compte");
+    });
+
     builder.addCase(fetchAgent.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 

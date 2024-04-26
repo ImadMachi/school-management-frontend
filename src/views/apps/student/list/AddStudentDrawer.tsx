@@ -286,7 +286,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label="Identifient"
+                  label="CNE"
                   onChange={onChange}
                   placeholder="Doe"
                   error={Boolean(errors.identification)}

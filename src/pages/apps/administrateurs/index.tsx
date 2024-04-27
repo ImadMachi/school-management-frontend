@@ -31,6 +31,7 @@ import {
   fetchData,
   deleteAdministrator,
   filterData,
+  updateAdministratorStatus,
 } from "src/store/apps/administrator";
 
 import { setAdministratorId } from "src/store/apps/administrator";
@@ -99,11 +100,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    // @ts-ignore
-    dispatch(deleteAdministrator(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   // @ts-ignore
+  //   dispatch(deleteAdministrator(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateAdministratorStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
+
   const handleModifyClick = () => {
     if (userId) {
       toast.error("Cet utilisateur a déjà un compte.");

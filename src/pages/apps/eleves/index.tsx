@@ -37,6 +37,7 @@ import {
   filterData,
   setStudentId,
   setStudentUserId,
+  updateStudentStatus,
 } from "src/store/apps/students";
 // ** Types Imports
 import { StudentsType } from "src/types/apps/studentTypes";
@@ -109,9 +110,19 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteStudent(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteStudent(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateStudentStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
 
   const handleModifyClick = () => {

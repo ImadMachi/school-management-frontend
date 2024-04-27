@@ -38,6 +38,7 @@ import {
   filterData,
   setParentId,
   setParentUserId,
+  updateParentStatus,
 } from "src/store/apps/parents";
 // ** Types Imports
 import { ParentsType } from "src/types/apps/parentTypes";
@@ -109,9 +110,19 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteParent(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteParent(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateParentStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
 
   const handleModifyClick = () => {
@@ -245,7 +256,7 @@ const columns = [
     headerName: "Éléves",
     field: "éléves",
     renderCell: ({ row }: CellType) => {
-      const students = row.students || []; 
+      const students = row.students || [];
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box
@@ -256,7 +267,7 @@ const columns = [
             }}
           >
             <Typography noWrap>
-              {students.length 
+              {students.length
                 ? students.map((user, index) => (
                     <span key={user.id}>
                       {user.firstName ?? "non spécifié"}
@@ -335,7 +346,6 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
 
   const generateCSVData = () => {
     return parentStore.data.map((item) => ({

@@ -112,6 +112,23 @@ export const updateParent = createAsyncThunk(
   }
 );
 
+export const updateParentStatus = createAsyncThunk(
+  "appParents/updateParentStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<ParentsType>(
+        `${HOST}/parents/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
 // ** Delete addParent
 interface DeleteProps {
   id: number;
@@ -236,6 +253,12 @@ export const appParentsSlice = createSlice({
     });
     builder.addCase(updateParent.rejected, (state, action) => {
       toast.error("Erreur modifiant le parent");
+    });
+    builder.addCase(updateParentStatus.fulfilled, (state, action) => {
+      toast.success("Le parent a été supprimé avec succès");
+    });
+    builder.addCase(updateParentStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant le parent");
     });
   },
 });

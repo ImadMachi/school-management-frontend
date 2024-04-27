@@ -96,7 +96,6 @@ export const addStudentAccount = createAsyncThunk(
   }
 );
 
-
 export const updateStudent = createAsyncThunk(
   "appStudents/updateStudent",
   async (
@@ -111,7 +110,22 @@ export const updateStudent = createAsyncThunk(
     return response.data;
   }
 );
-
+export const updateStudentStatus = createAsyncThunk(
+  "appStudents/updateStudentStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<StudentsType>(
+        `${HOST}/students/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
 // ** Delete addStudent
 interface DeleteProps {
   id: number;
@@ -200,7 +214,9 @@ export const appStudentsSlice = createSlice({
     });
     builder.addCase(addStudentAccount.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
-      state.data = state.data.filter((student) => student.id !== userIdToDelete);
+      state.data = state.data.filter(
+        (student) => student.id !== userIdToDelete
+      );
       state.allData = state.allData.filter(
         (Parent) => Parent.id !== userIdToDelete
       );
@@ -241,6 +257,12 @@ export const appStudentsSlice = createSlice({
     });
     builder.addCase(updateStudent.rejected, (state, action) => {
       toast.error("Erreur modifiant l'élève");
+    });
+    builder.addCase(updateStudentStatus.fulfilled, (state, action) => {
+      toast.success("L'élève a été supprimé avec succès");
+    });
+    builder.addCase(updateStudentStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'élève");
     });
   },
 });

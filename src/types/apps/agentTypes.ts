@@ -3,6 +3,7 @@ export type AgentsType = {
     firstName: string
     lastName: string
     phoneNumber: string
+    disabled: boolean;
     userId: number
   }
   

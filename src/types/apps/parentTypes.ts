@@ -5,6 +5,7 @@ export type ParentsType = {
     firstName: string;
     lastName: string;
     phoneNumber: string;
+    disabled: boolean;
     students : StudentsType[];
     userId: number;
   }

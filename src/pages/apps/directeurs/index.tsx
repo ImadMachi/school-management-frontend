@@ -31,6 +31,7 @@ import {
   fetchData,
   deleteDirector,
   filterData,
+  updateDirectorStatus,
 } from "src/store/apps/directors";
 
 import { setDirectorId, setDirectorUserId } from "src/store/apps/directors";
@@ -112,11 +113,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    // @ts-ignore
-    dispatch(deleteDirector(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteDirector(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateDirectorStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
+
+  
 
   const handleModifyClick = () => {
     if (userId) {

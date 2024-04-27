@@ -36,6 +36,7 @@ import {
   filterData,
   setTeacherId,
   setTeacherUserId,
+  updateTeacherStatus,
 } from "src/store/apps/teachers";
 
 // ** Types Imports
@@ -108,9 +109,19 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteTeacher(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteTeacher(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateTeacherStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
 
   const handleModifyClick = () => {

@@ -7,5 +7,6 @@ export type TeachersType = {
   dateOfBirth: Date
   dateOfEmployment: Date
   sex: string
+  disabled: boolean;
   userId: number
 }

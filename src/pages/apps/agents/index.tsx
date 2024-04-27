@@ -38,6 +38,7 @@ import {
   filterData,
   setAgentId,
   setAgentUserId,
+  updateAgentStatus,
 } from "src/store/apps/agents";
 // ** Types Imports
 import { AgentsType } from "src/types/apps/agentTypes";
@@ -111,10 +112,21 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteAgent(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteAgent(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateAgentStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
+
   const handleModifyClick = () => {
     if (userId) {
       toast.error("Cet utilisateur a déjà un compte.");

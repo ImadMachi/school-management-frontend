@@ -49,6 +49,9 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { fetchUserById } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
+import SidebarAddAdministrator from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
+import toast from "react-hot-toast";
+import SidebarAddAdministratorAccount from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
 
 interface CellType {
   row: AdministratorType;
@@ -78,20 +81,20 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
+  // ** State
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [modifyClicked, setModifyClicked] = useState<boolean>(false);
+  const [isAddAdministratorOpen, setIsAddAdministratorOpen] = useState(false);
+
+  const rowOptionsOpen = Boolean(anchorEl);
+
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setAdministratorId(id));
     dispatch(setAdministratorUserId(userId));
     setAnchorEl(event.currentTarget);
+    setModifyClicked(false);
   };
 
-  // ** State
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const rowOptionsOpen = Boolean(anchorEl);
-
-  // const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
-  //   setAnchorEl(event.currentTarget)
-  // }
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
   };
@@ -100,6 +103,14 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     // @ts-ignore
     dispatch(deleteAdministrator(id) as any);
     handleRowOptionsClose();
+  };
+  const handleModifyClick = () => {
+    if (userId) {
+      toast.error("Cet utilisateur a déjà un compte.");
+    } else {
+      setIsAddAdministratorOpen(true);
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -131,15 +142,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Modifier
-        </MenuItem> */}
+        <MenuItem onClick={handleModifyClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Créer le compte
+        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
         </MenuItem>
       </Menu>
+      {isAddAdministratorOpen && (
+        <SidebarAddAdministratorAccount
+          id={id}
+          open={isAddAdministratorOpen}
+          toggle={() => setIsAddAdministratorOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -265,8 +283,6 @@ const AdministratorList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
-  const userStore = useSelector((state: RootState) => state.users);
-
   const administratorStore = useSelector(
     (state: RootState) => state.administrator
   );
@@ -282,16 +298,6 @@ const AdministratorList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
-  const filteredData = administratorStore.data.filter((admin) => {
-    if (admin.userId) {
-      const associatedUser = userStore.data.find(
-        (user) => user.id === admin.userId
-      );
-      return !associatedUser || !associatedUser.disabled;
-    }
-    return true;
-  });
 
   const generateCSVData = () => {
     return administratorStore.allData.map((item) => ({
@@ -316,7 +322,7 @@ const AdministratorList = () => {
           />
           <DataGrid
             autoHeight
-            rows={filteredData}
+            rows={administratorStore.data}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

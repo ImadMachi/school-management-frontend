@@ -45,10 +45,12 @@ import { ParentsType } from "src/types/apps/parentTypes";
 import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/parents/list/TableHeader";
 import SidebarAddParent from "src/views/apps/parents/list/AddParentDrawer";
+import SidebarAddParentAcount from "src/views/apps/parents/list/AddParentAccountDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
 import { Avatar } from "@mui/material";
 import { ro } from "date-fns/locale";
 import { UserType } from "src/types/apps/UserType";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: ParentsType;
@@ -92,6 +94,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [modifyClicked, setModifyClicked] = useState<boolean>(false);
+  const [isAddParentOpen, setIsAddParentOpen] = useState(false);
 
   const rowOptionsOpen = Boolean(anchorEl);
 
@@ -99,6 +103,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setParentId(id));
     dispatch(setParentUserId(userId));
     setAnchorEl(event.currentTarget);
+    setModifyClicked(false);
   };
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
@@ -107,6 +112,15 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleDelete = () => {
     dispatch(deleteParent(id) as any);
     handleRowOptionsClose();
+  };
+
+  const handleModifyClick = () => {
+    if (userId) {
+      toast.error("Cet utilisateur a déjà un compte.");
+    } else {
+      setIsAddParentOpen(true);
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -138,15 +152,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Modifier
-        </MenuItem> */}
+        <MenuItem onClick={handleModifyClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Créer le compte
+        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
         </MenuItem>
       </Menu>
+      {isAddParentOpen && (
+        <SidebarAddParentAcount
+          id={id}
+          open={isAddParentOpen}
+          toggle={() => setIsAddParentOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -224,7 +245,7 @@ const columns = [
     headerName: "Éléves",
     field: "éléves",
     renderCell: ({ row }: CellType) => {
-      const user = row.students;
+      const students = row.students || []; 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box
@@ -235,11 +256,11 @@ const columns = [
             }}
           >
             <Typography noWrap>
-              {row.students.length > 0
-                ? row.students.map((user, index) => (
+              {students.length 
+                ? students.map((user, index) => (
                     <span key={user.id}>
                       {user.firstName ?? "non spécifié"}
-                      {index !== row.students.length - 1 && "-"}
+                      {index !== students.length - 1 && "-"}
                     </span>
                   ))
                 : "- -"}
@@ -302,7 +323,6 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const parentStore = useSelector((state: RootState) => state.parents);
-  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -315,17 +335,6 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
-
-  const filteredData = parentStore.data.filter((parent) => {
-    if (parent.userId) {
-      const associatedUser = userStore.data.find(
-        (user) => user.id === parent.userId
-      );
-      return !associatedUser || !associatedUser.disabled;
-    }
-    return true;
-  });
 
 
   const generateCSVData = () => {
@@ -352,7 +361,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={filteredData}
+            rows={parentStore.data}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

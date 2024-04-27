@@ -48,6 +48,9 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { fetchUserById } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
+import { t } from "i18next";
+import SidebarAddTeacherAccount from "src/views/apps/teacher/list/AddTeacherAccountDrawer";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: TeachersType;
@@ -90,6 +93,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
+  const [modifyClicked, setModifyClicked] = useState<boolean>(false);
 
   const rowOptionsOpen = Boolean(anchorEl);
 
@@ -97,6 +102,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setTeacherId(id));
     dispatch(setTeacherUserId(userId));
     setAnchorEl(event.currentTarget);
+    setModifyClicked(false);
   };
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
@@ -105,6 +111,15 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleDelete = () => {
     dispatch(deleteTeacher(id) as any);
     handleRowOptionsClose();
+  };
+
+  const handleModifyClick = () => {
+    if (userId) {
+      toast.error("Cet utilisateur a déjà un compte.");
+    } else {
+      setIsAddTeacherOpen(true);
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -136,15 +151,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Modifier
-        </MenuItem> */}
+        <MenuItem onClick={handleModifyClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Créer le compte
+        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
         </MenuItem>
       </Menu>
+      {isAddTeacherOpen && (
+        <SidebarAddTeacherAccount
+          id={id}
+          open={isAddTeacherOpen}
+          toggle={() => setIsAddTeacherOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -303,7 +325,6 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const teacherStore = useSelector((state: RootState) => state.teachers);
-  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -316,17 +337,6 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
-
-  const filteredData = teacherStore.data.filter((teacher) => {
-    if (teacher.userId) {
-      const associatedUser = userStore.data.find(
-        (user) => user.id === teacher.userId
-      );
-      return !associatedUser || !associatedUser.disabled;
-    }
-    return true;
-  });
 
   const generateCSVData = () => {
     return teacherStore.allData.map((item) => ({
@@ -355,7 +365,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={filteredData}
+            rows={teacherStore.data}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

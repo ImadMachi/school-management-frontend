@@ -55,6 +55,8 @@ import {
 } from "src/store/apps/mail";
 import { Button } from "@mui/material";
 import { fr } from "date-fns/locale";
+import { useSelector } from "react-redux";
+import { RootState } from "src/store";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",

@@ -10,9 +10,10 @@ import {
 import axios from "axios";
 import { HOST } from "src/store/constants/hostname";
 import { AdministratorType } from "src/types/apps/administratorTypes";
-import { CreateAdministratorDto } from "src/views/apps/absents/list/AddAdministratorDrawer";
+import { CreateAdministratorDto } from "src/views/apps/administrators/list/AddAdministratorDrawer";
 import { UpdateAdministratorDto } from "src/pages/apps/administrateurs/overview/[...params]";
 import toast from "react-hot-toast";
+import { CreateAdministratorAccountDto } from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
 
 // Use Record to define the type with known keys
 
@@ -73,6 +74,28 @@ export const addAdministrator = createAsyncThunk(
       `${HOST}/administrators?create-account=${data.createAccount}`,
       formData
     );
+    return response.data;
+  }
+);
+
+export const addAdministratorAccount = createAsyncThunk(
+  "appAdministrators/addAdministratorAccount",
+  async (
+    payload: { id: number; data: CreateAdministratorAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/administrators/${id}/create-account`,
+      formData
+    );
+    console.log(response.data);
     return response.data;
   }
 );
@@ -175,6 +198,22 @@ export const appAdministratorsSlice = createSlice({
     });
     builder.addCase(addAdministrator.rejected, (state, action) => {
       toast.error("Erreur ajoutant la classe");
+    });
+
+    builder.addCase(addAdministratorAccount.fulfilled, (state, action) => {
+      const updatedAdministrator = action.payload;
+      const index = state.allData.findIndex(
+        (administrator) => administrator.id === updatedAdministrator.id
+      );
+
+      if (index !== -1) {
+        state.data[index] = updatedAdministrator;
+        state.allData[index] = updatedAdministrator;
+        toast.success("Le compte a été créé avec succès");
+      }
+    });
+    builder.addCase(addAdministratorAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le compte");
     });
 
     builder.addCase(fetchAdministrator.fulfilled, (state, action) => {

@@ -324,6 +324,20 @@ const RowOptions = ({ id }: { id: number }) => {
         console.error("Update Absent failed:", error);
       });
 
+    const recipients =
+      emailToTeachers.length > 0 ? emailToTeachers : emailToAgents;
+
+    if (title.trim() !== "" && body.trim() !== "") {
+      const mail = {
+        subject: title,
+        body: body,
+        recipients: recipients,
+        attachments: [],
+        category: 1,
+      };
+
+      dispatch(sendMail(mail) as any);
+    }
     handleEditClose();
     reset();
     dispatch(fetchData() as any);

@@ -11,6 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateAgentDto } from "src/pages/apps/agents/overview/[...params]";
 import { AgentsType } from "src/types/apps/agentTypes";
+import { CreateAgentAccountDto } from "src/views/apps/agents/list/AddAgentAccountDrawer";
 import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
 
 const HOST = process.env.NEXT_PUBLIC_API_URL;
@@ -70,6 +71,28 @@ export const addAgent = createAsyncThunk(
       `${HOST}/agents?create-account=${data.createAccount}`,
       formData
     );
+    return response.data;
+  }
+);
+
+export const addAgentAccount = createAsyncThunk(
+  "appAgents/addAgentAccount",
+  async (
+    payload: { id: number; data: CreateAgentAccountDto },
+    { getState, dispatch }: Redux
+  ) => {
+    const { id, data } = payload;
+    const formData = new FormData();
+
+    formData.append("email", data.email || "");
+    formData.append("password", data.password || "");
+    formData.append("profile-images", data.profileImage || "");
+
+    const response = await axios.post(
+      `${HOST}/agents/${id}/create-account`,
+      formData
+    );
+    console.log(response.data);
     return response.data;
   }
 );
@@ -168,6 +191,22 @@ export const appAgentsSlice = createSlice({
     });
     builder.addCase(addAgent.rejected, (state, action) => {
       toast.error("Erreur ajoutant l'agent");
+    });
+
+    builder.addCase(addAgentAccount.fulfilled, (state, action) => {
+      const updatedAgent = action.payload;
+      const index = state.allData.findIndex(
+        (agent) => agent.id === updatedAgent.id
+      );
+
+      if (index !== -1) {
+        state.data[index] = updatedAgent;
+        state.allData[index] = updatedAgent;
+        toast.success("Le compte a été créé avec succès");
+      }
+    });
+    builder.addCase(addAgentAccount.rejected, (state, action) => {
+      toast.error("Erreur ajoutant le compte");
     });
 
     builder.addCase(fetchAgent.fulfilled, (state, action) => {

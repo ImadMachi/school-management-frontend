@@ -47,6 +47,8 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { fetchUserById } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
+import SidebarAddDirectorAccount from "src/views/apps/directors/list/AddDirectorAccountDrawer";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: DirectorType;
@@ -89,20 +91,23 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
+  // ** State
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isAddDirectorOpen, setIsAddDirectorOpen] = useState<boolean>(false);
+  const [modifyClicked, setModifyClicked] = useState(false);
+
+  
+
+  const rowOptionsOpen = Boolean(anchorEl);
+
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
     dispatch(setDirectorId(id));
     dispatch(setDirectorUserId(userId));
     setAnchorEl(event.currentTarget);
+    setModifyClicked(false);
+
   };
 
-  // ** State
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  const rowOptionsOpen = Boolean(anchorEl);
-
-  // const handleRowOptionsClick = (event: MouseEvent<HTMLElement>) => {
-  //   setAnchorEl(event.currentTarget)
-  // }
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
   };
@@ -111,6 +116,15 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     // @ts-ignore
     dispatch(deleteDirector(id) as any);
     handleRowOptionsClose();
+  };
+
+  const handleModifyClick = () => {
+    if (userId) {
+      toast.error("Cet utilisateur a déjà un compte.");
+    } else {
+      setIsAddDirectorOpen(true);
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -142,15 +156,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Modifier
-        </MenuItem> */}
+        <MenuItem onClick={handleModifyClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Créer le compte
+        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
         </MenuItem>
       </Menu>
+      {isAddDirectorOpen && (
+        <SidebarAddDirectorAccount
+          id={id}
+          open={isAddDirectorOpen}
+          toggle={() => setIsAddDirectorOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -276,7 +297,6 @@ const DirectorList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const directorStore = useSelector((state: RootState) => state.directors);
-  const userStore = useSelector((state: RootState) => state.users);
 
   useEffect(() => {
     dispatch(fetchData() as any);
@@ -289,17 +309,6 @@ const DirectorList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
-  
-  const filteredData = directorStore.data.filter((director) => {
-    if (director.userId) {
-      const associatedUser = userStore.data.find(
-        (user) => user.id === director.userId
-      );
-      return !associatedUser || !associatedUser.disabled;
-    }
-    return true;
-  });
 
   const generateCSVData = () => {
     return directorStore.allData.map((item) => ({
@@ -324,7 +333,7 @@ const DirectorList = () => {
           />
           <DataGrid
             autoHeight
-            rows={filteredData}
+            rows={directorStore.data}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

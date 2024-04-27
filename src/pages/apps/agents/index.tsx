@@ -49,6 +49,8 @@ import { ThemeColor } from "src/@core/layouts/types";
 import { Avatar } from "@mui/material";
 import { ro } from "date-fns/locale";
 import { UserType } from "src/types/apps/UserType";
+import toast from "react-hot-toast";
+import SidebarAddAgentAccount from "src/views/apps/agents/list/AddAgentAccountDrawer";
 
 interface CellType {
   row: AgentsType;
@@ -92,6 +94,9 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
   // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [modifyClicked, setModifyClicked] = useState<boolean>(false);
+  const [isAddAgentOpen, setIsAddAgentOpen] = useState(false);
+
 
   const rowOptionsOpen = Boolean(anchorEl);
 
@@ -99,6 +104,8 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setAgentId(id));
     dispatch(setAgentUserId(userId));
     setAnchorEl(event.currentTarget);
+    setModifyClicked(false);
+
   };
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
@@ -107,6 +114,14 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleDelete = () => {
     dispatch(deleteAgent(id) as any);
     handleRowOptionsClose();
+  };
+  const handleModifyClick = () => {
+    if (userId) {
+      toast.error("Cet utilisateur a déjà un compte.");
+    } else {
+      setIsAddAgentOpen(true);
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -138,15 +153,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
           <Icon icon="mdi:eye-outline" fontSize={20} />
           Voir
         </MenuItem>
-        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ '& svg': { mr: 2 } }}>
-          <Icon icon='mdi:pencil-outline' fontSize={20} />
-          Modifier
-        </MenuItem> */}
+        <MenuItem onClick={handleModifyClick} sx={{ "& svg": { mr: 2 } }}>
+          <Icon icon="mdi:pencil-outline" fontSize={20} />
+          Créer le compte
+        </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="mdi:delete-outline" fontSize={20} />
           Supprimer
         </MenuItem>
       </Menu>
+      {isAddAgentOpen && (
+        <SidebarAddAgentAccount
+          id={id}
+          open={isAddAgentOpen}
+          toggle={() => setIsAddAgentOpen(false)}
+        />
+      )}
     </>
   );
 };
@@ -271,7 +293,6 @@ const UserList = () => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const agentStore = useSelector((state: RootState) => state.agents);
-  const userStore = useSelector((state: RootState) => state.users);
 
 
   useEffect(() => {
@@ -281,16 +302,6 @@ const UserList = () => {
   useEffect(() => {
     dispatch(filterData(value));
   }, [dispatch, plan, value]);
-
-  const filteredData = agentStore.data.filter((agent) => {
-    if (agent.userId) {
-      const associatedUser = userStore.data.find(
-        (user) => user.id === agent.userId
-      );
-      return !associatedUser || !associatedUser.disabled;
-    }
-    return true;
-  });
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);
@@ -320,7 +331,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={filteredData}
+            rows={agentStore.data}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, HTMLAttributes, useRef, useState } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -32,6 +32,7 @@ import { fetchStudent, updateStudent } from "src/store/apps/students";
 import { StudentsType } from "src/types/apps/studentTypes";
 import EmailAppLayout from "src/views/apps/student/overview/mail/Mail";
 import EditIcon from "@mui/icons-material/Edit";
+import CustomAvatar from "src/@core/components/mui/avatar";
 
 // ** Custom Components
 import CustomChip from "src/@core/components/mui/chip";
@@ -50,8 +51,10 @@ import { Controller, useForm } from "react-hook-form";
 import { formatDate } from "src/@core/utils/format";
 import { UserType } from "src/types/apps/UserType";
 import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
-import { IconButton } from "@mui/material";
+import { Autocomplete, IconButton, ListItem } from "@mui/material";
 import { MailFolderType } from "src/types/apps/mailTypes";
+import { ParentsType } from "src/types/apps/parentTypes";
+import { getInitials } from "src/@core/utils/get-initials";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -60,15 +63,23 @@ interface ColorsType {
 export interface UpdateStudentDto {
   firstName?: string;
   lastName?: string;
+  identification: string;
   dateOfBirth?: Date;
   sex?: string;
+  parent: {
+    id: number;
+  };
 }
 
 const schema = yup.object().shape({
   firstName: yup.string().min(3).required(),
   lastName: yup.string().min(3).required(),
+  identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
+  parent: yup.object().shape({
+    id: yup.number().required(),
+  }),
 });
 
 const UserViewLeft = () => {
@@ -101,7 +112,47 @@ const UserViewLeft = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const parentStore = useSelector((state: RootState) => state.parents);
 
+  const userData2 = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData2.find((user) => user.id === userId);
+  };
+
+  const renderListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ParentsType
+  ) => {
+    const user = findUserDataById(option.userId);
+    if (user?.disabled === false || option.userId === null) {
+      return (
+        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {option.userId ? (
+              <Avatar
+                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+                src={`http://localhost:8000/uploads/${user?.profileImage}`}
+                sx={{ width: 30, height: 30, marginRight: "10px" }}
+              />
+            ) : (
+              <CustomAvatar
+                skin="light"
+                color="primary"
+                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+              >
+                {getInitials(`${option.firstName} ${option.lastName}`)}
+              </CustomAvatar>
+            )}
+
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.firstName} {option.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
+  };
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
@@ -116,18 +167,17 @@ const UserViewLeft = () => {
     const partialUpdateStudentDto: Partial<UpdateStudentDto> = {};
     if (data.firstName) partialUpdateStudentDto.firstName = data.firstName;
     if (data.lastName) partialUpdateStudentDto.lastName = data.lastName;
+    if (data.identification)
+      partialUpdateStudentDto.identification = data.identification;
     if (data.dateOfBirth)
       partialUpdateStudentDto.dateOfBirth = data.dateOfBirth;
     if (data.sex) partialUpdateStudentDto.sex = data.sex;
 
-    // Dispatch the action with both id and UpdateStudentDto properties
     dispatch(updateStudent({ id: studentId, updateStudentDto: data }))
       .then(() => {
-        // Rest of your logic
         reset();
       })
       .catch((error) => {
-        // Handle error if needed
         console.error("Update Student failed:", error);
       });
     handleEditClose();
@@ -165,18 +215,13 @@ const UserViewLeft = () => {
   };
 
   useEffect(() => {
-    if (id && !isNaN(Number(id))) {
-      dispatch(fetchStudent(Number(id)) as any);
-    } else {
-      router.push("/apps/eleves");
-    }
+    dispatch(fetchStudent(Number(id)) as any);
     return () => {
       setUserData(null);
     };
   }, [id]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (studentStore.data && studentStore.data.length > 0) {
       setUserData(studentStore.data[0]);
     }
@@ -195,7 +240,6 @@ const UserViewLeft = () => {
   }, [userId]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);
     }
@@ -224,11 +268,11 @@ const UserViewLeft = () => {
                 onMouseLeave={handleLeave}
                 style={{ position: "relative" }}
               >
-                {userId && userIdData?.profileImage ? (
+                {userData.userId ? (
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
-                      src={`http://localhost:8000/uploads/${userIdData.profileImage}`}
+                      src={`http://localhost:8000/uploads/${userIdData?.profileImage}`}
                       sx={{ width: 80, height: 80 }}
                     />
                     {isHovered && (
@@ -419,7 +463,28 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="identification"
+                          control={control}
+                          defaultValue={userData.identification}
+                          rules={{ required: "Nom est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="CNE"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
                           name="dateOfBirth"
@@ -461,13 +526,48 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
-                    {/* <Grid item xs={12}>
-                      <FormControlLabel
-                        label='Use as a billing address?'
-                        control={<Switch defaultChecked />}
-                        sx={{ '& .MuiTypography-root': { fontWeight: 500 } }}
-                      />
-                    </Grid> */}
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="parent.id"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field: { onChange, value } }) => (
+                            <Autocomplete
+                              id="parent-user-autocomplete"
+                              options={parentStore.data}
+                              getOptionLabel={(option) =>
+                                `${option.firstName} ${option.lastName}`
+                              }
+                              value={
+                                parentStore.data.find(
+                                  (user) => user.id === Number(value)
+                                ) || null
+                              }
+                              onChange={(e, newValue) => {
+                                const newValueId = newValue
+                                  ? newValue.id
+                                  : null;
+                                onChange(newValueId);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label="Parent"
+                                  error={Boolean(errors.parent)}
+                                  helperText={
+                                    errors.parent ? errors.parent.message : ""
+                                  }
+                                />
+                              )}
+                              renderOption={(props, option) =>
+                                renderListItem(props, option)
+                              }
+                            />
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
                   </Grid>
                 </form>
               </DialogContent>

@@ -120,14 +120,11 @@ const UserViewLeft = () => {
     if (data.lastName) partialUpdateParentDto.lastName = data.lastName;
     if (data.phoneNumber) partialUpdateParentDto.phoneNumber = data.phoneNumber;
 
-    // Dispatch the action with both id and UpdateParentDto properties
     dispatch(updateParent({ id: parentId, updateParentDto: data }))
       .then(() => {
-        // Rest of your logic
         reset();
       })
       .catch((error) => {
-        // Handle error if needed
         console.error("Update Parent failed:", error);
       });
     handleEditClose();
@@ -191,7 +188,6 @@ const UserViewLeft = () => {
   }, [userId]);
 
   useEffect(() => {
-    // Update state when the data is updated
     if (userStore.data && userStore.data.length > 0) {
       setUserIdData(userStore.data[0]);
     }
@@ -220,11 +216,11 @@ const UserViewLeft = () => {
                 onMouseLeave={handleLeave}
                 style={{ position: "relative" }}
               >
-                {userId && userIdData?.profileImage ? (
+                {userData.userId ? (
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
-                      src={`http://localhost:8000/uploads/${userIdData.profileImage}`}
+                      src={`http://localhost:8000/uploads/${userIdData?.profileImage}`}
                       sx={{ width: 80, height: 80 }}
                     />
                     {isHovered && (

@@ -517,7 +517,7 @@ export const mapRoleToFrench = (role: string) => {
     case UserRole.Teacher:
       return "Enseignant";
     case UserRole.Student:
-      return "Eleve";
+      return "Elève";
     case UserRole.Parent:
       return "Parent";
     case UserRole.Agent:

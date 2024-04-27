@@ -62,7 +62,7 @@ const navigation = (): VerticalNavItemsType => {
     },
     {
       action: "manage",
-      title: "Ecoles",
+      title: "Niveaux",
       icon: "mdi:school",
       children: [
         {
@@ -97,7 +97,7 @@ const navigation = (): VerticalNavItemsType => {
       path: "/apps/absences",
       title: "Gestion des absences",
       icon: "mdi:calendar-remove",
-    }
+    },
   ];
 };
 

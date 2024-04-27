@@ -83,6 +83,7 @@ import { fetchUser } from "src/store/apps/users";
 import { set, status } from "nprogress";
 import { formatDate } from "src/@core/utils/format";
 import { sendMail } from "src/store/apps/mail";
+import { mapRoleToFrench } from "../utilisateurs";
 
 interface CellType {
   row: AbsentsType;
@@ -644,24 +645,7 @@ const RowOptions = ({ id }: { id: number }) => {
     </>
   );
 };
-const mapRoleToFrench = (role: string) => {
-  switch (role) {
-    case UserRole.Director:
-      return "Directeur";
-    case UserRole.Administrator:
-      return "Administrateur";
-    case UserRole.Teacher:
-      return "Enseignant";
-    case UserRole.Student:
-      return "Eleve";
-    case UserRole.Parent:
-      return "Parent";
-    case UserRole.Agent:
-      return "Agent";
-    default:
-      return role;
-  }
-};
+
 const columns = [
   {
     flex: 0.2,

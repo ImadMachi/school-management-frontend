@@ -84,6 +84,7 @@ import { set, status } from "nprogress";
 import { formatDate } from "src/@core/utils/format";
 import { sendMail } from "src/store/apps/mail";
 import { mapRoleToFrench } from "../utilisateurs";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: AbsentsType;
@@ -210,7 +211,7 @@ const RowOptions = ({ id }: { id: number }) => {
           {option.profileImage ? (
             <Avatar
               alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              src={`${HOST}/uploads/${option.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (
@@ -429,7 +430,7 @@ const RowOptions = ({ id }: { id: number }) => {
           {absentData && absentData.absentUser.profileImage && (
             <>
               <Avatar
-                src={`http://localhost:8000/uploads/${absentData.absentUser?.profileImage}`}
+                src={`${HOST}/uploads/${absentData.absentUser?.profileImage}`}
                 sx={{ width: 80, height: 80 }}
               />
             </>
@@ -674,7 +675,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.absentUser.userData?.firstName} ${row.absentUser.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

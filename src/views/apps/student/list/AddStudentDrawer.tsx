@@ -51,6 +51,7 @@ import { StudentsType } from "src/types/apps/studentTypes";
 import { fetchData } from "src/store/apps/parents";
 import { getInitials } from "src/@core/utils/get-initials";
 import { ParentsType } from "src/types/apps/parentTypes";
+import { HOST } from "src/store/constants/hostname";
 
 interface SidebarAddStudentType {
   open: boolean;
@@ -193,7 +194,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
             {option.userId ? (
               <Avatar
                 alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-                src={`http://localhost:8000/uploads/${user?.profileImage}`}
+                src={`${HOST}/uploads/${user?.profileImage}`}
                 sx={{ width: 30, height: 30, marginRight: "10px" }}
               />
             ) : (

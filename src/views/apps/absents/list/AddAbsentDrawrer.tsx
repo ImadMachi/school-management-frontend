@@ -55,6 +55,7 @@ import {
   updateAbsent,
 } from "src/store/apps/absents";
 import { RadioButtonChecked } from "@mui/icons-material";
+import { HOST } from "src/store/constants/hostname";
 
 interface SidebarAddAbsentType {
   open: boolean;
@@ -207,7 +208,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
           {option.profileImage ? (
             <Avatar
               alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              src={`${HOST}/uploads/${option.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

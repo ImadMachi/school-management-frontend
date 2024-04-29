@@ -57,6 +57,7 @@ import { Button } from "@mui/material";
 import { fr } from "date-fns/locale";
 import { useSelector } from "react-redux";
 import { RootState } from "src/store";
+import { HOST } from "src/store/constants/hostname";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -132,6 +133,12 @@ const MailLog = (props: MailLogType) => {
     selectedGroup,
     isFetching,
   } = props;
+
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
 
   // ** State
   const [areAllMailsLoaded, setAreAllMailsLoaded] = useState(false);
@@ -363,6 +370,7 @@ const MailLog = (props: MailLogType) => {
               {store && store.mails && store.mails.length ? (
                 <List sx={{ p: 0 }}>
                   {store.mails.map((mail: MailType) => {
+                    const user = findUserDataById(mail.sender.id);
                     return (
                       <MailItem
                         key={mail.id}
@@ -412,7 +420,7 @@ const MailLog = (props: MailLogType) => {
                           {routeParams.folder !== "sent" && (
                             <Avatar
                               alt={mail.sender.senderData?.firstName}
-                              src={"./images/avatars/1.png"}
+                              src={`${HOST}/uploads/${user?.profileImage}`}
                               sx={{ mr: 3, width: "2rem", height: "2rem" }}
                             />
                           )}

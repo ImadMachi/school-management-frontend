@@ -26,6 +26,7 @@ import { RootState } from "src/store";
 import { useDispatch, useSelector } from "react-redux";
 import { IconButton } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
+import { HOST } from "src/store/constants/hostname";
 
 const ProfilePicture = styled("img")(({ theme }) => ({
   width: 120,
@@ -117,7 +118,7 @@ const UserProfileHeader = () => {
         >
           <>
             <ProfilePicture
-              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              src={`${HOST}/uploads/${user?.profileImage}`}
               alt="profile-picture"
             />
             {/* {isHovered && (

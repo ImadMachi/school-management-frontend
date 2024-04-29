@@ -79,6 +79,7 @@ import { setStudentId, setStudentUserId } from "src/store/apps/students";
 import { setParentId, setParentUserId } from "src/store/apps/parents";
 import { setAgentId, setAgentUserId } from "src/store/apps/agents";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: UserType;
@@ -336,7 +337,7 @@ const RowOptions = ({ id }: { id: number }) => {
         >
           <Avatar
             alt={`Profile Image of ${userData?.userData?.firstName} ${userData?.userData?.lastName}`}
-            src={`http://localhost:8000/uploads/${userData?.profileImage}`}
+            src={`${HOST}/uploads/${userData?.profileImage}`}
             sx={{ width: 80, height: 80 }}
           />
           
@@ -485,7 +486,7 @@ const columns = [
           {row.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.userData?.firstName} ${row.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${row.profileImage}`}
+              src={`${HOST}/uploads/${row.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

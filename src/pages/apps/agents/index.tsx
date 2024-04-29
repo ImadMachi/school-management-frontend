@@ -52,6 +52,7 @@ import { ro } from "date-fns/locale";
 import { UserType } from "src/types/apps/UserType";
 import toast from "react-hot-toast";
 import SidebarAddAgentAccount from "src/views/apps/agents/list/AddAgentAccountDrawer";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: AgentsType;
@@ -214,7 +215,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

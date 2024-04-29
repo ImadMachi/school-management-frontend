@@ -52,6 +52,7 @@ import { ClassType } from "src/types/apps/classTypes";
 import { TeachersType } from "src/types/apps/teacherTypes";
 import { fetchData as fetchTeachers } from "src/store/apps/teachers";
 import { fetchData } from "src/store/apps/users";
+import { HOST } from "src/store/constants/hostname";
 
 interface SidebarAddSubjectType {
   open: boolean;
@@ -245,7 +246,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
           {option.userId ? (
             <Avatar
               alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              src={`${HOST}/uploads/${user?.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

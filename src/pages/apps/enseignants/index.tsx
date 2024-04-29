@@ -52,6 +52,7 @@ import { UserType } from "src/types/apps/UserType";
 import { t } from "i18next";
 import SidebarAddTeacherAccount from "src/views/apps/teacher/list/AddTeacherAccountDrawer";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: TeachersType;
@@ -211,7 +212,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

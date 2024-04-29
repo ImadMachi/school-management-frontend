@@ -243,7 +243,6 @@ const MailLog = (props: MailLogType) => {
   // }
 
   const handleRefreshMailsClick = () => {
-    // Use the new function to fetch mails by userId and specify the folder
     dispatch(
       fetchMailsByUserId({
         q: query || "",
@@ -251,7 +250,7 @@ const MailLog = (props: MailLogType) => {
         label: routeParams.label as MailLabelType,
         userId: userId ? +userId : null,
       })
-    ); // Replace 'inbox' with the desired folder
+    );
     setRefresh(true);
     setTimeout(() => setRefresh(false), 1000);
   };

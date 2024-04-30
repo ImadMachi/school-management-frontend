@@ -321,8 +321,8 @@ const UserViewLeft = () => {
                     Éléves:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.students.map((student) => (
-                      <div key={student.id}>- {student.firstName} {student.lastName}</div>
+                    {userData.students?.map((student) => (
+                      <div key={student?.id}>- {student?.firstName} {student?.lastName}</div>
                     ))}
                   </Typography>
                 </Box>

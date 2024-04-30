@@ -14,7 +14,11 @@ import { useSettings } from "src/@core/hooks/useSettings";
 
 // ** Types
 import { RootState, AppDispatch } from "src/store";
-import { MailLayoutType, MailLabelColors, MailLabelType } from "src/types/apps/mailTypes";
+import {
+  MailLayoutType,
+  MailLabelColors,
+  MailLabelType,
+} from "src/types/apps/mailTypes";
 
 // ** Email App Component Imports
 import MailLog from "./MailLog";
@@ -22,6 +26,7 @@ import SidebarLeft from "./SidebarLeft";
 
 // ** Actions
 import {
+  fetchMails,
   paginateMail,
   getCurrentMail,
   handleSelectMail,
@@ -79,12 +84,21 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
           q: query || "",
           folder: routeParams.folder,
           label: routeParams.label as MailLabelType,
-          userId : userId ? +userId : null,
+          selectedCategory,
+          selectedGroup,
+          userId: userId ? +userId : null,
         }) as any
       );
       setIsFetching(false);
     })();
-  }, [dispatch, query, routeParams.folder, routeParams.label, userId]);
+  }, [
+    dispatch,
+    query,
+    routeParams.folder,
+    routeParams.label,
+    selectedCategory,
+    selectedGroup,
+  ]);
 
   const toggleComposeOpen = () => setComposeOpen(!composeOpen);
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);

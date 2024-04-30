@@ -44,6 +44,8 @@ export type FetchMailParamsType = {
 export type FetchMailByUserIdParamsType = {
   q: string;
   folder: MailFolderType;
+  selectedCategory: number;
+  selectedGroup: number;
   label: MailLabelType;
   userId: number | null;
 };

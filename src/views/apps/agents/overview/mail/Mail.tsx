@@ -79,12 +79,21 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
           q: query || "",
           folder: routeParams.folder,
           label: routeParams.label as MailLabelType,
-          userId : userId ? +userId : null,
+          selectedCategory,
+          selectedGroup,
+          userId: userId ? +userId : null,
         }) as any
       );
       setIsFetching(false);
     })();
-  }, [dispatch, query, routeParams.folder, routeParams.label, userId]);
+  }, [
+    dispatch,
+    query,
+    routeParams.folder,
+    routeParams.label,
+    selectedCategory,
+    selectedGroup,
+  ]);
 
   const toggleComposeOpen = () => setComposeOpen(!composeOpen);
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);

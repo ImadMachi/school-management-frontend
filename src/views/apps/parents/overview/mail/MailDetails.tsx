@@ -52,6 +52,8 @@ import {
   moveFromTrash,
   moveToTrash,
 } from "src/store/apps/mail";
+import { useSelector } from "react-redux";
+import { RootState } from "src/store";
 
 const HiddenReplyBack = styled(Box)<BoxProps>(({ theme }) => ({
   height: 11,
@@ -110,6 +112,12 @@ const MailDetails = (props: MailDetailsType) => {
   // ** Hook
   const { settings } = useSettings();
 
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
+
   // ** Effects
   useEffect(() => {
     if (mail) {
@@ -153,6 +161,8 @@ const MailDetails = (props: MailDetailsType) => {
       );
     }
   };
+  const user = findUserDataById(mail?.sender.id);
+
 
   return (
     <Sidebar
@@ -234,6 +244,7 @@ const MailDetails = (props: MailDetailsType) => {
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <>
                   {mail.isDeleted ? (
+                    
                     <IconButton size="small" onClick={handleMoveFromTrash}>
                       <Icon
                         icon="material-symbols-light:restore-from-trash-outline-rounded"
@@ -304,7 +315,7 @@ const MailDetails = (props: MailDetailsType) => {
                             " " +
                             mail.sender.senderData.lastName
                           }
-                          // src={mail.sender?.senderData?.avatar}
+                          src={`${HOST}/uploads/${user?.profileImage}`}
                           sx={{ width: "2.375rem", height: "2.375rem", mr: 3 }}
                         />
                         <Box sx={{ display: "flex", flexDirection: "column" }}>

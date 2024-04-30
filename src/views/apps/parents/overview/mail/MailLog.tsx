@@ -140,7 +140,6 @@ const MailLog = (props: MailLogType) => {
   const userId = params ? params[1] : null;
   const id = params ? params[2] : null;
 
-
   const userData = useSelector((state: RootState) => state.users.data);
 
   const findUserDataById = (userId: number) => {
@@ -148,18 +147,26 @@ const MailLog = (props: MailLogType) => {
   };
 
   useEffect(() => {
-    if (userId) {
-      dispatch(
+    (async () => {
+      await dispatch(
         fetchMailsByUserId({
           q: query || "",
           folder: routeParams.folder as MailFolderType,
           label: routeParams.label as MailLabelType,
+          selectedCategory,
+          selectedGroup,
           userId: userId ? +userId : null,
-        })
+        }) as any
       );
-    }
-  }, [userId]);
-  
+    })();
+  }, [
+    dispatch,
+    query,
+    routeParams.folder,
+    routeParams.label,
+    selectedCategory,
+    selectedGroup,
+  ]);
 
   // ** State
   const [areAllMailsLoaded, setAreAllMailsLoaded] = useState(false);
@@ -465,8 +472,8 @@ const MailLog = (props: MailLogType) => {
                                   textOverflow: ["ellipsis", "unset"],
                                 }}
                               >
-                                {mail.sender.senderData?.firstName}{" "}
-                                {mail.sender.senderData?.lastName}
+                                {user?.userData?.firstName}{" "}
+                                {user?.userData?.lastName}
                               </Typography>
                             )}
 

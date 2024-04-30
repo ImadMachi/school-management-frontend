@@ -14,7 +14,7 @@ import { useSettings } from "src/@core/hooks/useSettings";
 
 // ** Types
 import { RootState, AppDispatch } from "src/store";
-import { MailLayoutType, MailLabelColors } from "src/types/apps/mailTypes";
+import { MailLayoutType, MailLabelColors, MailLabelType } from "src/types/apps/mailTypes";
 
 // ** Email App Component Imports
 import MailLog from "./MailLog";
@@ -22,12 +22,13 @@ import SidebarLeft from "./SidebarLeft";
 
 // ** Actions
 import {
-  fetchMails,
   paginateMail,
   getCurrentMail,
   handleSelectMail,
   handleSelectAllMail,
+  fetchMailsByUserId,
 } from "src/store/apps/mail";
+import { useRouter } from "next/router";
 
 // ** Variables
 const labelColors: MailLabelColors = {
@@ -66,20 +67,24 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
     label: label || "",
     folder: folder || "inbox",
   };
+  const router = useRouter();
+  const { params } = router.query;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
 
   useEffect(() => {
     (async () => {
       await dispatch(
-        fetchMails({
+        fetchMailsByUserId({
           q: query || "",
           folder: routeParams.folder,
-          selectedCategory,
-          selectedGroup,
+          label: routeParams.label as MailLabelType,
+          userId : userId ? +userId : null,
         }) as any
       );
       setIsFetching(false);
     })();
-  }, [dispatch, query, routeParams.folder, selectedCategory, selectedGroup]);
+  }, [dispatch, query, routeParams.folder, routeParams.label, userId]);
 
   const toggleComposeOpen = () => setComposeOpen(!composeOpen);
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);

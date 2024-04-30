@@ -46,7 +46,7 @@ import {
   MailFoldersObjType,
 } from "src/types/apps/mailTypes";
 import {
-  fetchMails,
+  fetchMailsByUserId,
   markAsStarred,
   markAsUnStarred,
   moveFromTrash,
@@ -58,6 +58,7 @@ import { fr } from "date-fns/locale";
 import { useSelector } from "react-redux";
 import { RootState } from "src/store";
 import { HOST } from "src/store/constants/hostname";
+import { useRouter } from "next/router";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -134,11 +135,31 @@ const MailLog = (props: MailLogType) => {
     isFetching,
   } = props;
 
+  const router = useRouter();
+  const { params } = router.query;
+  const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
+
+
   const userData = useSelector((state: RootState) => state.users.data);
 
   const findUserDataById = (userId: number) => {
     return userData.find((user) => user.id === userId);
   };
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(
+        fetchMailsByUserId({
+          q: query || "",
+          folder: routeParams.folder as MailFolderType,
+          label: routeParams.label as MailLabelType,
+          userId: userId ? +userId : null,
+        })
+      );
+    }
+  }, [userId]);
+  
 
   // ** State
   const [areAllMailsLoaded, setAreAllMailsLoaded] = useState(false);

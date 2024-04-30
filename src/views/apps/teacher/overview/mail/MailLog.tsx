@@ -1,5 +1,11 @@
 // ** React Imports
-import { Fragment, useState, SyntheticEvent, ReactNode } from "react";
+import {
+  Fragment,
+  useState,
+  SyntheticEvent,
+  ReactNode,
+  useEffect,
+} from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -39,11 +45,19 @@ import {
   MailFoldersArrType,
   MailFoldersObjType,
 } from "src/types/apps/mailTypes";
-import { OptionType } from "src/@core/components/option-menu/types";
-import { fetchMails } from "src/store/apps/mail";
-import { fetchMailsByUserId } from "src/store/apps/mail";
+import {
+  fetchMailsByUserId,
+  markAsStarred,
+  markAsUnStarred,
+  moveFromTrash,
+  moveToTrash,
+  paginateMail,
+} from "src/store/apps/mail";
+import { Button } from "@mui/material";
+import { fr } from "date-fns/locale";
 import { useSelector } from "react-redux";
 import { RootState } from "src/store";
+import { HOST } from "src/store/constants/hostname";
 import { useRouter } from "next/router";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
@@ -108,25 +122,48 @@ const MailLog = (props: MailLogType) => {
     dispatch,
     setQuery,
     direction,
-    updateMail,
     routeParams,
     labelColors,
-    paginateMail,
     getCurrentMail,
     mailDetailsOpen,
-    updateMailLabel,
     handleSelectMail,
     setMailDetailsOpen,
     handleSelectAllMail,
     handleLeftSidebarToggle,
+    selectedCategory,
+    selectedGroup,
+    isFetching,
   } = props;
-
-  // ** State
-  const [refresh, setRefresh] = useState<boolean>(false);
 
   const router = useRouter();
   const { params } = router.query;
   const userId = params ? params[1] : null;
+  const id = params ? params[2] : null;
+
+
+  const userData = useSelector((state: RootState) => state.users.data);
+
+  const findUserDataById = (userId: number) => {
+    return userData.find((user) => user.id === userId);
+  };
+
+  useEffect(() => {
+    if (userId) {
+      dispatch(
+        fetchMailsByUserId({
+          q: query || "",
+          folder: routeParams.folder as MailFolderType,
+          label: routeParams.label as MailLabelType,
+          userId: userId ? +userId : null,
+        })
+      );
+    }
+  }, [userId]);
+  
+
+  // ** State
+  const [areAllMailsLoaded, setAreAllMailsLoaded] = useState(false);
+
   // ** Vars
   const folders: MailFoldersArrType[] = [
     {
@@ -198,6 +235,10 @@ const MailLog = (props: MailLogType) => {
     },
   };
 
+  useEffect(() => {
+    setAreAllMailsLoaded(false);
+  }, [routeParams.folder]);
+
   const foldersObj: MailFoldersObjType = {
     inbox: [foldersConfig.spam, foldersConfig.trash],
     sent: [foldersConfig.trash],
@@ -206,14 +247,57 @@ const MailLog = (props: MailLogType) => {
     trash: [foldersConfig.inbox, foldersConfig.spam],
   };
 
-  const handleMoveToTrash = () => {
-    // dispatch(updateMail({ emailIds: store.selectedMails, dataToUpdate: { folder: 'trash' } }))
+  const handleMoveToTrash = (e: SyntheticEvent, id: number) => {
+    e.stopPropagation();
+    dispatch(moveToTrash({ id, folder: routeParams.folder! }));
     dispatch(handleSelectAllMail(false));
   };
 
-  const handleStarMail = (e: SyntheticEvent, id: number, value: boolean) => {
+  const handleMoveFromTrash = (e: SyntheticEvent, id: number) => {
     e.stopPropagation();
-    // dispatch(updateMail({ emailIds: [id], dataToUpdate: { isStarred: value } }))
+    dispatch(moveFromTrash({ id, folder: routeParams.folder! }));
+    dispatch(handleSelectAllMail(false));
+  };
+
+  const handleClickLoad = async () => {
+    if (store?.mails?.length && store.mails.length < 10) {
+      setAreAllMailsLoaded(true);
+      return;
+    }
+
+    const currentMailsLength = store?.mails?.length;
+
+    await dispatch(
+      paginateMail({
+        offset: store?.mails?.length || 0,
+        folder: routeParams.folder!,
+        q: query,
+        selectedCategory,
+        selectedGroup,
+      })
+    );
+
+    const newMailsLength = store?.mails?.length;
+
+    // if (newMailsLength === currentMailsLength) {
+    //   setAreAllMailsLoaded(true);
+    // }
+  };
+
+  const handleStarMail = async (
+    e: SyntheticEvent,
+    id: number,
+    isStarred: boolean
+  ) => {
+    e.stopPropagation();
+
+    if (isStarred) {
+      await dispatch(markAsUnStarred({ id, folder: routeParams.folder! }));
+    }
+    if (!isStarred) {
+      await dispatch(markAsStarred(id));
+    }
+    dispatch(getCurrentMail(id));
   };
 
   const handleReadMail = (id: number | number[], value: boolean) => {
@@ -235,106 +319,6 @@ const MailLog = (props: MailLogType) => {
     // dispatch(updateMail({ emailIds: arr, dataToUpdate: { folder } }))
   };
 
-  // const handleRefreshMailsClick = () => {
-  //   // @ts-ignore
-  //   dispatch(fetchMails({ q: query || '', folder: routeParams.folder, label: routeParams.label }))
-  //   setRefresh(true)
-  //   setTimeout(() => setRefresh(false), 1000)
-  // }
-
-  const handleRefreshMailsClick = () => {
-    dispatch(
-      fetchMailsByUserId({
-        q: query || "",
-        folder: routeParams.folder as MailFolderType,
-        label: routeParams.label as MailLabelType,
-        userId: userId ? +userId : null,
-      })
-    );
-    setRefresh(true);
-    setTimeout(() => setRefresh(false), 1000);
-  };
-  const handleFoldersMenu = () => {
-    const array: OptionType[] = [];
-
-    if (
-      routeParams &&
-      routeParams.folder &&
-      !routeParams.label &&
-      foldersObj[routeParams.folder]
-    ) {
-      foldersObj[routeParams.folder].map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(store.selectedMails, folder.name);
-              dispatch(handleSelectAllMail(false));
-            },
-          },
-        });
-      });
-    } else if (routeParams && routeParams.label) {
-      folders.map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(store.selectedMails, folder.name);
-              dispatch(handleSelectAllMail(false));
-            },
-          },
-        });
-      });
-    } else {
-      foldersObj["inbox"].map((folder: MailFoldersArrType) => {
-        array.length = 0;
-        array.push({
-          icon: folder.icon,
-          text: (
-            <Typography sx={{ textTransform: "capitalize" }}>
-              {folder.name}
-            </Typography>
-          ),
-          menuItemProps: {
-            onClick: () => {
-              handleFolderUpdate(store.selectedMails, folder.name);
-              dispatch(handleSelectAllMail(false));
-            },
-          },
-        });
-      });
-    }
-
-    return array;
-  };
-
-  const renderMailLabels = (arr: MailLabelType[]) => {
-    return arr.map((label: MailLabelType, index: number) => {
-      return (
-        <Box
-          key={index}
-          component="span"
-          sx={{ mr: 3, color: `${labelColors[label]}.main` }}
-        >
-          <Icon icon="mdi:circle" fontSize="0.625rem" />
-        </Box>
-      );
-    });
-  };
-
   const mailDetailsProps = {
     hidden,
     folders,
@@ -344,7 +328,6 @@ const MailLog = (props: MailLogType) => {
     // updateMail,
     routeParams,
     labelColors,
-    paginateMail,
     handleStarMail,
     mailDetailsOpen,
     handleLabelUpdate,
@@ -365,14 +348,6 @@ const MailLog = (props: MailLogType) => {
       <Box sx={{ height: "100%", backgroundColor: "background.paper" }}>
         <Box sx={{ px: 5, py: 3 }}>
           <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-            {lgAbove ? null : (
-              <IconButton
-                onClick={handleLeftSidebarToggle}
-                sx={{ mr: 1, ml: -2 }}
-              >
-                <Icon icon="mdi:menu" fontSize={20} />
-              </IconButton>
-            )}
             <Input
               value={query}
               placeholder="Rechercher un message"
@@ -389,22 +364,7 @@ const MailLog = (props: MailLogType) => {
             />
           </Box>
         </Box>
-        <Divider sx={{ m: "0 !important" }} />
-        <Box sx={{ py: 2, px: { xs: 2.5, sm: 5 } }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <IconButton size="small" onClick={handleRefreshMailsClick}>
-                <Icon icon="mdi:reload" fontSize="1.375rem" />
-              </IconButton>
-            </Box>
-          </Box>
-        </Box>
+
         <Divider sx={{ m: "0 !important" }} />
         <Box
           sx={{
@@ -414,111 +374,144 @@ const MailLog = (props: MailLogType) => {
             height: "calc(100% - 7.25rem)",
           }}
         >
-          <ScrollWrapper hidden={hidden}>
-            {store && store.mails && store.mails.length && userId != null ? (
-              <List sx={{ p: 0 }}>
-                {store.mails.map((mail: MailType) => {
-                  return (
-                    <MailItem
-                      key={mail.id}
-                      sx={{ backgroundColor: "background.paper" }}
-                      onClick={() => {
-                        setMailDetailsOpen(true);
-                        dispatch(getCurrentMail(mail.id));
-                        // dispatch(updateMail({ emailIds: [mail.id], dataToUpdate: { isRead: true } }))
-                        setTimeout(() => {
-                          dispatch(handleSelectAllMail(false));
-                        }, 600);
-                      }}
-                    >
-                      <Box
+          {isFetching ? (
+            <Backdrop
+              open={true}
+              sx={{
+                zIndex: 5,
+                position: "absolute",
+                color: "common.white",
+                backgroundColor: "action.disabledBackground",
+              }}
+            >
+              <CircularProgress color="inherit" />
+            </Backdrop>
+          ) : (
+            <ScrollWrapper hidden={hidden}>
+              {store && store.mails && store.mails.length ? (
+                <List sx={{ p: 0 }}>
+                  {store.mails.map((mail: MailType) => {
+                    const user = findUserDataById(mail.sender.id);
+                    return (
+                      <MailItem
+                        key={mail.id}
                         sx={{
-                          mr: 4,
-                          display: "flex",
-                          overflow: "hidden",
-                          alignItems: "center",
+                          backgroundColor:
+                            mail.isRead && routeParams.folder !== "sent"
+                              ? "action.hover"
+                              : "background.paper",
+                        }}
+                        onClick={() => {
+                          setMailDetailsOpen(true);
+                          dispatch(getCurrentMail(mail.id));
+                          // dispatch(updateMail({ emailIds: [mail.id], dataToUpdate: { isRead: true } }))
+                          setTimeout(() => {
+                            dispatch(handleSelectAllMail(false));
+                          }, 600);
                         }}
                       >
-                        {/* <IconButton
-                          size="small"
-                          onClick={(e) =>
-                            handleStarMail(e, mail.id, !mail.isStarred)
-                          }
-                          sx={{
-                            mr: { xs: 0, sm: 3 },
-                            color: mail.isStarred
-                              ? "warning.main"
-                              : "text.secondary",
-                            "& svg": {
-                              display: { xs: "none", sm: "block" },
-                            },
-                          }}
-                        >
-                          <Icon icon="mdi:star-outline" />
-                        </IconButton> */}
-                        {routeParams.folder !== "sent" && (
-                          <Avatar
-                            alt={mail.sender.senderData?.firstName}
-                            src={"./images/avatars/1.png"}
-                            sx={{ mr: 3, width: "2rem", height: "2rem" }}
-                          />
-                        )}
-
                         <Box
                           sx={{
+                            mr: 4,
                             display: "flex",
                             overflow: "hidden",
-                            flexDirection: { xs: "column", sm: "row" },
-                            alignItems: { xs: "flex-start", sm: "center" },
+                            alignItems: "center",
                           }}
                         >
+                          <IconButton
+                            size="small"
+                            onClick={(e) =>
+                              handleStarMail(e, mail.id, mail.isStarred)
+                            }
+                            sx={{
+                              mr: { xs: 0, sm: 3 },
+                              color:
+                                routeParams.folder == "starred"
+                                  ? "warning.main"
+                                  : mail.isStarred
+                                  ? "warning.main"
+                                  : "text.secondary",
+                              "& svg": {
+                                display: { xs: "none", sm: "block" },
+                              },
+                            }}
+                          >
+                            <Icon icon="mdi:star-outline" />
+                          </IconButton>
                           {routeParams.folder !== "sent" && (
-                            <Typography
-                              sx={{
-                                mr: 4,
-                                fontWeight: 500,
-                                whiteSpace: "nowrap",
-                                width: ["100%", "auto"],
-                                overflow: ["hidden", "unset"],
-                                textOverflow: ["ellipsis", "unset"],
-                              }}
-                            >
-                              {mail.sender.senderData?.firstName}{" "}
-                              {mail.sender.senderData?.lastName}
-                            </Typography>
+                            <Avatar
+                              alt={mail.sender.senderData?.firstName}
+                              src={`${HOST}/uploads/${user?.profileImage}`}
+                              sx={{ mr: 3, width: "2rem", height: "2rem" }}
+                            />
                           )}
 
-                          <Typography
-                            noWrap
-                            variant="body2"
-                            sx={{ width: "100%" }}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              overflow: "hidden",
+                              flexDirection: { xs: "column", sm: "row" },
+                              alignItems: { xs: "flex-start", sm: "center" },
+                            }}
                           >
-                            {mail.subject}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box
-                        className="mail-actions"
-                        sx={{
-                          display: "none",
-                          alignItems: "center",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        {routeParams && routeParams.folder !== "trash" ? (
-                          <Tooltip placement="top" title="Delete Mail">
-                            <IconButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // dispatch(updateMail({ emailIds: [mail.id], dataToUpdate: { folder: 'trash' } }))
-                              }}
-                            >
-                              <Icon icon="mdi:delete-outline" />
-                            </IconButton>
-                          </Tooltip>
-                        ) : null}
+                            {routeParams.folder !== "sent" && (
+                              <Typography
+                                sx={{
+                                  mr: 4,
+                                  fontWeight: 500,
+                                  whiteSpace: "nowrap",
+                                  width: ["100%", "auto"],
+                                  overflow: ["hidden", "unset"],
+                                  textOverflow: ["ellipsis", "unset"],
+                                }}
+                              >
+                                {mail.sender.senderData?.firstName}{" "}
+                                {mail.sender.senderData?.lastName}
+                              </Typography>
+                            )}
 
-                        {/* <Tooltip placement='top' title={mail.isRead ? 'Unread Mail' : 'Read Mail'}>
+                            <Typography
+                              noWrap
+                              variant="body2"
+                              sx={{ width: "100%" }}
+                            >
+                              {mail.subject}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <Box
+                          className="mail-actions"
+                          sx={{
+                            display: "none",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          {routeParams && routeParams.folder !== "trash" ? (
+                            <Tooltip placement="top" title="Supprimer Message">
+                              <IconButton
+                                onClick={(e) => {
+                                  handleMoveToTrash(e, mail.id);
+                                }}
+                              >
+                                <Icon icon="mdi:delete-outline" />
+                              </IconButton>
+                            </Tooltip>
+                          ) : null}
+
+                          {routeParams && routeParams.folder == "trash" ? (
+                            <Tooltip placement="top" title="Restaurer Message">
+                              <IconButton
+                                onClick={(e) => {
+                                  handleMoveFromTrash(e, mail.id);
+                                }}
+                              >
+                                <Icon icon="material-symbols-light:restore-from-trash-outline-rounded" />
+                              </IconButton>
+                            </Tooltip>
+                          ) : null}
+
+                          {/* <Tooltip placement='top' title={mail.isRead ? 'Unread Mail' : 'Read Mail'}>
                           <IconButton
                             onClick={e => {
                               e.stopPropagation()
@@ -528,71 +521,82 @@ const MailLog = (props: MailLogType) => {
                             <Icon icon={mailReadToggleIcon} />
                           </IconButton>
                         </Tooltip> */}
-                      </Box>
-                      <Box
-                        className="mail-info-right"
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        {/* <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>{renderMailLabels(mail.labels)}</Box>  */}
-                        {mail.attachments?.length ? (
-                          <IconButton size="small">
-                            <Icon icon="mdi:attachment" fontSize="1.375rem" />
-                          </IconButton>
-                        ) : null}
-                        <Typography
-                          variant="caption"
+                        </Box>
+                        <Box
+                          className="mail-info-right"
                           sx={{
-                            minWidth: "50px",
-                            textAlign: "right",
-                            whiteSpace: "nowrap",
-                            color: "text.disabled",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
                           }}
                         >
-                          {new Date(mail.createdAt).toLocaleTimeString(
-                            "en-US",
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            }
+                          {!!mail.parentMessage && (
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                minWidth: "50px",
+                                textAlign: "right",
+                                whiteSpace: "nowrap",
+                                color: "text.disabled",
+                                marginRight: 2,
+                              }}
+                            >
+                              <Icon icon="ic:baseline-reply" />
+                            </Typography>
                           )}
-                        </Typography>
-                      </Box>
-                    </MailItem>
-                  );
-                })}
-              </List>
-            ) : (
-              <Box
-                sx={{
-                  mt: 6,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  "& svg": { mr: 2 },
-                }}
-              >
-                <Icon icon="mdi:alert-circle-outline" fontSize={20} />
-                <Typography>Aucun e-mail trouvé</Typography>
-              </Box>
-            )}
-          </ScrollWrapper>
-          <Backdrop
-            open={refresh}
-            onClick={() => setRefresh(false)}
-            sx={{
-              zIndex: 5,
-              position: "absolute",
-              color: "common.white",
-              backgroundColor: "action.disabledBackground",
-            }}
-          >
-            <CircularProgress color="inherit" />
-          </Backdrop>
+                          {mail.attachments?.length ? (
+                            <IconButton size="small">
+                              <Icon icon="mdi:attachment" fontSize="1.375rem" />
+                            </IconButton>
+                          ) : null}
+
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              minWidth: "50px",
+                              textAlign: "right",
+                              whiteSpace: "nowrap",
+                              color: "text.disabled",
+                            }}
+                          >
+                            {new Date(mail.createdAt).toLocaleTimeString(
+                              "fr-FR",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              }
+                            )}
+                          </Typography>
+                        </Box>
+                      </MailItem>
+                    );
+                  })}
+                  <Box sx={{ display: "flex", justifyContent: "center" }}>
+                    <Button
+                      onClick={() => handleClickLoad()}
+                      disabled={areAllMailsLoaded}
+                    >
+                      Charger plus
+                    </Button>
+                  </Box>
+                </List>
+              ) : (
+                <Box
+                  sx={{
+                    mt: 6,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    "& svg": { mr: 2 },
+                  }}
+                >
+                  <Icon icon="mdi:alert-circle-outline" fontSize={20} />
+                  <Typography>Aucun e-mail trouvé</Typography>
+                </Box>
+              )}
+            </ScrollWrapper>
+          )}
         </Box>
       </Box>
 

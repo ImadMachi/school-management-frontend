@@ -17,7 +17,7 @@ import levels from "./apps/levels";
 import cycles from "./apps/cycles";
 import subjects from "./apps/subjects";
 import agents from "./apps/agents";
-import absents from "./apps/absents";
+import absences from "./apps/absences";
 
 export const store = configureStore({
   reducer: {
@@ -36,7 +36,7 @@ export const store = configureStore({
     cycles,
     subjects,
     agents,
-    absents
+    absences,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

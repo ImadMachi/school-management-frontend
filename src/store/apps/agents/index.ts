@@ -92,7 +92,6 @@ export const addAgentAccount = createAsyncThunk(
       `${HOST}/agents/${id}/create-account`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

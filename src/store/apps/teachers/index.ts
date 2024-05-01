@@ -117,11 +117,9 @@ export const addTeacherAccount = createAsyncThunk(
       `${HOST}/teachers/${id}/create-account`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );
-
 
 export const deleteTeacher = createAsyncThunk(
   "appTeachers/deleteTeachers",
@@ -215,7 +213,7 @@ export const appTeachersSlice = createSlice({
     builder.addCase(addTeacherAccount.rejected, (state, action) => {
       toast.error("Erreur ajoutant le compte");
     });
-    
+
     builder.addCase(deleteTeacher.rejected, (state, action) => {
       toast.error("Erreur supprimant l'enseignant");
     });

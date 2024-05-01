@@ -95,7 +95,6 @@ export const addAdministratorAccount = createAsyncThunk(
       `${HOST}/administrators/${id}/create-account`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

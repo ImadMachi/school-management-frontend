@@ -91,11 +91,9 @@ export const addStudentAccount = createAsyncThunk(
       `${HOST}/students/${id}/create-account`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );
-
 
 export const updateStudent = createAsyncThunk(
   "appStudents/updateStudent",
@@ -200,7 +198,9 @@ export const appStudentsSlice = createSlice({
     });
     builder.addCase(addStudentAccount.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
-      state.data = state.data.filter((student) => student.id !== userIdToDelete);
+      state.data = state.data.filter(
+        (student) => student.id !== userIdToDelete
+      );
       state.allData = state.allData.filter(
         (Parent) => Parent.id !== userIdToDelete
       );

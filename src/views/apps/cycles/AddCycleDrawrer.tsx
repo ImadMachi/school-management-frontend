@@ -94,8 +94,6 @@ const SidebarAddCycle = (props: SidebarAddCycleType) => {
     if (props.cycleToEdit) {
       dispatch(editCycle({ ...payload, id: props.cycleToEdit.id }) as any);
     } else {
-      console.log(payload);
-
       dispatch(addCycle(payload) as any);
     }
     toggle();

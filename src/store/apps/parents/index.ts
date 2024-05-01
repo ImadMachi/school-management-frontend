@@ -92,7 +92,6 @@ export const addParentAccount = createAsyncThunk(
       `${HOST}/parents/${id}/create-account`,
       formData
     );
-    console.log(response.data);
     return response.data;
   }
 );

@@ -26,68 +26,21 @@ import { useDispatch } from "react-redux";
 
 // ** Types Imports
 import { AppDispatch, RootState } from "src/store";
-import {
-  Autocomplete,
-  Avatar,
-  Checkbox,
-  Chip,
-  FormControlLabel,
-  FormLabel,
-  Input,
-  InputLabel,
-  List,
-  ListItem,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Select,
-} from "@mui/material";
+import { Autocomplete, Avatar, Chip, ListItem } from "@mui/material";
 import { useSelector } from "react-redux";
 import { fetchData as fetchUsers } from "src/store/apps/users";
-import { fetchData as fetchAbsents } from "src/store/apps/absents";
+import { addAbsence, fetchData as fetchAbsents } from "src/store/apps/absences";
 import { getInitials } from "src/@core/utils/get-initials";
-import { AbsentsType } from "src/types/apps/absentsTypes";
+import { AddAbsenceType } from "src/types/apps/absenceTypes";
 import { UserType } from "src/types/apps/UserType";
-import {
-  addAbsent,
-  deleteAbsent,
-  fetchAbsent,
-  updateAbsent,
-} from "src/store/apps/absents";
-import { RadioButtonChecked } from "@mui/icons-material";
-
-interface SidebarAddAbsentType {
-  open: boolean;
-  toggle: () => void;
-  absentToEdit: AbsentsType | null;
-}
-
-export interface CreateAbsentDto {
-  absentUser: number;
-  datedebut: Date;
-  datefin: Date;
-  reason: string;
-  justified: boolean;
-  replaceUser: UserType[];
-  seance: string;
-  title: string;
-  body: string;
-  status: string;
-}
 
 type SelectType = UserType;
 
-const defaultValues = {
-  absentUser: "",
-  datedebut: "",
-  datefin: "",
+const defaultValues: AddAbsenceType = {
+  startDate: "",
+  endDate: "",
   reason: "",
-  justified: false,
-  replaceUser: [] as UserType[],
-  seance: "",
-  title: "",
-  body: "",
-  status: "non traiter",
+  absentUser: "",
 };
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
@@ -99,36 +52,22 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }));
 
 const schema = yup.object().shape({
-  id: yup.number(),
   absentUser: yup
     .number()
     .required("Absent est requis")
-    .positive("Absent est requis")
-    .integer("Absent est requis")
     .typeError("Absent est requis"),
-  datedebut: yup
-    .string()
-    .required("Date de début est requis")
-    .typeError("Date de début est requis"),
-  datefin: yup
-    .string()
-    .required("Date de fin est requis")
-    .typeError("Date de fin est requis"),
-  reason: yup
-    .string()
-    .required("Raison est requis")
-    .typeError("Raison est requis"),
-  justified: yup.boolean().required("Justifié est requis"),
-  replaceUser: yup.array(),
-  seance: yup.string(),
-  title: yup.string(),
-  body: yup.string(),
-  status: yup.string(),
+  startDate: yup.string().required("Date de début est requis"),
+  endDate: yup.string().required("Date de fin est requis"),
+  reason: yup.string().required("Raison est requis"),
 });
 
 type ToUserType = UserType;
 
-const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
+interface AddAbsenceDrawerProps {
+  open: boolean;
+  toggle: () => void;
+}
+const AddAbsenceDrawer = (props: AddAbsenceDrawerProps) => {
   // ** Props
   const { open, toggle } = props;
 
@@ -146,7 +85,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
 
   // ** Store
   const userStore = useSelector((state: RootState) => state.users);
-  const absentStore = useSelector((state: RootState) => state.absents);
+  const absenceStore = useSelector((state: RootState) => state.absences);
 
   const {
     reset,
@@ -162,21 +101,6 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
   });
 
   useEffect(() => {
-    if (props.absentToEdit) {
-      setValue("absentUser", `${props.absentToEdit.absentUser.id}`);
-      setValue("datedebut", props.absentToEdit.datedebut.toISOString());
-      setValue("datefin", props.absentToEdit.datefin.toISOString());
-      setValue("reason", props.absentToEdit.reason);
-      setValue("justified", props.absentToEdit.justified);
-      setValue("replaceUser", props.absentToEdit.replaceUser);
-      setValue("seance", props.absentToEdit.seance);
-      setValue("title", props.absentToEdit.title);
-      setValue("body", props.absentToEdit.body);
-      setValue("status", "non traiter");
-    }
-  }, [props.absentToEdit]);
-
-  useEffect(() => {
     dispatch(fetchUsers() as any);
   }, []);
 
@@ -186,7 +110,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
       absentUser: { id: data.absentUser },
     };
 
-    dispatch(addAbsent(payload) as any);
+    dispatch(addAbsence(payload) as any);
 
     toggle();
     reset();
@@ -289,9 +213,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant="h6">
-          {!!props.absentToEdit ? "Modifier" : "Ajouter"} Absent
-        </Typography>
+        <Typography variant="h6">Ajouter</Typography>
         <IconButton
           size="small"
           onClick={handleClose}
@@ -312,7 +234,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
                   id="absent-user-autocomplete"
                   options={userStore.data.filter(
                     (option) =>
-                      !absentStore.data.some(
+                      !absenceStore.data.some(
                         (absent) => absent.absentUser.id === option.id
                       )
                   )}
@@ -345,7 +267,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
             />
           </FormControl>
 
-          <FormControl fullWidth sx={{ mb: 6 }}>
+          {/* <FormControl fullWidth sx={{ mb: 6 }}>
             <InputLabel id="seance-select-label">Séance</InputLabel>
             <Controller
               name="seance"
@@ -368,21 +290,21 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
                 </Select>
               )}
             />
-          </FormControl>
+          </FormControl> */}
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="datedebut"
+              name="startDate"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  id="datedebut"
+                  id="startDate"
                   label="Date de début"
-                  type="datetime-local"
+                  type="date"
                   value={value}
                   onChange={onChange}
-                  error={Boolean(errors.datedebut)}
-                  helperText={errors.datedebut ? errors.datedebut.message : ""}
+                  error={Boolean(errors.startDate)}
+                  helperText={errors.startDate ? errors.startDate.message : ""}
                   InputLabelProps={{ shrink: true }}
                   sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
                 />
@@ -391,18 +313,18 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="datefin"
+              name="endDate"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  id="datefin"
+                  id="endDate"
                   label="Date de fin"
-                  type="datetime-local"
+                  type="date"
                   value={value}
                   onChange={onChange}
-                  error={Boolean(errors.datefin)}
-                  helperText={errors.datefin ? errors.datefin.message : ""}
+                  error={Boolean(errors.endDate)}
+                  helperText={errors.endDate ? errors.endDate.message : ""}
                   InputLabelProps={{ shrink: true }}
                   sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
                 />
@@ -429,7 +351,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
               )}
             />
           </FormControl>
-          <FormControl component="fieldset" fullWidth sx={{ mb: 6 }}>
+          {/* <FormControl component="fieldset" fullWidth sx={{ mb: 6 }}>
             <FormLabel component="legend">Justifié</FormLabel>
             <Controller
               name="justified"
@@ -459,7 +381,7 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
                 {errors.justified.message}
               </FormHelperText>
             )}
-          </FormControl>
+          </FormControl> */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <Button
               size="large"
@@ -484,4 +406,4 @@ const SidebarAddAbsent = (props: SidebarAddAbsentType) => {
   );
 };
 
-export default SidebarAddAbsent;
+export default AddAbsenceDrawer;

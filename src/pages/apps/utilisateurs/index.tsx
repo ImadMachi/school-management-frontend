@@ -1,12 +1,5 @@
 // ** React Imports
-import {
-  useState,
-  useEffect,
-  MouseEvent,
-  useCallback,
-  ChangeEvent,
-  useRef,
-} from "react";
+import { useState, useEffect, useCallback, ChangeEvent, useRef } from "react";
 
 // ** Next Imports
 import Link from "next/link";
@@ -24,7 +17,6 @@ import CustomChip from "src/@core/components/mui/chip";
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import EditIcon from "@mui/icons-material/Edit";
 
 import * as yup from "yup";
 
@@ -78,7 +70,6 @@ import { setTeacherId, setTeacherUserId } from "src/store/apps/teachers";
 import { setStudentId, setStudentUserId } from "src/store/apps/students";
 import { setParentId, setParentUserId } from "src/store/apps/parents";
 import { setAgentId, setAgentUserId } from "src/store/apps/agents";
-import toast from "react-hot-toast";
 
 interface CellType {
   row: UserType;
@@ -252,8 +243,6 @@ const RowOptions = ({ id }: { id: number }) => {
   // };
 
   function handleEditSubmit(data: any) {
-    console.log("data", data);
-
     const partialUpdatePasswordDto: Partial<UpdateUserDto> = { ...data };
     const newPassword = confirmPassword;
 
@@ -279,8 +268,6 @@ const RowOptions = ({ id }: { id: number }) => {
       console.error("New password is undefined");
       // Handle error, maybe display a message to the user
     }
-
-    
   }
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -353,7 +340,7 @@ const RowOptions = ({ id }: { id: number }) => {
           id="user-view-edit"
           sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
         >
-          Changer le mot de pass 
+          Changer le mot de pass
         </DialogTitle>
         <DialogContent
           sx={{
@@ -426,7 +413,7 @@ const RowOptions = ({ id }: { id: number }) => {
                   placeholder="********"
                   error={Boolean(errors.password)}
                   onChange={(e) => {
-                    field.onChange(e.target.value); 
+                    field.onChange(e.target.value);
                     setPassword(e.target.value);
                   }}
                   InputProps={{
@@ -719,7 +706,7 @@ const UserList = () => {
           />
           <DataGrid
             autoHeight
-            rows={userStore.data} 
+            rows={userStore.data}
             columns={columns}
             pageSize={pageSize}
             disableSelectionOnClick

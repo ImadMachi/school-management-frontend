@@ -56,6 +56,7 @@ import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { UserType } from "src/types/apps/UserType";
 import { MailFolderType } from "src/types/apps/mailTypes";
 import { IconButton } from "@mui/material";
+import { HOST } from "src/store/constants/hostname";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -223,7 +224,7 @@ const UserViewLeft = () => {
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
-                      src={`http://localhost:8000/uploads/${userIdData?.profileImage}`}
+                      src={`${HOST}/uploads/${userIdData?.profileImage}`}
                       sx={{ width: 80, height: 80 }}
                     />
                     {isHovered && (

@@ -36,6 +36,7 @@ import {
   filterData,
   setTeacherId,
   setTeacherUserId,
+  updateTeacherStatus,
 } from "src/store/apps/teachers";
 
 // ** Types Imports
@@ -51,6 +52,7 @@ import { UserType } from "src/types/apps/UserType";
 import { t } from "i18next";
 import SidebarAddTeacherAccount from "src/views/apps/teacher/list/AddTeacherAccountDrawer";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: TeachersType;
@@ -108,9 +110,19 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteTeacher(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteTeacher(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateTeacherStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
 
   const handleModifyClick = () => {
@@ -200,7 +212,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

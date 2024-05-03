@@ -131,7 +131,7 @@ const AddAbsenceDrawer = (props: AddAbsenceDrawerProps) => {
           {option.profileImage ? (
             <Avatar
               alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              src={`${HOST}/uploads/${option.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

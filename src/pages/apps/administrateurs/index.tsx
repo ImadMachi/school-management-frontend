@@ -31,6 +31,7 @@ import {
   fetchData,
   deleteAdministrator,
   filterData,
+  updateAdministratorStatus,
 } from "src/store/apps/administrator";
 
 import { setAdministratorId } from "src/store/apps/administrator";
@@ -52,6 +53,7 @@ import { UserType } from "src/types/apps/UserType";
 import SidebarAddAdministrator from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
 import toast from "react-hot-toast";
 import SidebarAddAdministratorAccount from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: AdministratorType;
@@ -99,11 +101,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    // @ts-ignore
-    dispatch(deleteAdministrator(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   // @ts-ignore
+  //   dispatch(deleteAdministrator(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateAdministratorStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
+
   const handleModifyClick = () => {
     if (userId) {
       toast.error("Cet utilisateur a déjà un compte.");
@@ -192,7 +205,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

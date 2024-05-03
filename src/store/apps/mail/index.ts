@@ -75,7 +75,7 @@ export const fetchMailsByUserId = createAsyncThunk(
   async (params: FetchMailByUserIdParamsType) => {
     const entityFolder = mapMailFolderToEntity(params.folder);
     const response = await axios.get(
-      `${HOST}/messages/user/${params.userId}?folder=${entityFolder}`
+      `${HOST}/messages/user/${params.userId}?folder=${entityFolder}&text=${params.q}&categoryId=${params.selectedCategory}&groupId=${params.selectedGroup}`
     );
     return { mails: response.data, filter: params };
   }

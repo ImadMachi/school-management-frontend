@@ -56,6 +56,8 @@ import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { UserType } from "src/types/apps/UserType";
 import { MailFolderType } from "src/types/apps/mailTypes";
 import { IconButton } from "@mui/material";
+import { StudentsType } from "src/types/apps/studentTypes";
+import { HOST } from "src/store/constants/hostname";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -65,6 +67,7 @@ export interface UpdateParentDto {
   firstName?: string;
   lastName?: string;
   phoneNumber?: string;
+  student?: StudentsType[];
 }
 
 const schema = yup.object().shape({
@@ -220,7 +223,7 @@ const UserViewLeft = () => {
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
-                      src={`http://localhost:8000/uploads/${userIdData?.profileImage}`}
+                      src={`${HOST}/uploads/${userIdData?.profileImage}`}
                       sx={{ width: 80, height: 80 }}
                     />
                     {isHovered && (
@@ -311,10 +314,18 @@ const UserViewLeft = () => {
                     {userData.phoneNumber}
                   </Typography>
                 </Box>
-                {/* <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
-                  <Typography variant='body2'>English</Typography>
-                </Box> */}
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Éléves:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.students?.map((student) => (
+                      <div key={student?.id}>- {student?.firstName} {student?.lastName}</div>
+                    ))}
+                  </Typography>
+                </Box>
                 <Box sx={{ display: "flex" }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -330,11 +341,7 @@ const UserViewLeft = () => {
               <Button variant="contained" onClick={handleEditClickOpen}>
                 Modifier
               </Button>
-              {/* <Button color='error' variant='outlined' onClick={() => setSuspendDialogOpen(true)}>
-                Suspend
-              </Button> */}
             </CardActions>
-
             <Dialog
               open={openEdit}
               onClose={handleEditClose}
@@ -423,14 +430,6 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
-
-                    {/* <Grid item xs={12}>
-                      <FormControlLabel
-                        label='Use as a billing address?'
-                        control={<Switch defaultChecked />}
-                        sx={{ '& .MuiTypography-root': { fontWeight: 500 } }}
-                      />
-                    </Grid> */}
                   </Grid>
                 </form>
               </DialogContent>

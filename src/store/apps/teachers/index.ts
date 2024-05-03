@@ -101,7 +101,7 @@ export const addTeacher = createAsyncThunk(
 );
 
 export const addTeacherAccount = createAsyncThunk(
-  "appAd/addAdministratorAccount",
+  "appTeachers/addTeacherAccount",
   async (
     payload: { id: number; data: CreateTeacherAccountDto },
     { getState, dispatch }: Redux
@@ -130,7 +130,7 @@ export const deleteTeacher = createAsyncThunk(
 );
 
 export const updateTeacher = createAsyncThunk(
-  "appteachers/updateTeacher",
+  "appTeachers/updateTeacher",
   async (
     payload: { id: number; updateTeacherDto: UpdateTeacherDto },
     { getState, dispatch }: Redux
@@ -141,6 +141,21 @@ export const updateTeacher = createAsyncThunk(
       updateTeacherDto
     );
     return response.data;
+  }
+);
+
+
+export const updateTeacherStatus = createAsyncThunk(
+  "appTeachers/updateTeacherStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<TeachersType>(`${HOST}/teachers/${id}/status`, {
+        disabled,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
   }
 );
 
@@ -220,7 +235,6 @@ export const appTeachersSlice = createSlice({
     builder.addCase(fetchTeacher.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
-      // Filter out the existing user data with the same ID
       state.data = state.data.filter(
         (teacher) => teacher.id !== userIdToDelete
       );
@@ -228,7 +242,6 @@ export const appTeachersSlice = createSlice({
         (teacher) => teacher.id !== userIdToDelete
       );
 
-      // Add the updated user data to the beginning of the arrays
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
@@ -247,6 +260,13 @@ export const appTeachersSlice = createSlice({
     });
     builder.addCase(updateTeacher.rejected, (state, action) => {
       toast.error("Erreur modifiant l'enseignant");
+    });
+    builder.addCase(updateTeacherStatus.fulfilled, (state, action) => {
+      toast.success("L'enseignant a été supprimé avec succès");
+    });
+
+    builder.addCase(updateTeacherStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'enseignant");
     });
   },
 });

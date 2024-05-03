@@ -108,6 +108,23 @@ export const updateAgent = createAsyncThunk(
   }
 );
 
+export const updateAgentStatus = createAsyncThunk(
+  "appAgents/updateAgentStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<AgentsType>(
+        `${HOST}/agents/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
 // ** Delete addAgent
 interface DeleteProps {
   id: number;
@@ -237,6 +254,12 @@ export const appAgentsSlice = createSlice({
     });
     builder.addCase(updateAgent.rejected, (state, action) => {
       toast.error("Erreur modifiant l'agent");
+    });
+    builder.addCase(updateAgentStatus.fulfilled, (state, action) => {
+      toast.success("L'agent a été supprimé avec succès");
+    });
+    builder.addCase(updateAgentStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'agent");
     });
   },
 });

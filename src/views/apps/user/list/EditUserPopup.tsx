@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import { UserType } from "src/types/apps/UserType";
+import { HOST } from "src/store/constants/hostname";
 
 interface EditUserPopupProps {
   isOpen: boolean;
@@ -65,7 +66,7 @@ const EditUserPopup: React.FC<EditUserPopupProps> = ({
           <>
             <Avatar
               alt={`Profile Image of ${userData.userData?.firstName} ${userData.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${userData.profileImage}`}
+              src={`${HOST}/uploads/${userData.profileImage}`}
               sx={{ width: 50, height: 50, marginBottom: 2 }}
             />
             <TextField

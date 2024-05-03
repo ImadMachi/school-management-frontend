@@ -54,6 +54,7 @@ import { ClassType } from "src/types/apps/classTypes";
 import { LevelType } from "src/types/apps/levelTypes";
 import { UserType } from "src/types/apps/UserType";
 import { t } from "i18next";
+import { HOST } from "src/store/constants/hostname";
 
 interface SidebarAddClassType {
   open: boolean;
@@ -226,7 +227,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
           {option.userId ? (
             <Avatar
               alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              src={`${HOST}/uploads/${user?.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (
@@ -257,7 +258,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
           {option.userId ? (
             <Avatar
               alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-              src={`http://localhost:8000/uploads/${user?.profileImage}`}
+              src={`${HOST}/uploads/${user?.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

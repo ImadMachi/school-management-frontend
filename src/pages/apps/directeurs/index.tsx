@@ -31,6 +31,7 @@ import {
   fetchData,
   deleteDirector,
   filterData,
+  updateDirectorStatus,
 } from "src/store/apps/directors";
 
 import { setDirectorId, setDirectorUserId } from "src/store/apps/directors";
@@ -49,6 +50,7 @@ import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
 import SidebarAddDirectorAccount from "src/views/apps/directors/list/AddDirectorAccountDrawer";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: DirectorType;
@@ -112,11 +114,22 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    // @ts-ignore
-    dispatch(deleteDirector(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteDirector(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateDirectorStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
+
+  
 
   const handleModifyClick = () => {
     if (userId) {
@@ -206,7 +219,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

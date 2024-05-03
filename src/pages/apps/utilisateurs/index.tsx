@@ -214,34 +214,6 @@ const RowOptions = ({ id }: { id: number }) => {
     }
   };
 
-  // const handleEditSubmit = async () => {
-  //   try {
-  //     const formData = handleSubmit();
-
-  //     const { newPassword, profileImage } = formData as any;
-
-  //     if (newPassword) {
-  //       await dispatch(
-  //         updatePassword({ id: id, newPassword: newPassword }) as any
-  //       );
-  //     }
-
-  //     if (profileImage) {
-  //       const response = await dispatch(
-  //         uploadProfileImage({ id, file: profileImage }) as any
-  //       ).unwrap();
-
-  //       if (userData) {
-  //         const imageUrl = response.profileImage;
-  //         setUserData({ ...userData, profileImage: imageUrl });
-  //       }
-  //     }
-  //     handleEditClose();
-  //   } catch (error) {
-  //     console.error("Error updating password or profile image:", error);
-  //   }
-  // };
-
   function handleEditSubmit(data: any) {
     const partialUpdatePasswordDto: Partial<UpdateUserDto> = { ...data };
     const newPassword = confirmPassword;
@@ -349,41 +321,11 @@ const RowOptions = ({ id }: { id: number }) => {
             flexDirection: "column",
           }}
         >
-          {/* <div
-            onMouseEnter={handleHover}
-            onMouseLeave={handleLeave}
-            style={{ position: "relative" }}
-          >
-            {userData && userData.profileImage && (
-              <> */}
           <Avatar
             alt={`Profile Image of ${userData?.userData?.firstName} ${userData?.userData?.lastName}`}
-            src={`http://localhost:8000/uploads/${userData?.profileImage}`}
+            src={`${HOST}/uploads/${userData?.profileImage}`}
             sx={{ width: 80, height: 80 }}
           />
-          {/* {isHovered && (
-                  <IconButton
-                    onClick={handleEditClick}
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      right: 0,
-                      backgroundColor: "rgba(244, 245, 250, 0.8)",
-                      padding: "4px",
-                    }}
-                  >
-                    <EditIcon sx={{ fontSize: 18 }} />
-                  </IconButton>
-                )}
-              </>
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-          </div> */}
 
           <Typography variant="h6" sx={{ mb: 4 }}>
             {userData?.userData?.firstName} {userData?.userData?.lastName}
@@ -530,7 +472,7 @@ const columns = [
           {row.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.userData?.firstName} ${row.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${row.profileImage}`}
+              src={`${HOST}/uploads/${row.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

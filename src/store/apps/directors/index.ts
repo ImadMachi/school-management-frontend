@@ -129,6 +129,23 @@ export const updateDirector = createAsyncThunk(
   }
 );
 
+export const updateDirectorStatus = createAsyncThunk(
+  "appDirectors/updateDirectorStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<DirectorType>(
+        `${HOST}/directors/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
 interface appDirectorsState {
   data: DirectorType[];
   total: number;
@@ -241,6 +258,12 @@ export const appDirectorsSlice = createSlice({
     });
     builder.addCase(updateDirector.rejected, (state, action) => {
       toast.error("Erreur modifiant le directeur");
+    });
+    builder.addCase(updateDirectorStatus.fulfilled, (state, action) => {
+      toast.success("Le directeur a été supprimé avec succès");
+    });
+    builder.addCase(updateDirectorStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant le directeur");
     });
   },
 });

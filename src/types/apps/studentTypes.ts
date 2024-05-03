@@ -8,6 +8,7 @@ export type StudentsType = {
     identification: string
     dateOfBirth: Date
     sex: string
+    disabled: boolean;
     userId: number
     classe : ClassType
     parent : ParentsType

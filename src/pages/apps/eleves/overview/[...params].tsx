@@ -55,6 +55,8 @@ import { Autocomplete, IconButton, ListItem } from "@mui/material";
 import { MailFolderType } from "src/types/apps/mailTypes";
 import { ParentsType } from "src/types/apps/parentTypes";
 import { getInitials } from "src/@core/utils/get-initials";
+import { fetchData } from "src/store/apps/parents";
+import { HOST } from "src/store/constants/hostname";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -132,7 +134,7 @@ const UserViewLeft = () => {
             {option.userId ? (
               <Avatar
                 alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-                src={`http://localhost:8000/uploads/${user?.profileImage}`}
+                src={`${HOST}/uploads/${user?.profileImage}`}
                 sx={{ width: 30, height: 30, marginRight: "10px" }}
               />
             ) : (
@@ -201,8 +203,6 @@ const UserViewLeft = () => {
           uploadProfileImage({ id: userId! as unknown as number, file })
         ).unwrap();
 
-        "Profile image uploaded successfully:", response;
-
         if (userIdData) {
           const imageUrl = response.profileImage;
           setUserIdData({ ...userIdData, profileImage: imageUrl });
@@ -216,6 +216,7 @@ const UserViewLeft = () => {
 
   useEffect(() => {
     dispatch(fetchStudent(Number(id)) as any);
+    dispatch(fetchData() as any);
     return () => {
       setUserData(null);
     };
@@ -272,7 +273,7 @@ const UserViewLeft = () => {
                   <>
                     <Avatar
                       alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
-                      src={`http://localhost:8000/uploads/${userIdData?.profileImage}`}
+                      src={`${HOST}/uploads/${userIdData?.profileImage}`}
                       sx={{ width: 80, height: 80 }}
                     />
                     {isHovered && (
@@ -357,16 +358,22 @@ const UserViewLeft = () => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
+                    CNE:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.identification}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
                     La date de naissance:
                   </Typography>
                   <Typography variant="body2">
                     {formatDate(userData.dateOfBirth)}
                   </Typography>
                 </Box>
-                {/* <Box sx={{ display: 'flex', mb: 2 }}>
-                  <Typography sx={{ mr: 2, fontWeight: 500, fontSize: '0.875rem' }}>Langue:</Typography>
-                  <Typography variant='body2'>English</Typography>
-                </Box> */}
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -374,6 +381,16 @@ const UserViewLeft = () => {
                     Sexe:
                   </Typography>
                   <Typography variant="body2">{userData.sex}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Parent:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.parent?.firstName} {userData.parent?.lastName}
+                  </Typography>
                 </Box>
                 <Box sx={{ display: "flex" }}>
                   <Typography
@@ -390,9 +407,6 @@ const UserViewLeft = () => {
               <Button variant="contained" onClick={handleEditClickOpen}>
                 Modifier
               </Button>
-              {/* <Button color='error' variant='outlined' onClick={() => setSuspendDialogOpen(true)}>
-                Suspend
-              </Button> */}
             </CardActions>
 
             <Dialog
@@ -489,9 +503,7 @@ const UserViewLeft = () => {
                         <Controller
                           name="dateOfBirth"
                           control={control}
-                          defaultValue={new Date(
-                            userData.dateOfBirth
-                          ).toLocaleDateString()}
+                          defaultValue={new Date(userData.dateOfBirth)}
                           rules={{ required: "Date de naissance est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
@@ -536,12 +548,13 @@ const UserViewLeft = () => {
                             <Autocomplete
                               id="parent-user-autocomplete"
                               options={parentStore.data}
+                              defaultValue={userData.parent}
                               getOptionLabel={(option) =>
                                 `${option.firstName} ${option.lastName}`
                               }
                               value={
                                 parentStore.data.find(
-                                  (user) => user.id === Number(value)
+                                  (user) => user.id === userData.parent?.id
                                 ) || null
                               }
                               onChange={(e, newValue) => {
@@ -588,9 +601,6 @@ const UserViewLeft = () => {
                 </Button>
               </DialogActions>
             </Dialog>
-            {/* 
-            <UserSuspendDialog open={suspendDialogOpen} setOpen={setSuspendDialogOpen} />
-            <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} /> */}
           </Card>
         </Grid>
         {userData.userId !== null && (

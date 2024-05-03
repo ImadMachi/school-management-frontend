@@ -75,6 +75,7 @@ import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
 import { useSettings } from "src/@core/hooks/useSettings";
 import { TemplateType } from "src/types/apps/templateTypes";
 import { useAuth } from "src/hooks/useAuth";
+import { HOST } from "src/store/constants/hostname";
 
 type ToUserType = UserType;
 
@@ -369,7 +370,7 @@ const ComposePopup = (props: MailComposeType) => {
           {option.profileImage ? (
             <Avatar
               alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
-              src={`http://localhost:8000/uploads/${option.profileImage}`}
+              src={`${HOST}/uploads/${option.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

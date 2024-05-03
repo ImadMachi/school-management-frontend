@@ -23,6 +23,7 @@ import { useAuth } from "src/hooks/useAuth";
 // ** Type Imports
 import { Settings } from "src/@core/context/settingsContext";
 import { mapRoleToFrench } from "src/pages/apps/utilisateurs";
+import { HOST } from "src/store/constants/hostname";
 
 interface Props {
   settings: Settings;
@@ -99,7 +100,7 @@ const UserDropdown = (props: Props) => {
           alt={`${user?.userData?.firstName} ${user?.userData?.lastName}`}
           onClick={handleDropdownOpen}
           sx={{ width: 40, height: 40 }}
-          src={`http://localhost:8000/uploads/${user?.profileImage}`}
+          src={`${HOST}/uploads/${user?.profileImage}`}
         />
       </Badge>
       <Menu
@@ -128,7 +129,7 @@ const UserDropdown = (props: Props) => {
             >
               <Avatar
                 alt={`${user?.userData?.firstName} ${user?.userData?.lastName}`}
-                src={`http://localhost:8000/uploads/${user?.profileImage}`}
+                src={`${HOST}/uploads/${user?.profileImage}`}
                 sx={{ width: "2.5rem", height: "2.5rem" }}
               />
             </Badge>

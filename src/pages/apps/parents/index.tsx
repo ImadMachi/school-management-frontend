@@ -38,6 +38,7 @@ import {
   filterData,
   setParentId,
   setParentUserId,
+  updateParentStatus,
 } from "src/store/apps/parents";
 // ** Types Imports
 import { ParentsType } from "src/types/apps/parentTypes";
@@ -51,6 +52,7 @@ import { Avatar } from "@mui/material";
 import { ro } from "date-fns/locale";
 import { UserType } from "src/types/apps/UserType";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: ParentsType;
@@ -109,9 +111,19 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteParent(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteParent(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateParentStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
 
   const handleModifyClick = () => {
@@ -201,7 +213,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (
@@ -245,7 +257,7 @@ const columns = [
     headerName: "Éléves",
     field: "éléves",
     renderCell: ({ row }: CellType) => {
-      const students = row.students || []; 
+      const students = row.students || [];
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Box
@@ -256,7 +268,7 @@ const columns = [
             }}
           >
             <Typography noWrap>
-              {students.length 
+              {students.length
                 ? students.map((user, index) => (
                     <span key={user.id}>
                       {user.firstName ?? "non spécifié"}
@@ -335,7 +347,6 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
 
   const generateCSVData = () => {
     return parentStore.data.map((item) => ({

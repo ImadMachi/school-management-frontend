@@ -38,6 +38,7 @@ import {
   filterData,
   setAgentId,
   setAgentUserId,
+  updateAgentStatus,
 } from "src/store/apps/agents";
 // ** Types Imports
 import { AgentsType } from "src/types/apps/agentTypes";
@@ -51,6 +52,7 @@ import { ro } from "date-fns/locale";
 import { UserType } from "src/types/apps/UserType";
 import toast from "react-hot-toast";
 import SidebarAddAgentAccount from "src/views/apps/agents/list/AddAgentAccountDrawer";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: AgentsType;
@@ -111,10 +113,21 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteAgent(id) as any);
-    handleRowOptionsClose();
+  // const handleDelete = () => {
+  //   dispatch(deleteAgent(id) as any);
+  //   handleRowOptionsClose();
+  // };
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(updateAgentStatus({ id: id, disabled: true }) as any);
+
+      await dispatch(fetchData() as any);
+    } catch (error) {
+      console.error("Error disabling user:", error);
+    }
   };
+
   const handleModifyClick = () => {
     if (userId) {
       toast.error("Cet utilisateur a déjà un compte.");
@@ -202,7 +215,7 @@ const columns = [
           {user?.profileImage ? (
             <Avatar
               alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`http://localhost:8000/uploads/${user.profileImage}`}
+              src={`${HOST}/uploads/${user.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
           ) : (

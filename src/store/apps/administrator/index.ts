@@ -128,6 +128,23 @@ export const updateAdministrator = createAsyncThunk(
   }
 );
 
+export const updateAdministratorStatus = createAsyncThunk(
+  "appAdministrators/updateAdministratorStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<AdministratorType>(
+        `${HOST}/administrators/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
 interface AppAdministratorsState {
   data: AdministratorType[];
   total: number;
@@ -240,6 +257,12 @@ export const appAdministratorsSlice = createSlice({
       }
     });
     builder.addCase(updateAdministrator.rejected, (state, action) => {
+      toast.error("Erreur modifiant l'administrateur");
+    });
+    builder.addCase(updateAdministratorStatus.fulfilled, (state, action) => {
+      toast.success("L'administrateur a été modifié avec succès");
+    });
+    builder.addCase(updateAdministratorStatus.rejected, (state, action) => {
       toast.error("Erreur modifiant l'administrateur");
     });
   },

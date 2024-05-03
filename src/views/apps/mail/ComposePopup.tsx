@@ -74,6 +74,7 @@ import { ClassType } from "src/types/apps/classTypes";
 import SwiperThumbnails from "src/views/components/swiper/SwiperThumbnails";
 import { useSettings } from "src/@core/hooks/useSettings";
 import { TemplateType } from "src/types/apps/templateTypes";
+import { useAuth } from "src/hooks/useAuth";
 
 type ToUserType = UserType;
 
@@ -132,6 +133,8 @@ const ComposePopup = (props: MailComposeType) => {
   const {
     settings: { direction },
   } = useSettings();
+
+  const { user } = useAuth();
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -402,13 +405,13 @@ const ComposePopup = (props: MailComposeType) => {
         onClick={() => setState([...array, option])}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.name}`)}
-            </CustomAvatar>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(`${option.name}`)}
+          </CustomAvatar>
           <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
         </Box>
       </ListItem>
@@ -545,7 +548,7 @@ const ComposePopup = (props: MailComposeType) => {
                 onChange={() => handleChangeCheckedRecipient(0)}
               />
             }
-            label="Etudiants"
+            label="Elèves"
           />
           <FormControlLabel
             control={
@@ -574,24 +577,28 @@ const ComposePopup = (props: MailComposeType) => {
             }
             label="Classes"
           />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checkedRecipients[4]}
-                onChange={() => handleChangeCheckedRecipient(4)}
-              />
-            }
-            label="Groupes"
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={checkedRecipients[5]}
-                onChange={() => handleChangeCheckedRecipient(5)}
-              />
-            }
-            label="Agents"
-          />
+          {user?.role != "Teacher" && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={checkedRecipients[4]}
+                  onChange={() => handleChangeCheckedRecipient(4)}
+                />
+              }
+              label="Groupes"
+            />
+          )}
+          {user?.role != "Teacher" && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={checkedRecipients[5]}
+                  onChange={() => handleChangeCheckedRecipient(5)}
+                />
+              }
+              label="Agents"
+            />
+          )}
         </FormGroup>
       </Box>
       <Box

@@ -224,7 +224,7 @@ const LoginPage = () => {
                 Veuillez vous connecter à votre compte
               </Typography>
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 mb: 6,
                 display: "flex",
@@ -239,7 +239,7 @@ const LoginPage = () => {
                 Admin: <strong>admin@gmail.com</strong> / Pass:{" "}
                 <strong>123456</strong>
               </Typography>
-            </Box>
+            </Box> */}
             <form
               noValidate
               autoComplete="off"

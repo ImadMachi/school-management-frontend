@@ -52,7 +52,7 @@ export type SendMailParamsType = {
   recipients: { id: number }[];
   subject: string;
   body: string;
-  attachments: File[];
+  attachments?: File[];
   category: number;
 };
 

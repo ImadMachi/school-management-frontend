@@ -16,7 +16,7 @@ import { useAuth } from "src/hooks/useAuth";
 export const getHomeRoute = (role: string) => {
   // if (role === 'client') return '/acl'
   // else return '/home'
-  return "/apps/utilisateurs";
+  return "/apps/mail";
 };
 
 const Home = () => {

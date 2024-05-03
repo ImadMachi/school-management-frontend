@@ -88,12 +88,17 @@ export const sendMail = createAsyncThunk(
     const formData = new FormData();
     formData.append("subject", data.subject);
     formData.append("body", data.body);
+
     for (let i = 0; i < data.recipients.length; i++) {
       formData.append(`recipients[${i}][id]`, data.recipients[i].id.toString());
     }
-    for (let file of data.attachments) {
-      formData.append(file.name, file);
+
+    if (data.attachments) {
+      for (let file of data.attachments) {
+        formData.append(file.name, file);
+      }
     }
+
     formData.append("categoryId", data.category.toString());
 
     const response = await axios.post(`${HOST}/messages`, formData, {

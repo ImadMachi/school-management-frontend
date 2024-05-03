@@ -1,7 +1,12 @@
-import EmailAppLayout from 'src/views/apps/mail/Mail'
+import EmailAppLayout from "src/views/apps/mail/Mail";
 
-const EmailApp = () => <EmailAppLayout folder='inbox' />
+const EmailApp = () => <EmailAppLayout folder="inbox" />;
 
-EmailApp.contentHeightFixed = true
+EmailApp.contentHeightFixed = true;
 
-export default EmailApp
+EmailApp.acl = {
+  action: "read",
+  subject: "mail",
+};
+
+export default EmailApp;

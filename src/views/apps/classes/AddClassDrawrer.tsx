@@ -166,6 +166,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
       setValue("administrator", `${props.classToEdit.administrator.id}`);
       setValue("teachers", props.classToEdit.teachers);
       setValue("students", props.classToEdit.students);
+      console.log(props.classToEdit);
+
       setValue("level", `${props.classToEdit.level.id}`);
     }
   }, [props.classToEdit]);
@@ -264,9 +266,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               color="primary"
               sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
             >
-              {getInitials(
-                `${option.firstName} ${option.lastName}`
-              )}
+              {getInitials(`${option.firstName} ${option.lastName}`)}
             </CustomAvatar>
           )}
 
@@ -407,7 +407,9 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   }
                   value={
                     value
-                      ? administratorStore.data.find((user) => user.id === Number(value))
+                      ? administratorStore.data.find(
+                          (user) => user.id === Number(value)
+                        )
                       : null
                   }
                   onChange={(event, newValue) => {
@@ -511,7 +513,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     "& .MuiSelect-selectMenu": { minHeight: "auto" },
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} label="Etudiants" />
+                    <TextField {...params} label="Elèves" />
                   )}
                 />
               )}

@@ -19,4 +19,9 @@ const UserProfileTab = () => {
   return <UserProfile data={data.user} />;
 };
 
+UserProfileTab.acl = {
+  action: "read",
+  subject: "profile",
+};
+
 export default UserProfileTab;

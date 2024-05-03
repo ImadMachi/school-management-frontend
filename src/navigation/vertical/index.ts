@@ -87,6 +87,8 @@ const navigation = (): VerticalNavItemsType => {
       path: "/apps/mail",
       title: "Messages",
       icon: "mdi:email",
+      action: "read",
+      subject: "mail",
     },
     {
       path: "/apps/mail-parametres",

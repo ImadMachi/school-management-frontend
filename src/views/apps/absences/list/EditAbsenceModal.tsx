@@ -40,6 +40,7 @@ import { AbsenceType } from "src/types/apps/absenceTypes";
 import { Icon } from "@iconify/react";
 import { addDays, differenceInDays, format } from "date-fns";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { sendMail } from "src/store/apps/mail";
 
 type SelectType = UserType;
 
@@ -73,6 +74,7 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
 
   // ** State
   const [absenceDays, setAbsenceDays] = useState<any[]>([]);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   // ** Store
   const userStore = useSelector((state: RootState) => state.users);
@@ -117,6 +119,48 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
     handleClose();
   };
 
+  const sendMessage = () => {
+    const recipients: { id: number }[] = [];
+
+    absenceDays.forEach((day) => {
+      day.sessions.forEach((session: any) => {
+        if (session.user) {
+          if (!recipients.includes(session.user.id)) {
+            recipients.push({ id: session.user.id });
+          }
+        }
+      });
+    });
+
+    const subject = "Notification de remplacement";
+
+    let body = `${absenceToEdit.absenceDays.map(
+      (day) =>
+        `${format(new Date(day.date), "dd/MM/yyyy")} ${translateDay(
+          format(new Date(day.date), "EEEE")
+        )} \n` +
+        `${day.sessions.map(
+          (session, i) =>
+            `Séance ${i + 1} : ${
+              session.user
+                ? `${
+                    userStore.data.find((user) => user.id === session.user.id)
+                      ?.userData.firstName
+                  } ${
+                    userStore.data.find((user) => user.id === session.user.id)
+                      ?.userData.lastName
+                  }`
+                : "Non défini"
+            }`
+        )}`
+    )}`;
+    body += `\n\n${notificationMessage}`;
+
+    const category = 2;
+
+    dispatch(sendMail({ recipients, subject, body, category }) as any);
+  };
+
   const handleClose = () => {
     setAbsenceToEdit(null);
     toggle();
@@ -143,27 +187,6 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
         return day;
     }
   }
-
-  const message = `${absenceToEdit.absenceDays.map(
-    (day) =>
-      `${format(new Date(day.date), "dd/MM/yyyy")} ${translateDay(
-        format(new Date(day.date), "EEEE")
-      )} \n` +
-      `${day.sessions.map(
-        (session, i) =>
-          `Séance ${i + 1} : ${
-            session.user
-              ? `${
-                  userStore.data.find((user) => user.id === session.user.id)
-                    ?.userData.firstName
-                } ${
-                  userStore.data.find((user) => user.id === session.user.id)
-                    ?.userData.lastName
-                }`
-              : "Non défini"
-          }`
-      )}`
-  )}`;
 
   const renderListItem = (
     props: HTMLAttributes<HTMLLIElement>,
@@ -223,7 +246,11 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
   }, []);
 
   return (
-    <Dialog open={open} onClose={toggle}>
+    <Dialog
+      open={open}
+      onClose={toggle}
+      sx={{ "& .MuiPaper-root": { maxWidth: 650 } }}
+    >
       <DialogTitle>Edit User</DialogTitle>
       <DialogContent>
         <Box sx={{ p: 5 }}>
@@ -232,7 +259,6 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
               <Controller
                 name="absentUser"
                 control={control}
-                disabled
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <Autocomplete
@@ -264,6 +290,7 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                       <TextField
                         {...params}
                         label="Absent"
+                        disabled
                         error={Boolean(errors.absentUser)}
                         helperText={
                           errors.absentUser ? errors.absentUser.message : ""
@@ -274,13 +301,11 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                 )}
               />
             </FormControl>
-            <p>{message}</p>
             <FormControl fullWidth sx={{ mb: 6 }}>
               <Controller
                 name="startDate"
                 control={control}
                 rules={{ required: true }}
-                disabled
                 render={({ field: { value, onChange } }) => (
                   <TextField
                     id="startDate"
@@ -304,7 +329,6 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                 name="endDate"
                 control={control}
                 rules={{ required: true }}
-                disabled
                 render={({ field: { value, onChange } }) => (
                   <TextField
                     id="endDate"
@@ -325,7 +349,6 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
               <Controller
                 name="reason"
                 control={control}
-                disabled
                 rules={{ required: true }}
                 render={({ field: { value, onChange } }) => (
                   <TextField
@@ -437,12 +460,7 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                         <FormControl fullWidth sx={{ mb: 6 }}>
                           <Autocomplete
                             id="replacing-user-autocomplete"
-                            options={userStore.data.filter(
-                              (option) =>
-                                !absenceStore.data.some(
-                                  (absent) => absent.absentUser.id === option.id
-                                )
-                            )}
+                            options={userStore.data}
                             getOptionLabel={(option) =>
                               `${option.userData?.firstName} ${option.userData?.lastName}`
                             }
@@ -498,6 +516,8 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
               <TextField
                 id="notification"
                 label="Message aux remplaçants"
+                value={notificationMessage}
+                onChange={(e) => setNotificationMessage(e.target.value)}
                 multiline
                 rows={4}
                 sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
@@ -512,6 +532,14 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                 sx={{ mr: 3 }}
               >
                 Soumettre
+              </Button>
+              <Button
+                size="large"
+                variant="outlined"
+                onClick={sendMessage}
+                sx={{ mr: 3 }}
+              >
+                Notifier
               </Button>
               <Button
                 size="large"

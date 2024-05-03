@@ -38,6 +38,7 @@ import { HOST } from "src/store/constants/hostname";
 import { Avatar } from "@mui/material";
 import { CategoryType } from "src/types/apps/categoryTypes";
 import { GroupType } from "src/types/apps/groupTypes";
+import { useAuth } from "src/hooks/useAuth";
 
 // ** Styled Components
 const ListItemStyled = styled(ListItem)<
@@ -79,9 +80,14 @@ const SidebarLeft = (props: MailSidebarType) => {
     setIsFetching,
   } = props;
 
+  // ** Auth
+  const { user } = useAuth();
+
+  // ** Stores
   const categoryStore = useSelector((state: RootState) => state.categories);
   const groupStore = useSelector((state: RootState) => state.groups);
 
+  // ** Methods
   const RenderBadge = (
     folder: "inbox" | "spam",
     color:
@@ -297,38 +303,41 @@ const SidebarLeft = (props: MailSidebarType) => {
                 }}
               />
             </ListItemStyled>
-            <ListItemStyled
-              component={Link}
-              href="/apps/mail/trash"
-              onClick={handleListItemClick.bind(null, "trash")}
-              sx={{
-                borderLeftColor: handleActiveItem("folder", "trash")
-                  ? "primary.main"
-                  : "transparent",
-              }}
-            >
-              <ListItemIcon
+
+            {user?.role == "Director" && (
+              <ListItemStyled
+                component={Link}
+                href="/apps/mail/trash"
+                onClick={handleListItemClick.bind(null, "trash")}
                 sx={{
-                  color: handleActiveItem("folder", "trash")
+                  borderLeftColor: handleActiveItem("folder", "trash")
                     ? "primary.main"
-                    : "text.secondary",
+                    : "transparent",
                 }}
               >
-                <Icon icon="mdi:delete-outline" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Corbeille"
-                primaryTypographyProps={{
-                  noWrap: true,
-                  sx: {
-                    fontWeight: 500,
-                    ...(handleActiveItem("folder", "trash") && {
-                      color: "primary.main",
-                    }),
-                  },
-                }}
-              />
-            </ListItemStyled>
+                <ListItemIcon
+                  sx={{
+                    color: handleActiveItem("folder", "trash")
+                      ? "primary.main"
+                      : "text.secondary",
+                  }}
+                >
+                  <Icon icon="mdi:delete-outline" />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Corbeille"
+                  primaryTypographyProps={{
+                    noWrap: true,
+                    sx: {
+                      fontWeight: 500,
+                      ...(handleActiveItem("folder", "trash") && {
+                        color: "primary.main",
+                      }),
+                    },
+                  }}
+                />
+              </ListItemStyled>
+            )}
           </List>
           <Typography
             component="h6"

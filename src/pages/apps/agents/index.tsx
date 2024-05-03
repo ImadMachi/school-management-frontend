@@ -99,7 +99,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const [modifyClicked, setModifyClicked] = useState<boolean>(false);
   const [isAddAgentOpen, setIsAddAgentOpen] = useState(false);
 
-
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -107,7 +106,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setAgentUserId(userId));
     setAnchorEl(event.currentTarget);
     setModifyClicked(false);
-
   };
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
@@ -307,7 +305,6 @@ const UserList = () => {
   const dispatch = useDispatch<AppDispatch>();
   const agentStore = useSelector((state: RootState) => state.agents);
 
-
   useEffect(() => {
     dispatch(fetchData() as any);
   }, []);
@@ -320,15 +317,15 @@ const UserList = () => {
     setValue(val);
   }, []);
 
-  const generateCSVData = () => {
-    return agentStore.data.map((item) => ({
-      id: item.id, // Add this line to include the id property
-      Prénom: item.firstName,
-      Nom: item.lastName,
-      Tel: item.phoneNumber,
-      compte: !!item.userId ? "oui" : "non",
-    }));
-  };
+  // const generateCSVData = () => {
+  //   return agentStore.data.map((item) => ({
+  //     id: item.id, // Add this line to include the id property
+  //     Prénom: item.firstName,
+  //     Nom: item.lastName,
+  //     Tel: item.phoneNumber,
+  //     compte: !!item.userId ? "oui" : "non",
+  //   }));
+  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
@@ -337,7 +334,7 @@ const UserList = () => {
       <Grid item xs={12}>
         <Card>
           <TableHeader
-            generateCSVData={generateCSVData}
+            // generateCSVData={generateCSVData}
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}

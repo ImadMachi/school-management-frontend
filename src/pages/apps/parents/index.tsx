@@ -348,15 +348,15 @@ const UserList = () => {
     setValue(val);
   }, []);
 
-  const generateCSVData = () => {
-    return parentStore.data.map((item) => ({
-      id: item.id, // Add this line to include the id property
-      Prénom: item.firstName,
-      Nom: item.lastName,
-      Tel: item.phoneNumber,
-      compte: !!item.userId ? "oui" : "non",
-    }));
-  };
+  // const generateCSVData = () => {
+  //   return parentStore.data.map((item) => ({
+  //     id: item.id, // Add this line to include the id property
+  //     Prénom: item.firstName,
+  //     Nom: item.lastName,
+  //     Tel: item.phoneNumber,
+  //     compte: !!item.userId ? "oui" : "non",
+  //   }));
+  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
@@ -365,7 +365,7 @@ const UserList = () => {
       <Grid item xs={12}>
         <Card>
           <TableHeader
-            generateCSVData={generateCSVData}
+            // generateCSVData={generateCSVData}
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}

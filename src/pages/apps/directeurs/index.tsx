@@ -98,8 +98,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const [isAddDirectorOpen, setIsAddDirectorOpen] = useState<boolean>(false);
   const [modifyClicked, setModifyClicked] = useState(false);
 
-  
-
   const rowOptionsOpen = Boolean(anchorEl);
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -107,7 +105,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     dispatch(setDirectorUserId(userId));
     setAnchorEl(event.currentTarget);
     setModifyClicked(false);
-
   };
 
   const handleRowOptionsClose = () => {
@@ -128,8 +125,6 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
       console.error("Error disabling user:", error);
     }
   };
-
-  
 
   const handleModifyClick = () => {
     if (userId) {
@@ -323,14 +318,14 @@ const DirectorList = () => {
     setValue(val);
   }, []);
 
-  const generateCSVData = () => {
-    return directorStore.allData.map((item) => ({
-      Prénom: item.firstName,
-      Nom: item.lastName,
-      Tel: item.phoneNumber,
-      compte: !!item.userId ? "oui" : "non",
-    }));
-  };
+  // const generateCSVData = () => {
+  //   return directorStore.allData.map((item) => ({
+  //     Prénom: item.firstName,
+  //     Nom: item.lastName,
+  //     Tel: item.phoneNumber,
+  //     compte: !!item.userId ? "oui" : "non",
+  //   }));
+  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
@@ -339,7 +334,7 @@ const DirectorList = () => {
       <Grid item xs={12}>
         <Card>
           <TableHeader
-            generateCSVData={generateCSVData}
+            // generateCSVData={generateCSVData}
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}

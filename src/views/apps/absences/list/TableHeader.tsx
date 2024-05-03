@@ -31,16 +31,7 @@ const TableHeader = (props: TableHeaderProps) => {
         justifyContent: "space-between",
       }}
     >
-      {/* <CSVLink data={props.generateCSVData()} filename={"absences.csv"}> */}
-      <Button
-        sx={{ mr: 4, mb: 2 }}
-        color="secondary"
-        variant="outlined"
-        startIcon={<Icon icon="mdi:export-variant" fontSize={20} />}
-      >
-        Exporter
-      </Button>
-      {/* </CSVLink> */}
+      <div></div>
       <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center" }}>
         <TextField
           size="small"

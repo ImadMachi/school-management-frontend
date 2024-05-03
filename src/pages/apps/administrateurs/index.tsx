@@ -109,7 +109,9 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
   const handleDelete = async () => {
     try {
-      await dispatch(updateAdministratorStatus({ id: id, disabled: true }) as any);
+      await dispatch(
+        updateAdministratorStatus({ id: id, disabled: true }) as any
+      );
 
       await dispatch(fetchData() as any);
     } catch (error) {
@@ -312,14 +314,14 @@ const AdministratorList = () => {
     setValue(val);
   }, []);
 
-  const generateCSVData = () => {
-    return administratorStore.allData.map((item) => ({
-      Prénom: item.firstName,
-      Nom: item.lastName,
-      Tel: item.phoneNumber,
-      compte: !!item.userId ? "oui" : "non",
-    }));
-  };
+  // const generateCSVData = () => {
+  //   return administratorStore.allData.map((item) => ({
+  //     Prénom: item.firstName,
+  //     Nom: item.lastName,
+  //     Tel: item.phoneNumber,
+  //     compte: !!item.userId ? "oui" : "non",
+  //   }));
+  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
@@ -328,7 +330,7 @@ const AdministratorList = () => {
       <Grid item xs={12}>
         <Card>
           <TableHeader
-            generateCSVData={generateCSVData}
+            // generateCSVData={generateCSVData}
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}

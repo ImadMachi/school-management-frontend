@@ -350,18 +350,18 @@ const UserList = () => {
     setValue(val);
   }, []);
 
-  const generateCSVData = () => {
-    return teacherStore.allData.map((item) => ({
-      Prénom: item.firstName,
-      Nom: item.lastName,
-      DateNaissance: item.dateOfBirth,
-      DateEmbauche: item.dateOfEmployment,
-      Tel: item.phoneNumber,
-      Sexe: item.sex || "-",
+  // const generateCSVData = () => {
+  //   return teacherStore.allData.map((item) => ({
+  //     Prénom: item.firstName,
+  //     Nom: item.lastName,
+  //     DateNaissance: item.dateOfBirth,
+  //     DateEmbauche: item.dateOfEmployment,
+  //     Tel: item.phoneNumber,
+  //     Sexe: item.sex || "-",
 
-      compte: !!item.userId ? "oui" : "non",
-    }));
-  };
+  //     compte: !!item.userId ? "oui" : "non",
+  //   }));
+  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
@@ -370,7 +370,7 @@ const UserList = () => {
       <Grid item xs={12}>
         <Card>
           <TableHeader
-            generateCSVData={generateCSVData}
+            // generateCSVData={generateCSVData}
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}

@@ -70,6 +70,7 @@ import { setTeacherId, setTeacherUserId } from "src/store/apps/teachers";
 import { setStudentId, setStudentUserId } from "src/store/apps/students";
 import { setParentId, setParentUserId } from "src/store/apps/parents";
 import { setAgentId, setAgentUserId } from "src/store/apps/agents";
+import { HOST } from "src/store/constants/hostname";
 
 interface CellType {
   row: UserType;
@@ -625,14 +626,14 @@ const UserList = () => {
     setValue(val);
   }, []);
 
-  const generateCSVData = () => {
-    return userStore.allData.map((item) => ({
-      Id: item.id,
-      Role: item.role,
-      Email: item.email,
-      compte: !!item.isActive ? "oui" : "non",
-    }));
-  };
+  // const generateCSVData = () => {
+  //   return userStore.allData.map((item) => ({
+  //     Id: item.id,
+  //     Role: item.role,
+  //     Email: item.email,
+  //     compte: !!item.isActive ? "oui" : "non",
+  //   }));
+  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
@@ -641,7 +642,7 @@ const UserList = () => {
       <Grid item xs={12}>
         <Card>
           <TableHeader
-            generateCSVData={generateCSVData}
+            // generateCSVData={generateCSVData}
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}

@@ -6,7 +6,7 @@ const navigation = (): VerticalNavItemsType => {
     {
       action: "manage",
       subject: "user",
-      title: "Utilisateurs",
+      title: "Gestion des utilisateurs",
       icon: "mdi:users",
       children: [
         {

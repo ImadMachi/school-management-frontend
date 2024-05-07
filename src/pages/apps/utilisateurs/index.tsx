@@ -91,27 +91,14 @@ const userRoleObj: UserRoleType = {
   Agent: { icon: "mdi:support", color: "secondary.main" },
 };
 
-export interface UpdateUserDto {
-  profileImage?: File;
-  email?: string;
+export interface UpdateUserPasswordDto {
   password?: string;
-  confirmPassword?: string;
 }
 const schema = yup.object().shape({
-  profileImage: yup.mixed().notRequired(),
-  email: yup.string().email().required("L'email est requis"),
   password: yup
     .string()
     .min(6, "Le mot de passe doit contenir au moins 6 caractères")
     .required("Le mot de passe est requis"),
-  confirmPassword: yup
-    .string()
-    .min(6, "Le mot de passe doit contenir au moins 6 caractères")
-    .oneOf(
-      [yup.ref("password"), null],
-      "Les mots de passe ne correspondent pas"
-    )
-    .required("La confirmation du mot de passe est requise"),
 });
 
 const accountStatusObj: AccountStatusType = {
@@ -129,47 +116,27 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-// ** renders client column
-// ** renders client column
 const RowOptions = ({ id }: { id: number }) => {
-  // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const auth = useAuth();
-
-  // ** State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  useState<UserType | null>(null);
   const [openEdit, setOpenEdit] = useState(false);
   const [userData, setUserData] = useState<UserType | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const {
     reset,
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<UpdateUserDto>({
+  } = useForm<UpdateUserPasswordDto>({
     mode: "onChange",
     resolver: yupResolver(schema),
   });
 
   const rowOptionsOpen = Boolean(anchorEl);
   const userStore = useSelector((state: RootState) => state.users);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (openEdit) {
-      const foundUser = userStore.data.find((user) => user.id === id);
-      if (foundUser) {
-        setUserData(foundUser);
-        setPassword(foundUser.password || "");
-        setConfirmPassword(foundUser.password || "");
-      }
-    }
-  }, [openEdit, id, userStore.data]);
 
   useEffect(() => {
     if (userStore.data && userStore.data.length > 0) {
@@ -178,7 +145,6 @@ const RowOptions = ({ id }: { id: number }) => {
   }, [userStore.data]);
 
   const handleEditClick = () => {
-    fileInputRef.current?.click();
     setOpenEdit(true);
   };
 
@@ -187,64 +153,26 @@ const RowOptions = ({ id }: { id: number }) => {
     setUserData(null);
   };
 
-  const handleHover = () => {
-    setIsHovered(true);
-  };
-
-  const handleLeave = () => {
-    setIsHovered(false);
-  };
-
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const userId = id;
-      try {
-        const response = await dispatch(
-          uploadProfileImage({ id: userId, file }) as any
-        ).unwrap();
-
-        if (userData) {
-          const imageUrl = response.profileImage;
-          setUserData({ ...userData, profileImage: imageUrl });
-        }
-      } catch (error) {
-        console.error("Error uploading profile image:", error);
-      }
-      e.target.value = "";
-    }
-  };
-
-  function handleEditSubmit(data: any) {
-    const partialUpdatePasswordDto: Partial<UpdateUserDto> = { ...data };
-    const newPassword = confirmPassword;
-
-    // Check if newPassword is not undefined
-    if (typeof newPassword === "string") {
+  const onSubmit = (data: UpdateUserPasswordDto) => {
+    const { password } = data;
+    if (password) {
       dispatch(
         updatePassword({
           id: id,
-          newPassword,
+          newPassword: password,
         }) as any
       )
         .then(() => {
-          reset();
           dispatch(fetchData() as any);
         })
         .catch((error: Error) => {
           console.error("Update User failed:", error);
-          // Handle error
         });
-
       handleEditClose();
-    } else {
-      console.error("New password is undefined");
-      // Handle error, maybe display a message to the user
     }
-  }
+  };
 
   const handleRowOptionsClick = (event: React.MouseEvent<HTMLElement>) => {
-    // dispatch(setSelectedId(id));
     setAnchorEl(event.currentTarget);
   };
   const handleRowOptionsClose = () => {
@@ -350,23 +278,31 @@ const RowOptions = ({ id }: { id: number }) => {
               rules={{ required: true }}
               render={({ field }) => (
                 <TextField
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   {...field}
                   label="Nouveau mot de passe"
                   placeholder="********"
                   error={Boolean(errors.password)}
                   onChange={(e) => {
                     field.onChange(e.target.value);
-                    setPassword(e.target.value);
+                    setPassword(e.target.value); // Step 2: Track Changes in Password Field
                   }}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
                           edge="end"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                          <Icon
+                            icon={
+                              showPassword
+                                ? "mdi:eye-outline"
+                                : "mdi:eye-off-outline"
+                            }
+                            fontSize={20}
+                          />
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -380,49 +316,12 @@ const RowOptions = ({ id }: { id: number }) => {
               </FormHelperText>
             )}
           </FormControl>
-          {/* <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="confirmPassword"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <TextField
-                  type="password"
-                  {...field}
-                  label="Confirmer le mot de passe"
-                  placeholder="********"
-                  error={Boolean(errors.confirmPassword)}
-                  onChange={(e) => {
-                    field.onChange(e.target.value); // Update input value
-                    setConfirmPassword(e.target.value); // Update confirmPassword state
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
-            />
-            {errors.confirmPassword && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.confirmPassword.message}
-              </FormHelperText>
-            )}
-          </FormControl> */}
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button
             variant="contained"
             sx={{ mr: 1 }}
-            onClick={() => handleEditSubmit(userData)}
+            onClick={handleSubmit(onSubmit)}
           >
             Soumetre
           </Button>

@@ -54,7 +54,7 @@ export const fetchUserById = createAsyncThunk(
 export const updatePassword = createAsyncThunk(
   "appUsers/updatePassword",
   async ({ id, newPassword }: { id: number; newPassword: string }) => {
-    const response = await axios.post<void>(
+    const response = await axios.post<UserType>(
       `${HOST}/users/${id}/change-password`,
       { newPassword }
     );

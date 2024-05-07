@@ -251,7 +251,7 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
       onClose={toggle}
       sx={{ "& .MuiPaper-root": { maxWidth: 650 } }}
     >
-      <DialogTitle>Edit User</DialogTitle>
+      <DialogTitle>Modifier Absence</DialogTitle>
       <DialogContent>
         <Box sx={{ p: 5 }}>
           <form onSubmit={handleSubmit(onSubmit)}>

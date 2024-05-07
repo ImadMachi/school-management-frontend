@@ -155,55 +155,6 @@ const AddAbsenceDrawer = (props: AddAbsenceDrawerProps) => {
     );
   };
 
-  const renderCustomChips = (
-    array: SelectType[],
-    getTagProps: ({ index }: { index: number }) => {},
-    state: SelectType[],
-    onChange: (...event: any[]) => void
-  ) => {
-    return state.map((item, index) => (
-      <Chip
-        size="small"
-        key={item.id}
-        label={`${item.userData?.firstName} ${item.userData?.lastName}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        //@ts-ignore
-        onDelete={() => handleDeleteChipItem(item.id, state, onChange)}
-      />
-    ));
-  };
-
-  const handleDeleteChipItem = (
-    value: number,
-    state: SelectType[],
-    setState: (val: SelectType[]) => void
-  ) => {
-    const arr = state;
-    const index = arr.findIndex((i) => i.id === value);
-    arr.splice(index, 1);
-    setState([...arr]);
-  };
-
-  const filterOptions = (
-    options: SelectType[],
-    params: any,
-    value: SelectType[]
-  ): SelectType[] => {
-    const { inputValue } = params;
-
-    const filteredOptions = options
-      .filter((option) =>
-        `${option.userData?.firstName} ${option.userData?.firstName}`
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
-      )
-      .filter((option) => !value.find((item) => item.id === option.id));
-
-    // @ts-ignore
-    return filteredOptions;
-  };
-
   return (
     <Drawer
       open={open}
@@ -214,7 +165,7 @@ const AddAbsenceDrawer = (props: AddAbsenceDrawerProps) => {
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant="h6">Ajouter</Typography>
+        <Typography variant="h6">Ajouter une absence</Typography>
         <IconButton
           size="small"
           onClick={handleClose}

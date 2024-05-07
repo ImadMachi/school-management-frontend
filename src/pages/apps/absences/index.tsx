@@ -5,7 +5,6 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 // ** MUI Imports
-import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Menu from "@mui/material/Menu";
 import Grid from "@mui/material/Grid";
@@ -20,9 +19,6 @@ import Icon from "src/@core/components/icon";
 // ** Store Imports
 import { useDispatch, useSelector } from "react-redux";
 
-// ** Actions Imports
-import { deleteAdministrator, filterData } from "src/store/apps/administrator";
-
 // ** Types Imports
 import { RootState, AppDispatch } from "src/store";
 
@@ -30,7 +26,7 @@ import { RootState, AppDispatch } from "src/store";
 import { ThemeColor } from "src/@core/layouts/types";
 import { AbsenceType } from "src/types/apps/absenceTypes";
 import TableHeader from "src/views/apps/absences/list/TableHeader";
-import { fetchData } from "src/store/apps/absences";
+import { deleteAbsence, fetchData } from "src/store/apps/absences";
 import { format } from "date-fns";
 import CustomChip from "src/@core/components/mui/chip";
 import AddAbsenceDrawer from "src/views/apps/absences/list/AddAbsenceDrawrer";
@@ -119,13 +115,17 @@ const RowOptions = ({
 
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
-    handleAbsenceId(id);
-    toggle();
   };
 
   const handleDelete = () => {
     // @ts-ignore
-    dispatch(deleteAdministrator(id) as any);
+    dispatch(deleteAbsence(id) as any);
+    handleRowOptionsClose();
+  };
+
+  const handleEditAbsence = () => {
+    handleAbsenceId(id);
+    toggle();
     handleRowOptionsClose();
   };
 
@@ -152,7 +152,7 @@ const RowOptions = ({
         <MenuItem
           component={Link}
           sx={{ "& svg": { mr: 2 } }}
-          onClick={handleRowOptionsClose}
+          onClick={handleEditAbsence}
           href="javascript:void(0);"
         >
           <Icon icon="mdi:eye-outline" fontSize={20} />
@@ -272,10 +272,6 @@ const AbsenceList = () => {
   useEffect(() => {
     dispatch(fetchData() as any);
   }, []);
-
-  useEffect(() => {
-    dispatch(filterData(value));
-  }, [dispatch, value]);
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);

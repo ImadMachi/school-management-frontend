@@ -8,11 +8,10 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateTeacherDto } from "src/pages/apps/enseignants/overview/[...params]";
+import { HOST } from "src/store/constants/hostname";
 import { TeachersType } from "src/types/apps/teacherTypes";
 import { CreateTeacherAccountDto } from "src/views/apps/teacher/list/AddTeacherAccountDrawer";
 import { CreateTeacherDto } from "src/views/apps/teacher/list/AddTeacherDrawer";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface Params {
   q: string;
@@ -144,14 +143,16 @@ export const updateTeacher = createAsyncThunk(
   }
 );
 
-
 export const updateTeacherStatus = createAsyncThunk(
   "appTeachers/updateTeacherStatus",
   async ({ id, disabled }: { id: number; disabled: boolean }) => {
     try {
-      const response = await axios.put<TeachersType>(`${HOST}/teachers/${id}/status`, {
-        disabled,
-      });
+      const response = await axios.put<TeachersType>(
+        `${HOST}/teachers/${id}/status`,
+        {
+          disabled,
+        }
+      );
       return response.data;
     } catch (error: any) {
       throw error.response.data.message;

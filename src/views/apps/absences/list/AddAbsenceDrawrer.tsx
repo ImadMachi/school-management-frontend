@@ -33,6 +33,7 @@ import { addAbsence, fetchData as fetchAbsents } from "src/store/apps/absences";
 import { getInitials } from "src/@core/utils/get-initials";
 import { AddAbsenceType } from "src/types/apps/absenceTypes";
 import { UserType } from "src/types/apps/UserType";
+import { HOST } from "src/store/constants/hostname";
 
 type SelectType = UserType;
 

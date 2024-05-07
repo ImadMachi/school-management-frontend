@@ -10,11 +10,10 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateAgentDto } from "src/pages/apps/agents/overview/[...params]";
+import { HOST } from "src/store/constants/hostname";
 import { AgentsType } from "src/types/apps/agentTypes";
 import { CreateAgentAccountDto } from "src/views/apps/agents/list/AddAgentAccountDrawer";
 import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface Params {
   q: string;

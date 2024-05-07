@@ -9,9 +9,8 @@ import {
 // ** Axios Imports
 import axios from "axios";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 import { AbsenceType } from "src/types/apps/absenceTypes";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface Headers {
   Authorization: string;

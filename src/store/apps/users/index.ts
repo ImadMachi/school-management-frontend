@@ -7,9 +7,9 @@ import {
 
 import axios from "axios";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 import { mapUserData } from "src/store/utils/mapUserData";
 import { UserRole, UserType } from "src/types/apps/UserType";
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface AppUserstate {
   data: UserType[];

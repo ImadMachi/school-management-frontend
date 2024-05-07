@@ -2,9 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import axios from "axios";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 import { TemplateType } from "src/types/apps/templateTypes";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface AppTemplatestate {
   data: TemplateType[];

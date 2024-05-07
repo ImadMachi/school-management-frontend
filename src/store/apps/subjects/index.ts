@@ -2,9 +2,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import axios from "axios";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 import { SubjectType } from "src/types/apps/subjectTypes";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface AppSubjectsState {
   data: SubjectType[];

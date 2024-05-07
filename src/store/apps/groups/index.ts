@@ -2,11 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import axios from "axios";
 import toast from "react-hot-toast";
+import { HOST } from "src/store/constants/hostname";
 import { mapUserData } from "src/store/utils/mapUserData";
 import { UserType } from "src/types/apps/UserType";
 import { GroupType } from "src/types/apps/groupTypes";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface AppGroupstate {
   data: GroupType[];

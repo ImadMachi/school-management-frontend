@@ -13,8 +13,7 @@ import { UpdateParentDto } from "src/pages/apps/parents/overview/[...params]";
 import { ParentsType } from "src/types/apps/parentTypes";
 import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
 import { CreateParentAccountDto } from "src/views/apps/parents/list/AddParentAccountDrawer";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
+import { HOST } from "src/store/constants/hostname";
 
 interface Params {
   q: string;

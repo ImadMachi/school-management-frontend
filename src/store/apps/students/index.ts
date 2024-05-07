@@ -10,11 +10,10 @@ import {
 import axios from "axios";
 import toast from "react-hot-toast";
 import { UpdateStudentDto } from "src/pages/apps/eleves/overview/[...params]";
+import { HOST } from "src/store/constants/hostname";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { CreateStudentAccountDto } from "src/views/apps/student/list/AddStudentAccountDrawer";
 import { CreateStudentDto } from "src/views/apps/student/list/AddStudentDrawer";
-
-const HOST = process.env.NEXT_PUBLIC_API_URL;
 
 interface Params {
   q: string;

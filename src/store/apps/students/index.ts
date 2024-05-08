@@ -54,7 +54,7 @@ export const addStudent = createAsyncThunk(
     formData.append("identification", data.identification);
     formData.append("dateOfBirth", data.dateOfBirth.toString());
     formData.append("sex", data.sex);
-    formData.append("parent[id]", data.parent.id.toString()); // Corrected line
+    formData.append("parent[id]", data.parent.id.toString());
     formData.append("createAccount", data.createAccount.toString());
 
     if (data.createAccount) {
@@ -202,13 +202,13 @@ export const appStudentsSlice = createSlice({
       toast.error("Erreur supprimant l'élève");
     });
 
+    builder.addCase(addStudent.rejected, (state, action) => {
+      toast.error("Erreur lors de l'ajout de l'élève");
+    });
     builder.addCase(addStudent.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
       toast.success("L'élève a été ajouté avec succès");
-    });
-    builder.addCase(addStudent.rejected, (state, action) => {
-      toast.error("Erreur ajoutant l'élève");
     });
     builder.addCase(addStudentAccount.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;

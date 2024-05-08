@@ -322,17 +322,11 @@ const UserViewLeft = () => {
                   </Typography>
                   <Typography variant="body2">
                     {userData.students?.map((student) => (
-                      <div key={student?.id}>- {student?.firstName} {student?.lastName}</div>
+                      <div key={student?.id}>
+                        - {student?.firstName} {student?.lastName}
+                      </div>
                     ))}
                   </Typography>
-                </Box>
-                <Box sx={{ display: "flex" }}>
-                  <Typography
-                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
-                  >
-                    Pays:
-                  </Typography>
-                  <Typography variant="body2">Maroc</Typography>
                 </Box>
               </Box>
             </CardContent>

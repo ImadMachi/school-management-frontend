@@ -305,14 +305,6 @@ const UserViewLeft = () => {
                     {userData.phoneNumber}
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex" }}>
-                  <Typography
-                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
-                  >
-                    Pays:
-                  </Typography>
-                  <Typography variant="body2">Maroc</Typography>
-                </Box>
               </Box>
             </CardContent>
 

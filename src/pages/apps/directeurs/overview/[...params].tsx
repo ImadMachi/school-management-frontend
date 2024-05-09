@@ -86,7 +86,9 @@ const UserViewLeft = () => {
   });
 
   const directorStore = useSelector((state: RootState) => state.directors);
-  const userStore = useSelector((state: RootState) => state.users);
+  const user = useSelector((state: RootState) =>
+    state.users.data.find((user) => user.id === parseInt(userId as string, 10))
+  );
   // ** States
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [userData, setUserData] = useState<DirectorType | null>(null);
@@ -181,11 +183,8 @@ const UserViewLeft = () => {
   }, [userId]);
 
   useEffect(() => {
-    // Update state when the data is updated
-    if (userStore.data && userStore.data.length > 0) {
-      setUserIdData(userStore.data[0]);
-    }
-  }, [userStore.data]);
+    return setUserIdData(user || null);
+  }, [user]);
 
   if (userData) {
     return (
@@ -239,21 +238,6 @@ const UserViewLeft = () => {
                       sx={{ width: 80, height: 80 }}
                       src="/images/avatars/1.png"
                     />
-
-                    {isHovered && (
-                      <IconButton
-                        onClick={handleEditClick}
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          right: 0,
-                          backgroundColor: "rgba(244, 245, 250, 0.8)",
-                          padding: "2px",
-                        }}
-                      >
-                        <EditIcon sx={{ fontSize: 18 }} />
-                      </IconButton>
-                    )}
                   </>
                 )}
                 <input

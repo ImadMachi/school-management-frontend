@@ -53,6 +53,7 @@ import { UserType } from "src/types/apps/UserType";
 import SidebarAddStudentAccount from "src/views/apps/student/list/AddStudentAccountDrawer";
 import toast from "react-hot-toast";
 import { HOST } from "src/store/constants/hostname";
+import { fetchData as fetchUsers } from "src/store/apps/users";
 
 interface CellType {
   row: StudentsType;
@@ -338,6 +339,12 @@ const UserList = () => {
 
   useEffect(() => {
     dispatch(fetchData() as any);
+  }, []);
+
+
+
+  useEffect(() => {
+    dispatch(fetchUsers() as any);
   }, []);
 
   useEffect(() => {

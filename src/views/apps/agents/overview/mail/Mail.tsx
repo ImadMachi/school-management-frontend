@@ -14,7 +14,11 @@ import { useSettings } from "src/@core/hooks/useSettings";
 
 // ** Types
 import { RootState, AppDispatch } from "src/store";
-import { MailLayoutType, MailLabelColors, MailLabelType } from "src/types/apps/mailTypes";
+import {
+  MailLayoutType,
+  MailLabelColors,
+  MailLabelType,
+} from "src/types/apps/mailTypes";
 
 // ** Email App Component Imports
 import MailLog from "./MailLog";
@@ -29,6 +33,12 @@ import {
   fetchMailsByUserId,
 } from "src/store/apps/mail";
 import { useRouter } from "next/router";
+
+import { fetchData } from "src/store/apps/users";
+import { fetchData as fetchCategoryData } from "src/store/apps/categories";
+import { fetchData as fetchClassesData } from "src/store/apps/classes";
+import { fetchData as fetchTemplatesData } from "src/store/apps/templates";
+import { fetchData as fetchGroupsData } from "src/store/apps/groups";
 
 // ** Variables
 const labelColors: MailLabelColors = {
@@ -95,6 +105,13 @@ const EmailAppLayout = ({ folder, label }: MailLayoutType) => {
     selectedGroup,
   ]);
 
+  useEffect(() => {
+    dispatch(fetchData() as any);
+    dispatch(fetchCategoryData() as any);
+    dispatch(fetchClassesData() as any);
+    dispatch(fetchTemplatesData() as any);
+    dispatch(fetchGroupsData() as any);
+  }, []);
   const toggleComposeOpen = () => setComposeOpen(!composeOpen);
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen);
 

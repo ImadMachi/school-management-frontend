@@ -54,6 +54,9 @@ import SidebarAddTeacherAccount from "src/views/apps/teacher/list/AddTeacherAcco
 import toast from "react-hot-toast";
 import { HOST } from "src/store/constants/hostname";
 
+import { fetchData as fetchUsers } from "src/store/apps/users";
+
+
 interface CellType {
   row: TeachersType;
 }
@@ -298,6 +301,37 @@ const columns = [
     ),
   },
   {
+    flex: 0.17,
+    minWidth: 40,
+    headerName: "Matiéres",
+    field: "matiéres",
+    renderCell: ({ row }: CellType) => {
+      const subjects = row.subjects || [];
+      return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "column",
+            }}
+          >
+            <Typography noWrap>
+              {subjects.length
+                ? subjects.map((sub, index) => (
+                    <span key={sub.id}>
+                      {sub.name ?? "non spécifié"}
+                      {index !== subjects.length - 1 && "-"}
+                    </span>
+                  ))
+                : "- -"}
+            </Typography>
+          </Box>
+        </Box>
+      );
+    },
+  },
+  {
     flex: 0.15,
     minWidth: 120,
     headerName: "Compte",
@@ -345,6 +379,11 @@ const UserList = () => {
   useEffect(() => {
     dispatch(filterData(value));
   }, [dispatch, plan, value]);
+
+
+  useEffect(() => {
+    dispatch(fetchUsers() as any);
+  }, []);
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);

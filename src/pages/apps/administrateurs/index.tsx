@@ -47,7 +47,7 @@ import TableHeader from "src/views/apps/administrators/list/TableHeader";
 import AddAdministratorDrawer from "src/views/apps/administrators/list/AddAdministratorDrawer";
 import CustomChip from "src/@core/components/mui/chip";
 import { ThemeColor } from "src/@core/layouts/types";
-import { fetchUserById } from "src/store/apps/users";
+import { fetchUserById, updateUserStatus } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
 import SidebarAddAdministrator from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
@@ -101,18 +101,14 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  // const handleDelete = () => {
-  //   // @ts-ignore
-  //   dispatch(deleteAdministrator(id) as any);
-  //   handleRowOptionsClose();
-  // };
-
   const handleDelete = async () => {
     try {
       await dispatch(
         updateAdministratorStatus({ id: id, disabled: true }) as any
       );
-
+      if (userId) {
+        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
+      }
       await dispatch(fetchData() as any);
     } catch (error) {
       console.error("Error disabling user:", error);
@@ -353,3 +349,7 @@ const AdministratorList = () => {
 };
 
 export default AdministratorList;
+function dispatch(arg0: any) {
+  throw new Error("Function not implemented.");
+}
+

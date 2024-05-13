@@ -47,12 +47,13 @@ import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/student/list/TableHeader";
 import SidebarAddStudent from "src/views/apps/student/list/AddStudentDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
-import { fetchUserById } from "src/store/apps/users";
+import { fetchUserById, updateUserStatus } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
 import SidebarAddStudentAccount from "src/views/apps/student/list/AddStudentAccountDrawer";
 import toast from "react-hot-toast";
 import { HOST } from "src/store/constants/hostname";
+import { fetchData as fetchUsers } from "src/store/apps/users";
 
 interface CellType {
   row: StudentsType;
@@ -111,15 +112,12 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  // const handleDelete = () => {
-  //   dispatch(deleteStudent(id) as any);
-  //   handleRowOptionsClose();
-  // };
-
   const handleDelete = async () => {
     try {
       await dispatch(updateStudentStatus({ id: id, disabled: true }) as any);
-
+      if (userId) {
+        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
+      }
       await dispatch(fetchData() as any);
     } catch (error) {
       console.error("Error disabling user:", error);
@@ -337,6 +335,10 @@ const UserList = () => {
 
   useEffect(() => {
     dispatch(fetchData() as any);
+  }, []);
+
+  useEffect(() => {
+    dispatch(fetchUsers() as any);
   }, []);
 
   useEffect(() => {

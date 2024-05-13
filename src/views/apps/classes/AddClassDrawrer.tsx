@@ -215,36 +215,29 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     onChange: (...event: any[]) => void
   ) => {
     const user = findUserDataById(option.userId);
-    return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => {
-          onChange({ target: { value: [...array, option] } });
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.userId ? (
+
+    if (option?.userId) {
+      return (
+        <ListItem
+          key={option.id}
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            onChange({ target: { value: [...array, option] } });
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Avatar
               alt={`Profile Image of ${option.firstName} ${option.lastName}`}
               src={`${HOST}/uploads/${user?.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.firstName} ${option.lastName}`)}
-            </CustomAvatar>
-          )}
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.firstName} {option.lastName}
-          </Typography>
-        </Box>
-      </ListItem>
-    );
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.firstName} {option.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
   };
 
   const renderListItem = (
@@ -252,31 +245,33 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     option: SelectType
   ) => {
     const user = findUserDataById(option.userId);
-    return (
-      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.userId ? (
-            <Avatar
-              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-              src={`${HOST}/uploads/${user?.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.firstName} ${option.lastName}`)}
-            </CustomAvatar>
-          )}
+    if (option?.userId) {
+      return (
+        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {option.userId ? (
+              <Avatar
+                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+                src={`${HOST}/uploads/${user?.profileImage}`}
+                sx={{ width: 30, height: 30, marginRight: "10px" }}
+              />
+            ) : (
+              <CustomAvatar
+                skin="light"
+                color="primary"
+                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+              >
+                {getInitials(`${option.firstName} ${option.lastName}`)}
+              </CustomAvatar>
+            )}
 
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.firstName} {option.lastName}
-          </Typography>
-        </Box>
-      </ListItem>
-    );
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.firstName} {option.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
   };
 
   const renderCustomChips = (

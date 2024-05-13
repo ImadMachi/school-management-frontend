@@ -125,14 +125,6 @@ export const appUsersSlice = createSlice({
       state.total = action.payload.length;
       state.allData = action.payload;
     });
-    // builder.addCase(deleteUser.fulfilled, (state, action) => {
-    //     state.data = state.data.filter(User => User.id !== action.payload)
-    //     state.allData = state.allData.filter(User => User.id !== action.payload)
-    // })
-    // builder.addCase(addUser.fulfilled, (state, action) => {
-    //     state.data.unshift(action.payload)
-    //     state.allData.unshift(action.payload)
-    // })
     builder.addCase(fetchUser.fulfilled, (state, action) => {
       const userIdToDelete = action.payload.id;
 
@@ -175,13 +167,13 @@ export const appUsersSlice = createSlice({
     builder.addCase(uploadProfileImage.rejected, (state, action) => {
       toast.error("Erreur lors de la mise à jour de l'image de profil");
     });
-    builder.addCase(updateUserStatus.fulfilled, (state, action) => {
-      toast.success("L'utilisateur a été supprimé avec succès");
-    });
+    // builder.addCase(updateUserStatus.fulfilled, (state, action) => {
+    //   toast.success("L'utilisateur a été supprimé avec succès");
+    // });
 
-    builder.addCase(updateUserStatus.rejected, (state, action) => {
-      toast.error("Erreur supprimant l'utilisateur");
-    });
+    // builder.addCase(updateUserStatus.rejected, (state, action) => {
+    //   toast.error("Erreur supprimant l'utilisateur");
+    // });
   },
 });
 

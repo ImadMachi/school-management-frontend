@@ -360,6 +360,7 @@ const ComposePopup = (props: MailComposeType) => {
     array: ToUserType[],
     setState: (val: ToUserType[]) => void
   ) => {
+    if (option.isActive == true){
     return (
       <ListItem
         key={option.id}
@@ -392,6 +393,7 @@ const ComposePopup = (props: MailComposeType) => {
       </ListItem>
     );
   };
+}
 
   const renderClassListItem = (
     props: HTMLAttributes<HTMLLIElement>,

@@ -23,7 +23,7 @@ import Icon from "src/@core/components/icon";
 // ** Store Imports
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "src/store";
-import { fetchUserById } from "src/store/apps/users";
+import { fetchUserById, updateUserStatus } from "src/store/apps/users";
 
 // ** Custom Components Imports
 import CustomAvatar from "src/@core/components/mui/avatar";
@@ -119,7 +119,9 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleDelete = async () => {
     try {
       await dispatch(updateParentStatus({ id: id, disabled: true }) as any);
-
+      if (userId){
+        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
+      }
       await dispatch(fetchData() as any);
     } catch (error) {
       console.error("Error disabling user:", error);

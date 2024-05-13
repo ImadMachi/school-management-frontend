@@ -210,19 +210,17 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
         sx={{ cursor: "pointer" }}
         onClick={() => {
           onChange({ target: { value: [...array, option] } });
-        }}  
+        }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.name}`)}
-            </CustomAvatar>
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.name}
-          </Typography>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(`${option.name}`)}
+          </CustomAvatar>
+          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
         </Box>
       </ListItem>
     );
@@ -234,37 +232,36 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     onChange: (...event: any[]) => void
   ) => {
     const user = findUserDataById(option.userId);
-    return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => {
-          onChange({ target: { value: [...array, option] } });
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.userId ? (
-            <Avatar
-              alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-              src={`${HOST}/uploads/${user?.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(`${option.firstName} ${option.lastName}`)}
-            </CustomAvatar>
-          )}
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.firstName} {option.lastName}
-          </Typography>
-        </Box>
-      </ListItem>
-    );
+
+    if (option?.userId) {
+      return (
+        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {option.userId ? (
+              <Avatar
+                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+                src={`${HOST}/uploads/${user?.profileImage}`}
+                sx={{ width: 30, height: 30, marginRight: "10px" }}
+              />
+            ) : (
+              <CustomAvatar
+                skin="light"
+                color="primary"
+                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+              >
+                {getInitials(`${option.firstName} ${option.lastName}`)}
+              </CustomAvatar>
+            )}
+
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.firstName} {option.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
   };
+
   const renderCustomChips = (
     array: SelectType[],
     getTagProps: ({ index }: { index: number }) => {},
@@ -293,8 +290,6 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
       );
     });
   };
-
-
 
   const handleDeleteChipItem = (
     value: number,
@@ -424,7 +419,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
               </FormHelperText>
             )}
           </FormControl>
-       
+
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="teachers"
@@ -445,14 +440,13 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) => {
-                    if (typeof option === 'string') {
-                      return ''; 
-                    } else if ('firstName' in option && 'lastName' in option) {
+                    if (typeof option === "string") {
+                      return "";
+                    } else if ("firstName" in option && "lastName" in option) {
                       return `${option.firstName} ${option.lastName}`;
                     }
-                    return '';
+                    return "";
                   }}
-                  
                   renderOption={(props, option) =>
                     renderTeacherListItem(props, option, value, onChange)
                   }

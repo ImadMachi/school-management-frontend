@@ -45,7 +45,7 @@ import TableHeader from "src/views/apps/directors/list/TableHeader";
 import AddDirectorDrawer from "src/views/apps/directors/list/AddDirectorDrawer";
 import CustomChip from "src/@core/components/mui/chip";
 import { ThemeColor } from "src/@core/layouts/types";
-import { fetchUserById } from "src/store/apps/users";
+import { fetchUserById, updateUserStatus } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
 import SidebarAddDirectorAccount from "src/views/apps/directors/list/AddDirectorAccountDrawer";
@@ -111,15 +111,12 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
     setAnchorEl(null);
   };
 
-  // const handleDelete = () => {
-  //   dispatch(deleteDirector(id) as any);
-  //   handleRowOptionsClose();
-  // };
-
   const handleDelete = async () => {
     try {
       await dispatch(updateDirectorStatus({ id: id, disabled: true }) as any);
-
+      if (userId) {
+        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
+      }
       await dispatch(fetchData() as any);
     } catch (error) {
       console.error("Error disabling user:", error);

@@ -46,13 +46,14 @@ import { useAuth } from "src/hooks/useAuth";
 import TableHeader from "src/views/apps/teacher/list/TableHeader";
 import SidebarAddTeacher from "src/views/apps/teacher/list/AddTeacherDrawer";
 import { ThemeColor } from "src/@core/layouts/types";
-import { fetchUserById } from "src/store/apps/users";
+import { fetchUserById, updateUserStatus } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
 import { UserType } from "src/types/apps/UserType";
-import { t } from "i18next";
 import SidebarAddTeacherAccount from "src/views/apps/teacher/list/AddTeacherAccountDrawer";
 import toast from "react-hot-toast";
 import { HOST } from "src/store/constants/hostname";
+
+import { fetchData as fetchUsers } from "src/store/apps/users";
 
 interface CellType {
   row: TeachersType;
@@ -118,7 +119,9 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   const handleDelete = async () => {
     try {
       await dispatch(updateTeacherStatus({ id: id, disabled: true }) as any);
-
+      if (userId) {
+        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
+      }
       await dispatch(fetchData() as any);
     } catch (error) {
       console.error("Error disabling user:", error);
@@ -294,6 +297,37 @@ const columns = [
     ),
   },
   {
+    flex: 0.17,
+    minWidth: 40,
+    headerName: "Matiéres",
+    field: "matiéres",
+    renderCell: ({ row }: CellType) => {
+      const subjects = row.subjects || [];
+      return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "column",
+            }}
+          >
+            <Typography noWrap>
+              {subjects.length
+                ? subjects.map((sub, index) => (
+                    <span key={sub.id}>
+                      {sub.name ?? "non spécifié"}
+                      {index !== subjects.length - 1 && "-"}
+                    </span>
+                  ))
+                : "- -"}
+            </Typography>
+          </Box>
+        </Box>
+      );
+    },
+  },
+  {
     flex: 0.15,
     minWidth: 120,
     headerName: "Compte",
@@ -340,6 +374,10 @@ const UserList = () => {
   useEffect(() => {
     dispatch(filterData(value));
   }, [dispatch, plan, value]);
+
+  useEffect(() => {
+    dispatch(fetchUsers() as any);
+  }, []);
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);

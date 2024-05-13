@@ -71,6 +71,7 @@ import { setStudentId, setStudentUserId } from "src/store/apps/students";
 import { setParentId, setParentUserId } from "src/store/apps/parents";
 import { setAgentId, setAgentUserId } from "src/store/apps/agents";
 import { HOST } from "src/store/constants/hostname";
+import toast from "react-hot-toast";
 
 interface CellType {
   row: UserType;
@@ -189,8 +190,10 @@ const RowOptions = ({ id }: { id: number }) => {
       await dispatch(updateUserStatus({ id: id, disabled: true }) as any);
 
       await dispatch(fetchData() as any);
+
+      toast.success("L'utilisateur a été supprimé avec succès");
     } catch (error) {
-      console.error("Error disabling user:", error);
+      toast.error("Erreur supprimant l'utilisateur");
     }
     setUserData(updatedUserData);
   };

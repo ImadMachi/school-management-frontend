@@ -43,7 +43,7 @@ const ForwardMailPopup: React.FC<ForwardMailPopupProps> = ({
 
   return (
     <Dialog open={isOpen} onClose={onClose}>
-      <DialogTitle>Transferer le message</DialogTitle>
+      <DialogTitle>Transferer le message (pas encore fini)</DialogTitle>
       <DialogContent>
         <Button variant="contained" color="primary" onClick={() => {}}>
           Save

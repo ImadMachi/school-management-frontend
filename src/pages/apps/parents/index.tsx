@@ -254,8 +254,8 @@ const columns = [
   {
     flex: 0.17,
     minWidth: 40,
-    headerName: "Éléves",
-    field: "éléves",
+    headerName: "Enfants",
+    field: "élèves",
     renderCell: ({ row }: CellType) => {
       const students = row.students || [];
       return (
@@ -288,11 +288,7 @@ const columns = [
     headerName: "Telephone",
     field: "phoneNumber",
     renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
-          {row.phoneNumber}
-        </Typography>
-      );
+      return <Typography noWrap>{row.phoneNumber}</Typography>;
     },
   },
   {
@@ -308,7 +304,6 @@ const columns = [
           size="small"
           label={status}
           color={accountStatusObj[status]}
-          sx={{ textTransform: "capitalize" }}
         />
       );
     },

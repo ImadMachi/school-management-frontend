@@ -210,10 +210,10 @@ export const appAdministratorsSlice = createSlice({
     builder.addCase(addAdministrator.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
-      toast.success("La classe a été ajoutée avec succès");
+      toast.success("L'administrateur a été ajoutée avec succès");
     });
     builder.addCase(addAdministrator.rejected, (state, action) => {
-      toast.error("Erreur ajoutant la classe");
+      toast.error("Erreur ajoutant l'administrateur ");
     });
 
     builder.addCase(addAdministratorAccount.fulfilled, (state, action) => {

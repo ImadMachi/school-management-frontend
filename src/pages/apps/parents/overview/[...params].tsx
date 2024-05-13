@@ -275,12 +275,7 @@ const UserViewLeft = () => {
               <Typography variant="h6" sx={{ mb: 4 }}>
                 {userData.firstName} {userData.lastName}
               </Typography>
-              <CustomChip
-                skin="light"
-                size="small"
-                label="Parent"
-                sx={{ textTransform: "capitalize" }}
-              />
+              <CustomChip skin="light" size="small" label="Parent" />
             </CardContent>
             <CardContent>
               <Typography variant="h6">Details</Typography>
@@ -318,7 +313,7 @@ const UserViewLeft = () => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
-                    Éléves:
+                    Enfants:
                   </Typography>
                   <Typography variant="body2">
                     {userData.students?.map((student) => (

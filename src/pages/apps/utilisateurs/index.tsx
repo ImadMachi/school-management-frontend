@@ -467,11 +467,7 @@ const columns = [
     headerName: "Email",
     field: "email",
     renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
-          {row.email}
-        </Typography>
-      );
+      return <Typography noWrap>{row.email}</Typography>;
     },
   },
   {
@@ -487,7 +483,6 @@ const columns = [
           size="small"
           label={status}
           color={accountStatusObj[status]}
-          sx={{ textTransform: "capitalize" }}
         />
       );
     },

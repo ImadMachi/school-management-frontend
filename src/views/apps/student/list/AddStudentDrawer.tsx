@@ -150,6 +150,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     setValue,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm({
     defaultValues,
     mode: "onChange",
@@ -187,7 +188,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     option: ParentsType
   ) => {
     const user = findUserDataById(option.userId);
-    if (user?.disabled === false || option.userId===null) {
+    if (user?.disabled === false || option.userId === null) {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -215,6 +216,18 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
       );
     }
   };
+
+  useEffect(() => {
+    const firstName = watch("firstName");
+    const lastName = watch("lastName");
+
+    const email = `${firstName}.${lastName}@gmail.com`;
+    setValue("createUserDto.email", email);
+
+    if (!firstName && !lastName) {
+      setValue("createUserDto.email", "");
+    }
+  }, [watch("firstName"), watch("lastName")]);
 
   return (
     <Drawer

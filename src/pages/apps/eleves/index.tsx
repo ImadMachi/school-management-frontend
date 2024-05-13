@@ -308,7 +308,6 @@ const columns = [
           size="small"
           label={status}
           color={accountStatusObj[status]}
-          sx={{ textTransform: "capitalize" }}
         />
       );
     },

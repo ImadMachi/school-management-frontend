@@ -107,6 +107,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     setValue,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm({
     defaultValues,
     mode: "onChange",
@@ -130,6 +131,18 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     toggle();
     reset();
   };
+
+  useEffect(() => {
+    const firstName = watch("firstName");
+    const lastName = watch("lastName");
+
+    const email = `${firstName}.${lastName}@gmail.com`;
+    setValue("createUserDto.email", email);
+
+    if (!firstName && !lastName) {
+      setValue("createUserDto.email", "");
+    }
+  }, [watch("firstName"), watch("lastName")]);
 
   return (
     <Drawer

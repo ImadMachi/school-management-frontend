@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -128,6 +128,8 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     getValues,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm({
     defaultValues,
     mode: "onChange",
@@ -152,11 +154,17 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     reset();
   };
 
-  const handleDeleteSelectedFile = (fileName: string) => {
-    setSelectedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
-  };
+  useEffect(() => {
+    const firstName = watch("firstName");
+    const lastName = watch("lastName");
+
+    const email = `${firstName}.${lastName}@gmail.com`;
+    setValue("createUserDto.email", email);
+
+    if (!firstName && !lastName) {
+      setValue("createUserDto.email", "");
+    }
+  }, [watch("firstName"), watch("lastName")]);
 
   return (
     <Drawer

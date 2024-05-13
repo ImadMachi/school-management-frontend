@@ -251,11 +251,7 @@ const columns = [
     headerName: "Telephone",
     field: "phoneNumber",
     renderCell: ({ row }: CellType) => {
-      return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
-          {row.phoneNumber}
-        </Typography>
-      );
+      return <Typography noWrap>{row.phoneNumber}</Typography>;
     },
   },
   {
@@ -271,7 +267,6 @@ const columns = [
           size="small"
           label={status}
           color={accountStatusObj[status]}
-          sx={{ textTransform: "capitalize" }}
         />
       );
     },

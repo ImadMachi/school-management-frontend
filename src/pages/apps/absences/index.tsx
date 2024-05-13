@@ -187,7 +187,7 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
     field: "startDate",
     renderCell: ({ row }: CellType) => {
       return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
+        <Typography noWrap>
           {format(new Date(row.startDate), "dd/MM/yyyy")}
         </Typography>
       );
@@ -200,7 +200,7 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
     field: "endDate",
     renderCell: ({ row }: CellType) => {
       return (
-        <Typography noWrap sx={{ textTransform: "capitalize" }}>
+        <Typography noWrap>
           {format(new Date(row.endDate), "dd/MM/yyyy")}
         </Typography>
       );
@@ -218,7 +218,6 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
           size="small"
           label={mapAbsenceJustification(row.justified)}
           color={absenceJustificationColor(row.justified)}
-          sx={{ textTransform: "capitalize" }}
         />
       );
     },
@@ -235,7 +234,6 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
           size="small"
           label={mapAbsenceStatus(row.status)}
           color={absenceStatusObj[row.status]}
-          sx={{ textTransform: "capitalize" }}
         />
       );
     },

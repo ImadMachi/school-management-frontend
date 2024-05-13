@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -48,16 +48,6 @@ export interface CreateParentDto {
   };
   profileImage?: File;
 }
-
-const showErrors = (field: string, valueLen: number, min: number) => {
-  if (valueLen === 0) {
-    return `${field} field is required`;
-  } else if (valueLen > 0 && valueLen < min) {
-    return `${field} must be at least ${min} characters`;
-  } else {
-    return "";
-  }
-};
 
 const Header = styled(Box)<BoxProps>(({ theme }) => ({
   display: "flex",
@@ -118,6 +108,8 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     getValues,
     handleSubmit,
     formState: { errors },
+    watch,
+    setValue,
   } = useForm({
     defaultValues,
     mode: "onChange",
@@ -141,30 +133,17 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     toggle();
     reset();
   };
-  const handleAttachmentButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
+  useEffect(() => {
+    const firstName = watch("firstName");
+    const lastName = watch("lastName");
 
-  const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const uniqueNewFiles = newFiles.filter((newFile) =>
-        selectedFiles.every(
-          (existingFile) => existingFile.name !== newFile.name
-        )
-      );
-      setSelectedFiles((prevFiles) => [...prevFiles, ...uniqueNewFiles]);
-    }
-  };
+    const email = `${firstName}.${lastName}@gmail.com`;
+    setValue("createUserDto.email", email);
 
-  const handleDeleteSelectedFile = (fileName: string) => {
-    setSelectedFiles((prevFiles) =>
-      prevFiles.filter((file) => file.name !== fileName)
-    );
-  };
+    if (!firstName && !lastName) {
+      setValue("createUserDto.email", "");
+    }
+  }, [watch("firstName"), watch("lastName")]);
 
   return (
     <Drawer

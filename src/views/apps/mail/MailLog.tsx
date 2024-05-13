@@ -5,6 +5,7 @@ import {
   SyntheticEvent,
   ReactNode,
   useEffect,
+  useContext,
 } from "react";
 
 // ** MUI Imports
@@ -58,6 +59,8 @@ import { fr } from "date-fns/locale";
 import { useSelector } from "react-redux";
 import { RootState } from "src/store";
 import { HOST } from "src/store/constants/hostname";
+import { AuthContext } from "src/context/AuthContext";
+import ForwardMailPopup from "./ForwardMailModal";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -134,6 +137,10 @@ const MailLog = (props: MailLogType) => {
     isFetching,
   } = props;
 
+  // ** States
+  const [isForwardMailOpen, setIsForwardMailOpen] = useState(false);
+  const [mailToForwardId, setMailToForwardId] = useState<number | null>(null);
+
   const userData = useSelector((state: RootState) => state.users.data);
 
   const findUserDataById = (userId: number) => {
@@ -142,6 +149,9 @@ const MailLog = (props: MailLogType) => {
 
   // ** State
   const [areAllMailsLoaded, setAreAllMailsLoaded] = useState(false);
+
+  // ** Hooks
+  const { user: authUser } = useContext(AuthContext);
 
   // ** Vars
   const folders: MailFoldersArrType[] = [
@@ -296,6 +306,17 @@ const MailLog = (props: MailLogType) => {
   ) => {
     const arr = Array.isArray(id) ? [...id] : [id];
     // dispatch(updateMail({ emailIds: arr, dataToUpdate: { folder } }))
+  };
+
+  const handleForwardMail = (e: SyntheticEvent, id: number) => {
+    e.stopPropagation();
+    setMailToForwardId(id);
+    setIsForwardMailOpen(true);
+  };
+
+  const onCloseForwardMailModal = () => {
+    setIsForwardMailOpen(false);
+    setMailToForwardId(null);
   };
 
   const mailDetailsProps = {
@@ -467,6 +488,23 @@ const MailLog = (props: MailLogType) => {
                           }}
                         >
                           {routeParams && routeParams.folder !== "trash" ? (
+                            <Tooltip
+                              placement="top"
+                              title="Transférer le message"
+                            >
+                              <IconButton
+                                onClick={(e) => {
+                                  handleForwardMail(e, mail.id);
+                                }}
+                              >
+                                <Icon icon="mdi:forward-outline" />
+                              </IconButton>
+                            </Tooltip>
+                          ) : null}
+
+                          {routeParams &&
+                          authUser?.role === "Director" &&
+                          routeParams.folder !== "trash" ? (
                             <Tooltip placement="top" title="Supprimer Message">
                               <IconButton
                                 onClick={(e) => {
@@ -581,6 +619,12 @@ const MailLog = (props: MailLogType) => {
 
       {/* @ts-ignore */}
       <MailDetails {...mailDetailsProps} />
+
+      <ForwardMailPopup
+        isOpen={isForwardMailOpen}
+        onClose={onCloseForwardMailModal}
+        messageId={mailToForwardId}
+      />
     </Box>
   );
 };

@@ -12,7 +12,6 @@ interface TableHeaderProps {
   value: string;
   toggle: () => void;
   handleFilter: (val: string) => void;
-  // generateCSVData: () => any;
 }
 
 const TableHeader = (props: TableHeaderProps) => {

@@ -26,7 +26,7 @@ import { RootState, AppDispatch } from "src/store";
 import { ThemeColor } from "src/@core/layouts/types";
 import { AbsenceType } from "src/types/apps/absenceTypes";
 import TableHeader from "src/views/apps/absences/list/TableHeader";
-import { deleteAbsence, fetchData } from "src/store/apps/absences";
+import { deleteAbsence, fetchData, filterData } from "src/store/apps/absences";
 import { format } from "date-fns";
 import CustomChip from "src/@core/components/mui/chip";
 import AddAbsenceDrawer from "src/views/apps/absences/list/AddAbsenceDrawrer";
@@ -294,6 +294,7 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
 
 const AbsenceList = () => {
   // ** State
+  const [plan, setPlan] = useState<string>("");
   const [value, setValue] = useState<string>("");
   const [pageSize, setPageSize] = useState<number>(10);
   const [addAbsenceOpen, setAddAbsenceOpen] = useState<boolean>(false);
@@ -308,6 +309,10 @@ const AbsenceList = () => {
   useEffect(() => {
     dispatch(fetchData() as any);
   }, []);
+  
+  useEffect(() => {
+    dispatch(filterData(value));
+  }, [dispatch, plan, value]);
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);

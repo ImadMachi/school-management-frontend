@@ -103,7 +103,8 @@ export const appAbsencesSlice = createSlice({
             .includes(filterValue) ||
           absences.startDate.toString().toLowerCase().includes(filterValue) ||
           absences.endDate.toString().toLowerCase().includes(filterValue) ||
-          absences.absentUser.role.toLowerCase().includes(filterValue)
+          absences.absentUser.role.toLowerCase().includes(filterValue) ||
+          absences.absentUser.email.toLowerCase().includes(filterValue)
       );
     },
   },

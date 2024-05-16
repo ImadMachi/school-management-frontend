@@ -58,6 +58,11 @@ export type SendMailParamsType = {
   category: number;
 };
 
+export type ForwardMailParamsType = {
+  messageId: number;
+  recipients: { id: number }[];
+};
+
 export type PaginateMailParamsType = {
   q: string;
   offset: number;

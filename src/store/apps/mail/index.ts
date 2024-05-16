@@ -17,6 +17,7 @@ import {
   MailFolderType,
   SendMailParamsType,
   FetchMailByUserIdParamsType,
+  ForwardMailParamsType,
 } from "src/types/apps/mailTypes";
 
 interface ReduxType {
@@ -105,6 +106,17 @@ export const sendMail = createAsyncThunk(
       headers: {
         "Content-Type": "multipart/form-data",
       },
+    });
+    return response.data;
+  }
+);
+
+// ** Forward Mail
+export const forwardMail = createAsyncThunk(
+  "appEmail/forwardMail",
+  async ({ messageId, recipients }: ForwardMailParamsType) => {
+    const response = await axios.post(`${HOST}/messages/${messageId}/forward`, {
+      recipients,
     });
     return response.data;
   }
@@ -329,6 +341,16 @@ export const appEmailSlice = createSlice({
 
     builder.addCase(sendMail.rejected, (state, action) => {
       toast.error("Erreur lors de l'envoi du message");
+    });
+
+    builder.addCase(forwardMail.fulfilled, (state, action) => {
+      console.log(action.payload);
+
+      toast.success("Message transféré avec succès");
+    });
+
+    builder.addCase(forwardMail.rejected, (state, action) => {
+      toast.error("Erreur lors du transfert du message");
     });
 
     builder.addCase(fetchMailsByUserId.fulfilled, (state, action) => {

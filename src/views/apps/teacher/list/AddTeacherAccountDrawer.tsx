@@ -101,8 +101,11 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onSubmit = (data: CreateTeacherAccountDto) => {
-    dispatch(addTeacherAccount({ id, data }) as any);
+  const onSubmit = async (data: CreateTeacherAccountDto) => {
+    const result = await dispatch(addTeacherAccount({ id, data }) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };

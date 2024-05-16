@@ -121,8 +121,11 @@ const SidebarAddDirector = (props: SidebarAddDirectorType) => {
     defaultValue: false,
   });
 
-  const onSubmit = (data: CreateDirectorDto) => {
-    dispatch(addDirector(data) as any);
+  const onSubmit = async (data: CreateDirectorDto) => {
+    const result = await dispatch(addDirector(data) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };
@@ -136,7 +139,7 @@ const SidebarAddDirector = (props: SidebarAddDirectorType) => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const email = `${firstName}.${lastName}@gmail.com`;
+    const email = `${firstName}.${lastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {

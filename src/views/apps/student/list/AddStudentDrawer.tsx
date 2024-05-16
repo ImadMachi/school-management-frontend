@@ -169,8 +169,11 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     dispatch(fetchData() as any);
   }, []);
 
-  const onSubmit = (data: CreateStudentDto) => {
-    dispatch(addStudent(data) as any);
+  const onSubmit = async (data: CreateStudentDto) => {
+    const result = await dispatch(addStudent(data) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };
@@ -221,7 +224,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const email = `${firstName}.${lastName}@gmail.com`;
+    const email = `${firstName}.${lastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {

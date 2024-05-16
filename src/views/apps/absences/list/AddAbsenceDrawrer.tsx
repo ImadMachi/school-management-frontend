@@ -73,16 +73,6 @@ const AddAbsenceDrawer = (props: AddAbsenceDrawerProps) => {
   const { open, toggle } = props;
 
   const dispatch = useDispatch<AppDispatch>();
-  const seanceOptions = [
-    "Seance 1",
-    "Seance 2",
-    "Seance 3",
-    "Seance 4",
-    "Seance 5",
-    "Seance 6",
-    "Seance 7",
-    "Tout la journée",
-  ];
 
   // ** Store
   const userStore = useSelector((state: RootState) => state.users);

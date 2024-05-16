@@ -104,7 +104,6 @@ export const appUsersSlice = createSlice({
         (User) =>
           User.id.toString().toLowerCase().includes(filterValue) ||
           User.role.toLowerCase().includes(filterValue) ||
-          User.isActive.toString().toLowerCase().includes(filterValue) ||
           User.email.toLowerCase().includes(filterValue)
       );
     },

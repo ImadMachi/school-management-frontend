@@ -205,6 +205,10 @@ export const appAgentsSlice = createSlice({
       toast.success("L'agent a été ajouté avec succès");
     });
     builder.addCase(addAgent.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant l'agent");
     });
 
@@ -221,6 +225,10 @@ export const appAgentsSlice = createSlice({
       }
     });
     builder.addCase(addAgentAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le compte");
     });
 

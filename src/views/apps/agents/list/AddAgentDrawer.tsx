@@ -123,8 +123,11 @@ const SidebarAddAgent = (props: SidebarAddAgentType) => {
     defaultValue: false,
   });
 
-  const onSubmit = (data: CreateAgentDto) => {
-    dispatch(addAgent(data) as any);
+  const onSubmit = async (data: CreateAgentDto) => {
+    const result = await dispatch(addAgent(data) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };
@@ -138,7 +141,7 @@ const SidebarAddAgent = (props: SidebarAddAgentType) => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const email = `${firstName}.${lastName}@gmail.com`;
+    const email = `${firstName}.${lastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {

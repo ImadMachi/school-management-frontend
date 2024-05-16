@@ -213,6 +213,11 @@ export const appAdministratorsSlice = createSlice({
       toast.success("L'administrateur a été ajoutée avec succès");
     });
     builder.addCase(addAdministrator.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
+
       toast.error("Erreur ajoutant l'administrateur ");
     });
 
@@ -229,6 +234,10 @@ export const appAdministratorsSlice = createSlice({
       }
     });
     builder.addCase(addAdministratorAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le compte");
     });
 

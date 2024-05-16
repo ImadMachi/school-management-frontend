@@ -101,8 +101,11 @@ const SidebarAddDirectorAccount = (props: SidebarUpdateDirectorType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onSubmit = (data: CreateDirectorAccountDto) => {
-    dispatch(addDirectorAccount({ id, data }) as any);
+  const onSubmit = async (data: CreateDirectorAccountDto) => {
+    const result = await dispatch(addDirectorAccount({ id, data }) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };

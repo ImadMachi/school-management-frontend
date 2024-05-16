@@ -101,8 +101,11 @@ const SidebarAddStudentAccount = (props: SidebarUpdateStudentType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onSubmit = (data: CreateStudentAccountDto) => {
-    dispatch(addStudentAccount({ id, data }) as any);
+  const onSubmit = async (data: CreateStudentAccountDto) => {
+    const result = await dispatch(addStudentAccount({ id, data }) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };

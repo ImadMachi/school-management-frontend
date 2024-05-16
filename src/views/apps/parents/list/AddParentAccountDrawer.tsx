@@ -101,8 +101,11 @@ const SidebarAddParent = (props: SidebarUpdateParentType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onSubmit = (data: CreateParentAccountDto) => {
-    dispatch(addParentAccount({ id, data }) as any);
+  const onSubmit = async (data: CreateParentAccountDto) => {
+    const result = await dispatch(addParentAccount({ id, data }) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };

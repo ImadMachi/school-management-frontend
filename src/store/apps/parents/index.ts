@@ -208,6 +208,10 @@ export const appParentsSlice = createSlice({
       toast.success("Le parent a été ajouté avec succès");
     });
     builder.addCase(addParent.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le parent");
     });
     builder.addCase(addParentAccount.fulfilled, (state, action) => {
@@ -221,6 +225,10 @@ export const appParentsSlice = createSlice({
       toast.success("Le parent a été ajouté avec succès");
     });
     builder.addCase(addParentAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le parent");
     });
     builder.addCase(fetchParent.fulfilled, (state, action) => {

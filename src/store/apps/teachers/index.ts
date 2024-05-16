@@ -206,13 +206,18 @@ export const appTeachersSlice = createSlice({
       );
       toast.success("enseignant a été supprimé avec succès");
     });
-    builder.addCase(addTeacher.rejected, (state, action) => {
-      toast.error("Erreur lors de l'ajout de l'enseignant");
-    });
+
     builder.addCase(addTeacher.fulfilled, (state, action) => {
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
       toast.success("L'enseignant a été ajouté avec succès");
+    });
+    builder.addCase(addTeacher.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
+      toast.error("Erreur lors de l'ajout de l'enseignant");
     });
     builder.addCase(addTeacherAccount.fulfilled, (state, action) => {
       const updatedTeacher = action.payload;
@@ -227,6 +232,10 @@ export const appTeachersSlice = createSlice({
       }
     });
     builder.addCase(addTeacherAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le compte");
     });
 

@@ -155,7 +155,7 @@ const App = (props: ExtendedAppProps) => {
                     </WindowWrapper>
                     <ReactHotToast>
                       <Toaster
-                        position={settings.toastPosition}
+                        position="top-center"
                         toastOptions={{ className: "react-hot-toast" }}
                       />
                     </ReactHotToast>

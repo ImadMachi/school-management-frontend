@@ -121,8 +121,13 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     defaultValue: false,
   });
 
-  const onSubmit = (data: CreateAdministratorDto) => {
-    dispatch(addAdministrator(data) as any);
+  const onSubmit = async (data: CreateAdministratorDto) => {
+    const result = await dispatch(addAdministrator(data) as any);
+
+    if (result.error) {
+      return;
+    }
+
     toggle();
     reset();
   };
@@ -136,7 +141,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const email = `${firstName}.${lastName}@gmail.com`;
+    const email = `${firstName}.${lastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {

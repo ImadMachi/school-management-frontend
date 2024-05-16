@@ -213,6 +213,10 @@ export const appDirectorsSlice = createSlice({
       toast.success("Le directeur a été ajouté avec succès");
     });
     builder.addCase(addDirector.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le directeur");
     });
     builder.addCase(addDirectorAccount.fulfilled, (state, action) => {
@@ -228,6 +232,10 @@ export const appDirectorsSlice = createSlice({
       }
     });
     builder.addCase(addDirectorAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le compte du directeur");
     });
     builder.addCase(fetchDirector.fulfilled, (state, action) => {

@@ -81,7 +81,9 @@ const defaultValues = {
   profileImage: undefined,
 };
 
-const SidebarAddAdministratorAccount = (props: SidebarUpdateAdministratorType) => {
+const SidebarAddAdministratorAccount = (
+  props: SidebarUpdateAdministratorType
+) => {
   // ** Props
   const { id, open, toggle } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -101,8 +103,11 @@ const SidebarAddAdministratorAccount = (props: SidebarUpdateAdministratorType) =
   });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onSubmit = (data: CreateAdministratorAccountDto) => {
-    dispatch(addAdministratorAccount({ id, data }) as any);
+  const onSubmit = async (data: CreateAdministratorAccountDto) => {
+    const result = await dispatch(addAdministratorAccount({ id, data }) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };

@@ -203,6 +203,10 @@ export const appStudentsSlice = createSlice({
     });
 
     builder.addCase(addStudent.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur lors de l'ajout de l'élève");
     });
     builder.addCase(addStudent.fulfilled, (state, action) => {
@@ -223,6 +227,10 @@ export const appStudentsSlice = createSlice({
       toast.success("L'élève a été ajouté avec succès");
     });
     builder.addCase(addStudentAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant l'élève");
     });
     builder.addCase(fetchStudent.fulfilled, (state, action) => {

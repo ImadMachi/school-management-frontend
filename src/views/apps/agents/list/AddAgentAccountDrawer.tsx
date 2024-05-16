@@ -101,8 +101,11 @@ const SidebarAddAgentAccount = (props: SidebarUpdateAgentType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
 
-  const onSubmit = (data: CreateAgentAccountDto) => {
-    dispatch(addAgentAccount({ id, data }) as any);
+  const onSubmit = async (data: CreateAgentAccountDto) => {
+    const result = await dispatch(addAgentAccount({ id, data }) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };

@@ -184,6 +184,39 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
     onChange: (...event: any[]) => void,
     multiple?: boolean
   ) => {
+    if (option.isActive == true && option.role === "Agent" || option.role === "Teacher") {
+      return (
+        <ListItem
+          key={option.id}
+          sx={{ cursor: "pointer" }}
+          onClick={() => {
+            onChange({
+              target: { value: multiple ? [...array, option] : [option] },
+            });
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Avatar
+              alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
+              src={`${HOST}/uploads/${option.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.userData.firstName} {option.userData.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
+  };
+
+  const renderAdministratorListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: UserType,
+    array: UserType[],
+    onChange: (...event: any[]) => void,
+    multiple?: boolean
+  ) => {
     if (option.isActive == true) {
       return (
         <ListItem
@@ -339,12 +372,11 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as UserType).userData.firstName} ${
-                      (option as UserType).userData.lastName
+                    `${(option as UserType).userData.firstName} ${(option as UserType).userData.lastName
                     }`
                   }
                   renderOption={(props, option) =>
-                    renderUserListItem(props, option, value, onChange)
+                    renderAdministratorListItem(props, option, value, onChange)
                   }
                   renderTags={(array: UserType[], getTagProps) =>
                     renderCustomChips(array, getTagProps, value, onChange)
@@ -386,8 +418,7 @@ const AddGroupDrawer = (props: SidebarAddGroupType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as UserType).userData.firstName} ${
-                      (option as UserType).userData.lastName
+                    `${(option as UserType).userData.firstName} ${(option as UserType).userData.lastName
                     }`
                   }
                   renderOption={(props, option) =>

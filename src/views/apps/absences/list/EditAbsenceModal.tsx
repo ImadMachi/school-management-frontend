@@ -192,33 +192,23 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
     props: HTMLAttributes<HTMLLIElement>,
     option: UserType
   ) => {
-    return (
-      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.profileImage ? (
+    if (option?.role === "Agent" || option?.role === "Teacher") {
+      return (
+        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <Avatar
               alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
               src={`${HOST}/uploads/${option.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(
-                `${option.userData?.firstName} ${option.userData?.lastName}`
-              )}
-            </CustomAvatar>
-          )}
 
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.userData.firstName} {option.userData.lastName}
-          </Typography>
-        </Box>
-      </ListItem>
-    );
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.userData.firstName} {option.userData.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    }
   };
 
   const numberOfDays =

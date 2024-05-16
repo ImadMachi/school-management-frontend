@@ -29,7 +29,7 @@ import { useDispatch } from "react-redux";
 // ** Actions Imports
 // ** Types Imports
 import { AppDispatch } from "src/store";
-import { Avatar, Checkbox, Chip, FormControlLabel } from "@mui/material";
+import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
 import { addAdministratorAccount } from "src/store/apps/administrator";
 
 interface SidebarUpdateAdministratorType {
@@ -86,6 +86,8 @@ const SidebarAddAdministratorAccount = (props: SidebarUpdateAdministratorType) =
   const { id, open, toggle } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [showPassword, setShowPassword] = useState(false);
+
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const {
@@ -185,12 +187,32 @@ const SidebarAddAdministratorAccount = (props: SidebarUpdateAdministratorType) =
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  type="password"
-                  value={value}
+                type={showPassword ? "text" : "password"}
+                value={value}
                   label="Mot de passe"
                   onChange={onChange}
                   placeholder="********"
                   error={Boolean(errors.password)}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <Icon
+                            icon={
+                              showPassword
+                                ? "mdi:eye-outline"
+                                : "mdi:eye-off-outline"
+                            }
+                            fontSize={20}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               )}
             />

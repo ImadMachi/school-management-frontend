@@ -30,7 +30,7 @@ import { useDispatch } from "react-redux";
 import { addDirectorAccount } from "src/store/apps/directors";
 // ** Types Imports
 import { AppDispatch } from "src/store";
-import { Avatar, Checkbox, Chip, FormControlLabel } from "@mui/material";
+import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
 
 interface SidebarUpdateDirectorType {
   id: number;
@@ -100,6 +100,7 @@ const SidebarAddDirectorAccount = (props: SidebarUpdateDirectorType) => {
     resolver: yupResolver(schema),
   });
   const [isHovered, setIsHovered] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: CreateDirectorAccountDto) => {
     const result = await dispatch(addDirectorAccount({ id, data }) as any);
@@ -188,12 +189,32 @@ const SidebarAddDirectorAccount = (props: SidebarUpdateDirectorType) => {
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={value}
                   label="Mot de passe"
                   onChange={onChange}
                   placeholder="********"
                   error={Boolean(errors.password)}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <Icon
+                            icon={
+                              showPassword
+                                ? "mdi:eye-outline"
+                                : "mdi:eye-off-outline"
+                            }
+                            fontSize={20}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               )}
             />

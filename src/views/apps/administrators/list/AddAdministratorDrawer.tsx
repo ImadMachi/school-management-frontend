@@ -25,7 +25,7 @@ import { useDispatch } from "react-redux";
 
 // ** Types Imports
 import { AppDispatch } from "src/store";
-import { Avatar, Checkbox, Chip, FormControlLabel, Grid } from "@mui/material";
+import { Avatar, Checkbox, Chip, FormControlLabel, Grid, InputAdornment } from "@mui/material";
 import { addAdministrator } from "src/store/apps/administrator";
 import { on } from "events";
 
@@ -114,6 +114,8 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     resolver: yupResolver(schema),
   });
   const [isHovered, setIsHovered] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
 
   const createAccount = useWatch({
     control,
@@ -278,12 +280,32 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <TextField
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={value}
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.createUserDto?.password)}
+                      error={Boolean(errors.password)}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              edge="end"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              <Icon
+                                icon={
+                                  showPassword
+                                    ? "mdi:eye-outline"
+                                    : "mdi:eye-off-outline"
+                                }
+                                fontSize={20}
+                              />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   )}
                 />

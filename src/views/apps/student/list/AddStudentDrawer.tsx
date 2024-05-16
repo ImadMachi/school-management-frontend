@@ -39,6 +39,7 @@ import {
   Chip,
   FormControlLabel,
   Grid,
+  InputAdornment,
   InputLabel,
   ListItem,
   MenuItem,
@@ -157,6 +158,8 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     resolver: yupResolver(schema),
   });
   const [isHovered, setIsHovered] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const parentStore = useSelector((state: RootState) => state.parents);
 
   const createAccount = useWatch({
@@ -447,12 +450,32 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <TextField
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={value}
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.createUserDto?.password)}
+                      error={Boolean(errors.password)}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              edge="end"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              <Icon
+                                icon={
+                                  showPassword
+                                    ? "mdi:eye-outline"
+                                    : "mdi:eye-off-outline"
+                                }
+                                fontSize={20}
+                              />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   )}
                 />

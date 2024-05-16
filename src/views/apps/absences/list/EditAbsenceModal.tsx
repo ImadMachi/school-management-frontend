@@ -141,16 +141,13 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
         )} \n` +
         `${day.sessions.map(
           (session, i) =>
-            `Séance ${i + 1} : ${
-              session.user
-                ? `${
-                    userStore.data.find((user) => user.id === session.user.id)
-                      ?.userData.firstName
-                  } ${
-                    userStore.data.find((user) => user.id === session.user.id)
-                      ?.userData.lastName
-                  }`
-                : "Non défini"
+            `Séance ${i + 1} : ${session.user
+              ? `${userStore.data.find((user) => user.id === session.user.id)
+                ?.userData.firstName
+              } ${userStore.data.find((user) => user.id === session.user.id)
+                ?.userData.lastName
+              }`
+              : "Non défini"
             }`
         )}`
     )}`;
@@ -192,34 +189,34 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
     props: HTMLAttributes<HTMLLIElement>,
     option: UserType
   ) => {
-    return (
-      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.profileImage ? (
-            <Avatar
-              alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
-              src={`${HOST}/uploads/${option.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(
-                `${option.userData?.firstName} ${option.userData?.lastName}`
-              )}
-            </CustomAvatar>
-          )}
-
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.userData.firstName} {option.userData.lastName}
-          </Typography>
-        </Box>
-      </ListItem>
-    );
+    const { absentUser } = absenceToEdit || {};
+    if (absentUser) {
+      if (
+        (absentUser.role === "Teacher" && option.role === "Teacher") ||
+        (absentUser.role === "Agent" && option.role === "Agent")
+      ) {
+        // Check if the option is not the absent user
+        if (option.id !== absentUser.id) {
+          return (
+            <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <Avatar
+                  alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
+                  src={`${HOST}/uploads/${option.profileImage}`}
+                  sx={{ width: 30, height: 30, marginRight: "10px" }}
+                />
+                <Typography sx={{ fontSize: "0.875rem" }}>
+                  {option.userData.firstName} {option.userData.lastName}
+                </Typography>
+              </Box>
+            </ListItem>
+          );
+        }
+      }
+    }
   };
+  
+  
 
   const numberOfDays =
     differenceInDays(
@@ -276,8 +273,8 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                     value={
                       value
                         ? userStore.data.find(
-                            (user) => user.id === Number(value)
-                          )
+                          (user) => user.id === Number(value)
+                        )
                         : null
                     }
                     onChange={(event, newValue) => {

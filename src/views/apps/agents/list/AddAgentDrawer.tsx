@@ -30,7 +30,7 @@ import { useDispatch } from "react-redux";
 import { addAgent } from "src/store/apps/agents";
 // ** Types Imports
 import { AppDispatch } from "src/store";
-import { Avatar, Checkbox, Chip, FormControlLabel } from "@mui/material";
+import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
 
 interface SidebarAddAgentType {
   open: boolean;
@@ -116,6 +116,7 @@ const SidebarAddAgent = (props: SidebarAddAgentType) => {
     resolver: yupResolver(schema),
   });
   const [isHovered, setIsHovered] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const createAccount = useWatch({
     control,
@@ -279,12 +280,32 @@ const SidebarAddAgent = (props: SidebarAddAgentType) => {
                   rules={{ required: true }}
                   render={({ field: { value, onChange } }) => (
                     <TextField
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       value={value}
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.createUserDto?.password)}
+                      error={Boolean(errors.password)}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              edge="end"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              <Icon
+                                icon={
+                                  showPassword
+                                    ? "mdi:eye-outline"
+                                    : "mdi:eye-off-outline"
+                                }
+                                fontSize={20}
+                              />
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
                     />
                   )}
                 />

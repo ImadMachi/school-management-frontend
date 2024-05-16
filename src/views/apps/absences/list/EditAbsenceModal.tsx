@@ -205,7 +205,6 @@ const EditAbsenceModal: React.FC<EditAbsenceModalProps> = (
                   src={`${HOST}/uploads/${option.profileImage}`}
                   sx={{ width: 30, height: 30, marginRight: "10px" }}
                 />
-  
                 <Typography sx={{ fontSize: "0.875rem" }}>
                   {option.userData.firstName} {option.userData.lastName}
                 </Typography>

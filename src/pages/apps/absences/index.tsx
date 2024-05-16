@@ -31,6 +31,8 @@ import { format } from "date-fns";
 import CustomChip from "src/@core/components/mui/chip";
 import AddAbsenceDrawer from "src/views/apps/absences/list/AddAbsenceDrawrer";
 import EditAbsenceModal from "src/views/apps/absences/list/EditAbsenceModal";
+import { HOST } from "src/store/constants/hostname";
+import { Avatar, Box } from "@mui/material";
 
 interface CellType {
   row: AbsenceType;
@@ -177,7 +179,43 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
     headerName: "Absent",
     field: "absent",
     renderCell: ({ row }: CellType) => {
-      return <Typography noWrap>{row.absentUser.email}</Typography>;
+      const dispatch = useDispatch<AppDispatch>();
+
+      return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {row.absentUser.profileImage ? (
+            <Avatar
+              alt={`Profile Image of ${row.absentUser?.email} `}
+              src={`${HOST}/uploads/${row.absentUser.profileImage}`}
+              sx={{ width: 30, height: 30, marginRight: "10px" }}
+            />
+          ) : (
+            <CustomAvatar
+              skin="light"
+              color={"primary"}
+              sx={{
+                width: 30,
+                height: 30,
+                fontSize: ".875rem",
+                marginRight: "10px",
+              }}
+            >
+              {getInitials(
+                `${row.absentUser?.email}`
+              )}
+            </CustomAvatar>
+          )}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "column",
+            }}
+          >
+            <Typography noWrap>{row.absentUser.email}</Typography>
+          </Box>
+        </Box>
+      );
     },
   },
   {

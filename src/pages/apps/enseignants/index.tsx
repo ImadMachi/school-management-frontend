@@ -299,8 +299,8 @@ const columns = [
   {
     flex: 0.17,
     minWidth: 40,
-    headerName: "Matiéres",
-    field: "matiéres",
+    headerName: "Matieres",
+    field: "matieres",
     renderCell: ({ row }: CellType) => {
       const subjects = row.subjects || [];
       return (

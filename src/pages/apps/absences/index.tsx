@@ -33,6 +33,8 @@ import AddAbsenceDrawer from "src/views/apps/absences/list/AddAbsenceDrawrer";
 import EditAbsenceModal from "src/views/apps/absences/list/EditAbsenceModal";
 import { HOST } from "src/store/constants/hostname";
 import { Avatar, Box } from "@mui/material";
+import CustomAvatar from "src/@core/components/mui/avatar";
+import { getInitials } from "src/@core/utils/get-initials";
 
 interface CellType {
   row: AbsenceType;
@@ -200,9 +202,7 @@ const columns = ({ toggle, handleAbsenceId }: ColumnsProps) => [
                 marginRight: "10px",
               }}
             >
-              {getInitials(
-                `${row.absentUser?.email}`
-              )}
+              {getInitials(`${row.absentUser?.email}`)}
             </CustomAvatar>
           )}
           <Box

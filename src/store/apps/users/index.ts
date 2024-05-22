@@ -62,6 +62,14 @@ export const updatePassword = createAsyncThunk(
   }
 );
 
+export const reactivateAccount = createAsyncThunk(
+  "appUsers/reactivateAccount",
+  async ({ id }: { id: number }) => {
+    const response = await axios.get(`${HOST}/users/${id}/reactivate-account`);
+    return response.data;
+  }
+);
+
 export const uploadProfileImage = createAsyncThunk(
   "appUsers/uploadProfileImage",
   async ({ id, file }: { id: number; file: File }) => {
@@ -90,6 +98,7 @@ export const updateUserStatus = createAsyncThunk(
     }
   }
 );
+
 export const appUsersSlice = createSlice({
   name: "appUsers",
   initialState,
@@ -170,13 +179,26 @@ export const appUsersSlice = createSlice({
     builder.addCase(uploadProfileImage.rejected, (state, action) => {
       toast.error("Erreur lors de la mise à jour de l'image de profil");
     });
-    // builder.addCase(updateUserStatus.fulfilled, (state, action) => {
-    //   toast.success("L'utilisateur a été supprimé avec succès");
-    // });
+    builder.addCase(updateUserStatus.fulfilled, (state, action) => {
+      const deletedUserId = action.payload.id;
 
-    // builder.addCase(updateUserStatus.rejected, (state, action) => {
-    //   toast.error("Erreur supprimant l'utilisateur");
-    // });
+      state.data = state.data.filter((User) => User.id !== deletedUserId);
+      state.allData = state.allData.filter((User) => User.id !== deletedUserId);
+
+      toast.success("L'utilisateur a été supprimé avec succès");
+    });
+
+    builder.addCase(updateUserStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant l'utilisateur");
+    });
+
+    builder.addCase(reactivateAccount.fulfilled, (state, action) => {
+      toast.success("Le compte a été réactivé avec succès");
+    });
+
+    builder.addCase(reactivateAccount.rejected, (state, action) => {
+      toast.error("Erreur lors de la réactivation du compte");
+    });
   },
 });
 

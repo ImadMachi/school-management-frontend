@@ -265,6 +265,14 @@ export const appStudentsSlice = createSlice({
       toast.error("Erreur modifiant l'élève");
     });
     builder.addCase(updateStudentStatus.fulfilled, (state, action) => {
+      const deletedStudentId = action.payload.id;
+
+      state.data = state.data.filter(
+        (student) => student.id !== deletedStudentId
+      );
+      state.allData = state.allData.filter(
+        (student) => student.id !== deletedStudentId
+      );
       toast.success("L'élève a été supprimé avec succès");
     });
     builder.addCase(updateStudentStatus.rejected, (state, action) => {

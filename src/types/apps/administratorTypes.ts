@@ -1,13 +1,14 @@
 export type AdministratorType = {
-  id: number
-  firstName: string
-  lastName: string
-  phoneNumber: string
+  id: number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
   disabled: boolean;
-  userId: number
-  user: { 
-    id: number
-    email: string
-    profileImage: File
-  }
-}
+  userId: number;
+  user: {
+    id: number;
+    email: string;
+    profileImage: File;
+    disabled: boolean;
+  };
+};

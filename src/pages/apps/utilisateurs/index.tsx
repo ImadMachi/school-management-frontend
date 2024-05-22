@@ -186,15 +186,8 @@ const RowOptions = ({ id }: { id: number }) => {
 
     const updatedUserData = { ...userData, disabled: true };
 
-    try {
-      await dispatch(updateUserStatus({ id: id, disabled: true }) as any);
+    dispatch(updateUserStatus({ id: id, disabled: true }) as any);
 
-      await dispatch(fetchData() as any);
-
-      toast.success("L'utilisateur a été supprimé avec succès");
-    } catch (error) {
-      toast.error("Erreur supprimant l'utilisateur");
-    }
     setUserData(updatedUserData);
   };
 

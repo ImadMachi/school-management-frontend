@@ -47,10 +47,8 @@ import TableHeader from "src/views/apps/administrators/list/TableHeader";
 import AddAdministratorDrawer from "src/views/apps/administrators/list/AddAdministratorDrawer";
 import CustomChip from "src/@core/components/mui/chip";
 import { ThemeColor } from "src/@core/layouts/types";
-import { fetchUserById, updateUserStatus } from "src/store/apps/users";
+import { fetchUserById, reactivateAccount } from "src/store/apps/users";
 import { Avatar } from "@mui/material";
-import { UserType } from "src/types/apps/UserType";
-import SidebarAddAdministrator from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
 import toast from "react-hot-toast";
 import SidebarAddAdministratorAccount from "src/views/apps/administrators/list/AddAdministratorAccountDrawer";
 import { HOST } from "src/store/constants/hostname";
@@ -79,7 +77,15 @@ const StyledLink = styled(Link)(({ theme }) => ({
   },
 }));
 
-const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
+const RowOptions = ({
+  id,
+  userId,
+  row,
+}: {
+  id: number;
+  userId: number;
+  row: AdministratorType;
+}) => {
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
 
@@ -102,26 +108,21 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   };
 
   const handleDelete = async () => {
-    try {
-      await dispatch(
-        updateAdministratorStatus({ id: id, disabled: true }) as any
-      );
-      if (userId) {
-        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
-      }
-      await dispatch(fetchData() as any);
-    } catch (error) {
-      console.error("Error disabling user:", error);
-    }
+    await dispatch(
+      updateAdministratorStatus({ id: id, disabled: true }) as any
+    );
   };
 
   const handleModifyClick = () => {
-    if (userId) {
+    if (row.user && row.user.disabled) {
+      dispatch(reactivateAccount({ id: row.user.id }) as any);
+      dispatch(fetchData() as any);
+    } else if (row.user && !row.user.disabled) {
       toast.error("Cet utilisateur a déjà un compte.");
     } else {
       setIsAddAdministratorOpen(true);
-      handleRowOptionsClose();
     }
+    handleRowOptionsClose();
   };
 
   return (
@@ -256,7 +257,7 @@ const columns = [
     headerName: "Compte",
     field: "userId",
     renderCell: ({ row }: CellType) => {
-      const status = !!row.userId ? "oui" : "non";
+      const status = row.user ? (row.user?.disabled ? "non" : "oui") : "non";
       return (
         <CustomChip
           skin="light"
@@ -274,7 +275,7 @@ const columns = [
     field: "actions",
     headerName: "Actions",
     renderCell: ({ row }: CellType) => (
-      <RowOptions id={row.id} userId={row.userId} />
+      <RowOptions id={row.id} userId={row.userId} row={row} />
     ),
   },
 ];
@@ -347,4 +348,3 @@ export default AdministratorList;
 function dispatch(arg0: any) {
   throw new Error("Function not implemented.");
 }
-

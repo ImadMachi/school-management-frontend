@@ -269,6 +269,13 @@ export const appAdministratorsSlice = createSlice({
       toast.error("Erreur modifiant l'administrateur");
     });
     builder.addCase(updateAdministratorStatus.fulfilled, (state, action) => {
+      const deleteAdministratorId = action.payload.id;
+      state.data = state.data.filter(
+        (administrator) => administrator.id !== deleteAdministratorId
+      );
+      state.allData = state.allData.filter(
+        (administrator) => administrator.id !== deleteAdministratorId
+      );
       toast.success("L'administrateur a été modifié avec succès");
     });
     builder.addCase(updateAdministratorStatus.rejected, (state, action) => {

@@ -272,6 +272,13 @@ export const appTeachersSlice = createSlice({
       toast.error("Erreur modifiant l'enseignant");
     });
     builder.addCase(updateTeacherStatus.fulfilled, (state, action) => {
+      const deletedTeacherId = action.payload.id;
+      state.data = state.data.filter(
+        (teacher) => teacher.id !== deletedTeacherId
+      );
+      state.allData = state.allData.filter(
+        (teacher) => teacher.id !== deletedTeacherId
+      );
       toast.success("L'enseignant a été supprimé avec succès");
     });
 

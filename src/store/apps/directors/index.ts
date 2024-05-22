@@ -268,6 +268,13 @@ export const appDirectorsSlice = createSlice({
       toast.error("Erreur modifiant le directeur");
     });
     builder.addCase(updateDirectorStatus.fulfilled, (state, action) => {
+      const deletedDirectorId = action.payload.id;
+      state.data = state.data.filter(
+        (Director) => Director.id !== deletedDirectorId
+      );
+      state.allData = state.allData.filter(
+        (Director) => Director.id !== deletedDirectorId
+      );
       toast.success("Le directeur a été supprimé avec succès");
     });
     builder.addCase(updateDirectorStatus.rejected, (state, action) => {

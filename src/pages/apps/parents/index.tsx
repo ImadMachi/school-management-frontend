@@ -117,15 +117,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
   // };
 
   const handleDelete = async () => {
-    try {
-      await dispatch(updateParentStatus({ id: id, disabled: true }) as any);
-      if (userId){
-        await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
-      }
-      await dispatch(fetchData() as any);
-    } catch (error) {
-      console.error("Error disabling user:", error);
-    }
+    await dispatch(updateParentStatus({ id: id, disabled: true }) as any);
   };
 
   const handleModifyClick = () => {
@@ -299,7 +291,7 @@ const columns = [
     headerName: "Compte",
     field: "userId",
     renderCell: ({ row }: CellType) => {
-      const status = !!row.userId ? "oui" : "non";
+      const status = row.user ? (row.user?.disabled ? "non" : "oui") : "non";
       return (
         <CustomChip
           skin="light"

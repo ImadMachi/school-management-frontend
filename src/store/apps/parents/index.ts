@@ -261,6 +261,12 @@ export const appParentsSlice = createSlice({
       toast.error("Erreur modifiant le parent");
     });
     builder.addCase(updateParentStatus.fulfilled, (state, action) => {
+      const deletedParentId = action.payload.id;
+
+      state.data = state.data.filter((Parent) => Parent.id !== deletedParentId);
+      state.allData = state.allData.filter(
+        (Parent) => Parent.id !== deletedParentId
+      );
       toast.success("Le parent a été supprimé avec succès");
     });
     builder.addCase(updateParentStatus.rejected, (state, action) => {

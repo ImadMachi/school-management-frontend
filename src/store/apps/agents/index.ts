@@ -263,6 +263,12 @@ export const appAgentsSlice = createSlice({
       toast.error("Erreur modifiant l'agent");
     });
     builder.addCase(updateAgentStatus.fulfilled, (state, action) => {
+      const deletedAgentId = action.payload.id;
+
+      state.data = state.data.filter((agent) => agent.id !== deletedAgentId);
+      state.allData = state.allData.filter(
+        (agent) => agent.id !== deletedAgentId
+      );
       toast.success("L'agent a été supprimé avec succès");
     });
     builder.addCase(updateAgentStatus.rejected, (state, action) => {

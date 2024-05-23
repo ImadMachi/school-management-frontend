@@ -184,7 +184,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
 const columns = [
   {
-    flex: 0.2,
+    flex: 0.1,
     minWidth: 230,
     headerName: "Utilisateur",
     field: "Utilisateur",
@@ -261,7 +261,7 @@ const columns = [
     ),
   },
   {
-    flex: 0.15,
+    flex: 0.1,
     minWidth: 70,
     headerName: "Date de Naissance",
     field: "dateOfBirth",
@@ -272,7 +272,7 @@ const columns = [
     ),
   },
   {
-    flex: 0.1,
+    flex: 0.05,
     minWidth: 90,
     sortable: false,
     field: "sex",
@@ -282,19 +282,20 @@ const columns = [
     ),
   },
   {
-    flex: 0.1,
+    flex: 0.15,
     minWidth: 160,
     sortable: false,
     field: "parent",
     headerName: "Parent",
     renderCell: ({ row }: CellType) => (
       <Typography noWrap>
-        {row.parent?.firstName || "-"} {row.parent?.lastName || "-"}
+        {row.father?.firstName || "-"} {row.father?.lastName || "-"} - {row.mother?.firstName || "-"} {row.mother?.lastName || "-"}
+
       </Typography>
     ),
   },
   {
-    flex: 0.15,
+    flex: 0.1,
     minWidth: 120,
     headerName: "Compte",
     field: "userId",

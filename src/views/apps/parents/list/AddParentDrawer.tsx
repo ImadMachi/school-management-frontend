@@ -124,8 +124,11 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     defaultValue: false,
   });
 
-  const onSubmit = (data: CreateParentDto) => {
-    dispatch(addParent(data) as any);
+  const onSubmit = async (data: CreateParentDto) => {
+    const result = await dispatch(addParent(data) as any);
+    if (result.error) {
+      return;
+    }
     toggle();
     reset();
   };
@@ -138,7 +141,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const email = `${firstName}.${lastName}@gmail.com`;
+    const email = `${firstName}.${lastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {
@@ -281,7 +284,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.password)}
+                      error={Boolean(errors.createUserDto?.password)}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">

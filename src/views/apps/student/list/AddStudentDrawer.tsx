@@ -65,7 +65,10 @@ export interface CreateStudentDto {
   identification: string;
   dateOfBirth: Date;
   sex: string;
-  parent: {
+  father: {
+    id: number;
+  };
+  mother: {
     id: number;
   };
   createAccount: boolean;
@@ -90,7 +93,10 @@ const schema = yup.object().shape({
   identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
-  parent: yup.object().shape({
+  father: yup.object().shape({
+    id: yup.number().required(),
+  }),
+  mother: yup.object().shape({
     id: yup.number().required(),
   }),
   createUserDto: yup.object().when("createAccount", {
@@ -121,7 +127,8 @@ const defaultValues = {
   identification: "",
   dateOfBirth: new Date(),
   sex: "",
-  parent: { id: "" },
+  father: { id: "" },
+  mother: { id: "" },
   createAccount: false,
   createUserDto: {
     email: "",
@@ -368,12 +375,12 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="parent.id"
+              name="father.id"
               control={control}
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <Autocomplete
-                  id="parent-user-autocomplete"
+                  id="father-user-autocomplete"
                   options={parentStore.data}
                   getOptionLabel={(option) =>
                     `${option.firstName} ${option.lastName}`
@@ -390,9 +397,9 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Parent"
-                      error={Boolean(errors.parent)}
-                      helperText={errors.parent ? errors.parent.message : ""}
+                      label="Pére"
+                      error={Boolean(errors.father)}
+                      helperText={errors.father ? errors.father.message : ""}
                     />
                   )}
                   renderOption={(props, option) =>
@@ -402,6 +409,44 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               )}
             />
           </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="mother.id"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  id="mother-user-autocomplete"
+                  options={parentStore.data}
+                  getOptionLabel={(option) =>
+                    `${option.firstName} ${option.lastName}`
+                  }
+                  value={
+                    parentStore.data.find(
+                      (user) => user.id === Number(value)
+                    ) || null
+                  }
+                  onChange={(e, newValue) => {
+                    const newValueId = newValue ? newValue.id : null;
+                    onChange(newValueId);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Mére"
+                      error={Boolean(errors.father)}
+                      helperText={errors.father ? errors.father.message : ""}
+                    />
+                  )}
+                  renderOption={(props, option) =>
+                    renderListItem(props, option)
+                  }
+                />
+              )}
+            />
+          </FormControl>
+
 
           <FormControlLabel
             control={
@@ -452,7 +497,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.password)}
+                      error={Boolean(errors.createUserDto?.password)}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">

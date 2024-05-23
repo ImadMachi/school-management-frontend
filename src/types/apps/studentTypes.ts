@@ -11,6 +11,6 @@ export type StudentsType = {
     disabled: boolean;
     userId: number
     classe : ClassType
-    parent : ParentsType
+    father : ParentsType
+    mother : ParentsType
   }
-  

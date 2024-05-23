@@ -54,7 +54,8 @@ export const addStudent = createAsyncThunk(
     formData.append("identification", data.identification);
     formData.append("dateOfBirth", data.dateOfBirth.toString());
     formData.append("sex", data.sex);
-    formData.append("parent[id]", data.parent.id.toString());
+    formData.append("father[id]", data.father.id.toString());
+    formData.append("mother[id]", data.mother.id.toString());
     formData.append("createAccount", data.createAccount.toString());
 
     if (data.createAccount) {

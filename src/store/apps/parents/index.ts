@@ -44,7 +44,6 @@ export const fetchParent = createAsyncThunk(
 );
 
 // ** Add User
-
 export const addParent = createAsyncThunk(
   "appParents/addParent",
   async (data: CreateParentDto) => {
@@ -208,6 +207,10 @@ export const appParentsSlice = createSlice({
       toast.success("Le parent a été ajouté avec succès");
     });
     builder.addCase(addParent.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le parent");
     });
     builder.addCase(addParentAccount.fulfilled, (state, action) => {
@@ -221,6 +224,10 @@ export const appParentsSlice = createSlice({
       toast.success("Le parent a été ajouté avec succès");
     });
     builder.addCase(addParentAccount.rejected, (state, action) => {
+      if (action.error.code === "ERR_BAD_REQUEST") {
+        toast.error("Cet email est déjà utilisé");
+        return;
+      }
       toast.error("Erreur ajoutant le parent");
     });
     builder.addCase(fetchParent.fulfilled, (state, action) => {
@@ -253,6 +260,12 @@ export const appParentsSlice = createSlice({
       toast.error("Erreur modifiant le parent");
     });
     builder.addCase(updateParentStatus.fulfilled, (state, action) => {
+      const deletedParentId = action.payload.id;
+
+      state.data = state.data.filter((Parent) => Parent.id !== deletedParentId);
+      state.allData = state.allData.filter(
+        (Parent) => Parent.id !== deletedParentId
+      );
       toast.success("Le parent a été supprimé avec succès");
     });
     builder.addCase(updateParentStatus.rejected, (state, action) => {

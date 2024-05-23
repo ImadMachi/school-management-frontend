@@ -29,6 +29,8 @@ import TableHeader from "src/views/apps/absences/list/TableHeader";
 import { deleteAbsence, fetchData, filterData } from "src/store/apps/absences";
 import { format } from "date-fns";
 import CustomChip from "src/@core/components/mui/chip";
+import CustomAvatar from "src/@core/components/mui/avatar";
+import { getInitials } from "src/@core/utils/get-initials";
 import AddAbsenceDrawer from "src/views/apps/absences/list/AddAbsenceDrawrer";
 import EditAbsenceModal from "src/views/apps/absences/list/EditAbsenceModal";
 import { HOST } from "src/store/constants/hostname";

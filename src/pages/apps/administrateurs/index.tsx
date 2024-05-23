@@ -305,15 +305,6 @@ const AdministratorList = () => {
     setValue(val);
   }, []);
 
-  // const generateCSVData = () => {
-  //   return administratorStore.allData.map((item) => ({
-  //     Prénom: item.firstName,
-  //     Nom: item.lastName,
-  //     Tel: item.phoneNumber,
-  //     compte: !!item.userId ? "oui" : "non",
-  //   }));
-  // };
-
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 
   return (

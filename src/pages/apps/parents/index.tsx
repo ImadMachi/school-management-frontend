@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "src/store";
 import { fetchUserById, updateUserStatus } from "src/store/apps/users";
 
+
 // ** Custom Components Imports
 import CustomAvatar from "src/@core/components/mui/avatar";
 
@@ -33,7 +34,7 @@ import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
 import {
-  fetchData,
+  fetchData as fetchParents,
   deleteParent,
   filterData,
   setParentId,
@@ -122,7 +123,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
       if (userId){
         await dispatch(updateUserStatus({ id: userId, disabled: true }) as any);
       }
-      await dispatch(fetchData() as any);
+      await dispatch(fetchParents() as any);
     } catch (error) {
       console.error("Error disabling user:", error);
     }
@@ -333,13 +334,17 @@ const UserList = () => {
   const dispatch = useDispatch<AppDispatch>();
   const parentStore = useSelector((state: RootState) => state.parents);
 
+
   useEffect(() => {
-    dispatch(fetchData() as any);
-  }, []);
+    dispatch(fetchParents() as any);
+  }, [dispatch]);
+
+
 
   useEffect(() => {
     dispatch(filterData(value));
   }, [dispatch, plan, value]);
+
 
   const handleFilter = useCallback((val: string) => {
     setValue(val);
@@ -356,6 +361,8 @@ const UserList = () => {
   // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
+
+
 
   return (
     <Grid container spacing={6}>

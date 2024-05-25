@@ -65,10 +65,7 @@ export interface CreateStudentDto {
   identification: string;
   dateOfBirth: Date;
   sex: string;
-  father: {
-    id: number;
-  };
-  mother: {
+  parent: {
     id: number;
   };
   createAccount: boolean;
@@ -93,10 +90,7 @@ const schema = yup.object().shape({
   identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
-  father: yup.object().shape({
-    id: yup.number().required(),
-  }),
-  mother: yup.object().shape({
+  parent: yup.object().shape({
     id: yup.number().required(),
   }),
   createUserDto: yup.object().when("createAccount", {
@@ -127,8 +121,7 @@ const defaultValues = {
   identification: "",
   dateOfBirth: new Date(),
   sex: "",
-  father: { id: "" },
-  mother: { id: "" },
+  parent: { id: "" },
   createAccount: false,
   createUserDto: {
     email: "",
@@ -202,24 +195,17 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            {option.userId ? (
-              <Avatar
-                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-                src={`${HOST}/uploads/${user?.profileImage}`}
-                sx={{ width: 30, height: 30, marginRight: "10px" }}
-              />
-            ) : (
+            
               <CustomAvatar
                 skin="light"
                 color="primary"
                 sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
               >
-                {getInitials(`${option.firstName} ${option.lastName}`)}
+                {getInitials(`${option.fatherFirstName} ${option.motherFirstName}`)}
               </CustomAvatar>
-            )}
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.firstName} {option.lastName}
+              {option.fatherFirstName} {option.fatherLastName} {option.motherFirstName} {option.motherLastName}
             </Typography>
           </Box>
         </ListItem>
@@ -375,15 +361,15 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="father.id"
+              name="parent.id"
               control={control}
               rules={{ required: true }}
               render={({ field: { onChange, value } }) => (
                 <Autocomplete
-                  id="father-user-autocomplete"
+                  id="parent-user-autocomplete"
                   options={parentStore.data}
                   getOptionLabel={(option) =>
-                    `${option.firstName} ${option.lastName}`
+                    `${option.fatherFirstName} ${option.fatherLastName} ${option.motherFirstName} ${option.motherLastName}`
                   }
                   value={
                     parentStore.data.find(
@@ -398,8 +384,8 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                     <TextField
                       {...params}
                       label="Pére"
-                      error={Boolean(errors.father)}
-                      helperText={errors.father ? errors.father.message : ""}
+                      error={Boolean(errors.parent)}
+                      helperText={errors.parent ? errors.parent.message : ""}
                     />
                   )}
                   renderOption={(props, option) =>
@@ -409,45 +395,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               )}
             />
           </FormControl>
-
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="mother.id"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { onChange, value } }) => (
-                <Autocomplete
-                  id="mother-user-autocomplete"
-                  options={parentStore.data}
-                  getOptionLabel={(option) =>
-                    `${option.firstName} ${option.lastName}`
-                  }
-                  value={
-                    parentStore.data.find(
-                      (user) => user.id === Number(value)
-                    ) || null
-                  }
-                  onChange={(e, newValue) => {
-                    const newValueId = newValue ? newValue.id : null;
-                    onChange(newValueId);
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Mére"
-                      error={Boolean(errors.father)}
-                      helperText={errors.father ? errors.father.message : ""}
-                    />
-                  )}
-                  renderOption={(props, option) =>
-                    renderListItem(props, option)
-                  }
-                />
-              )}
-            />
-          </FormControl>
-
-
           <FormControlLabel
             control={
               <Controller

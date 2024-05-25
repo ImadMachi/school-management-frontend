@@ -370,11 +370,16 @@ const columns = [
     renderCell: ({ row }: CellType) => {
       const dispatch = useDispatch<AppDispatch>();
 
+      // Determine the name to display based on the role
+      const displayName = row.role === "Parent"
+        ? `${row.userData.fatherFirstName} ${row.userData.fatherLastName} et ${row.userData.motherFirstName} ${row.userData.motherLastName}`
+        : `${row.userData.firstName} ${row.userData.lastName}`;
+
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {row.profileImage ? (
             <Avatar
-              alt={`Profile Image of ${row.userData?.firstName} ${row.userData?.lastName}`}
+              alt={`Profile Image of ${displayName}`}
               src={`${HOST}/uploads/${row.profileImage}`}
               sx={{ width: 30, height: 30, marginRight: "10px" }}
             />
@@ -389,9 +394,7 @@ const columns = [
                 marginRight: "10px",
               }}
             >
-              {getInitials(
-                `${row.userData?.firstName} ${row.userData?.lastName}`
-              )}
+              {getInitials(displayName)}
             </CustomAvatar>
           )}
           <Box
@@ -404,9 +407,8 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${
-                row.userData?.id
-              }`}
+              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${row.userData?.id
+                }`}
               onClick={() => {
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
@@ -429,7 +431,7 @@ const columns = [
                 }
               }}
             >
-              {row.userData?.firstName} {row.userData?.lastName}
+              {displayName}
             </StyledLink>
           </Box>
         </Box>

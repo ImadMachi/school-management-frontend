@@ -68,12 +68,10 @@ export interface UpdateStudentDto {
   identification: string;
   dateOfBirth?: Date;
   sex?: string;
-  father: {
+  parent: {
     id: number;
   };
-  mother: {
-    id: number;
-  };
+
 }
 
 const schema = yup.object().shape({
@@ -82,10 +80,7 @@ const schema = yup.object().shape({
   identification: yup.string().min(7).required(),
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
-  father: yup.object().shape({
-    id: yup.number().required(),
-  }),
-  mother: yup.object().shape({
+  parent: yup.object().shape({
     id: yup.number().required(),
   }),
 });
@@ -139,24 +134,17 @@ const UserViewLeft = () => {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            {option.userId ? (
-              <Avatar
-                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-                src={`${HOST}/uploads/${user?.profileImage}`}
-                sx={{ width: 30, height: 30, marginRight: "10px" }}
-              />
-            ) : (
+
               <CustomAvatar
                 skin="light"
                 color="primary"
                 sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
               >
-                {getInitials(`${option.firstName} ${option.lastName}`)}
+                {getInitials(`${option.fatherFirstName} ${option.motherFirstName}`)}
               </CustomAvatar>
-            )}
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.firstName} {option.lastName}
+              {option.fatherFirstName} {option.fatherLastName} {option.motherFirstName} {option.motherLastName}
             </Typography>
           </Box>
         </ListItem>
@@ -375,7 +363,7 @@ const UserViewLeft = () => {
                     Père:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.father?.firstName} {userData.father?.lastName}
+                    {userData.parent?.fatherFirstName} {userData.parent?.fatherLastName}
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", mb: 2 }}>
@@ -385,7 +373,7 @@ const UserViewLeft = () => {
                     Mère:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.mother?.firstName} {userData.mother?.lastName}
+                    {userData.parent?.motherFirstName} {userData.parent?.motherLastName}
                   </Typography>
                 </Box>
               </Box>
@@ -529,20 +517,20 @@ const UserViewLeft = () => {
                     <Grid item xs={12}>
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name="father.id"
+                          name="parent.id"
                           control={control}
                           rules={{ required: true }}
                           render={({ field: { onChange, value } }) => (
                             <Autocomplete
-                              id="father-user-autocomplete"
+                              id="parent-user-autocomplete"
                               options={parentStore.data}
-                              defaultValue={userData.father}
+                              defaultValue={userData.parent}
                               getOptionLabel={(option) =>
-                                `${option.firstName} ${option.lastName}`
+                                `${option.fatherFirstName} ${option.fatherLastName} ${option.motherFirstName} ${option.motherLastName}`
                               }
                               value={
                                 parentStore.data.find(
-                                  (user) => user.id === userData.father?.id
+                                  (user) => user.id === userData.parent?.id
                                 ) || null
                               }
                               onChange={(e, newValue) => {
@@ -554,53 +542,10 @@ const UserViewLeft = () => {
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
-                                  label="Père"
-                                  error={Boolean(errors.father)}
+                                  label="Parent"
+                                  error={Boolean(errors.parent)}
                                   helperText={
-                                    errors.father ? errors.father.message : ""
-                                  }
-                                />
-                              )}
-                              renderOption={(props, option) =>
-                                renderListItem(props, option)
-                              }
-                            />
-                          )}
-                        />
-                      </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl fullWidth sx={{ mb: 6 }}>
-                        <Controller
-                          name="mother.id"
-                          control={control}
-                          rules={{ required: true }}
-                          render={({ field: { onChange, value } }) => (
-                            <Autocomplete
-                              id="mother-user-autocomplete"
-                              options={parentStore.data}
-                              defaultValue={userData.mother}
-                              getOptionLabel={(option) =>
-                                `${option.firstName} ${option.lastName}`
-                              }
-                              value={
-                                parentStore.data.find(
-                                  (user) => user.id === userData.mother?.id
-                                ) || null
-                              }
-                              onChange={(e, newValue) => {
-                                const newValueId = newValue
-                                  ? newValue.id
-                                  : null;
-                                onChange(newValueId);
-                              }}
-                              renderInput={(params) => (
-                                <TextField
-                                  {...params}
-                                  label="Mère"
-                                  error={Boolean(errors.mother)}
-                                  helperText={
-                                    errors.mother ? errors.mother.message : ""
+                                    errors.parent ? errors.parent.message : ""
                                   }
                                 />
                               )}

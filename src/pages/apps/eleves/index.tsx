@@ -289,8 +289,7 @@ const columns = [
     headerName: "Parent",
     renderCell: ({ row }: CellType) => (
       <Typography noWrap>
-        {row.father?.firstName || "-"} {row.father?.lastName || "-"} - {row.mother?.firstName || "-"} {row.mother?.lastName || "-"}
-
+        {row.parent?.fatherFirstName || "-"} {row.parent?.fatherLastName || "-"} - {row.parent?.motherFirstName || "-"} {row.parent?.motherLastName || "-"}
       </Typography>
     ),
   },

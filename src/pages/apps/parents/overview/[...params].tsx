@@ -33,6 +33,12 @@ import { ParentsType } from "src/types/apps/parentTypes";
 import EmailAppLayout from "src/views/apps/parents/overview/mail/Mail";
 import EditIcon from "@mui/icons-material/Edit";
 
+// ** Custom Components Imports
+import CustomAvatar from "src/@core/components/mui/avatar";
+
+// ** Utils Import
+import { getInitials } from "src/@core/utils/get-initials";
+
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 import Image from "next/image";
@@ -64,16 +70,25 @@ interface ColorsType {
 }
 
 export interface UpdateParentDto {
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+  fatherFirstName?: string;
+  fatherLastName?: string;
+  fatherPhoneNumber?: string;
+  motherFirstName?: string;
+  motherLastName?: string;
+  motherPhoneNumber?: string;
+  address?: string;
   student?: StudentsType[];
 }
 
 const schema = yup.object().shape({
-  firstName: yup.string().min(3).required(),
-  lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required(),
+  fatherFirstName: yup.string().required("Prénom du père est requis"),
+  fatherLastName: yup.string().required("Nom du père est requis"),
+  fatherPhoneNumber: yup.string().required("Contact du père est requis"),
+  motherFirstName: yup.string().required("Prénom de la mère est requis"),
+  motherLastName: yup.string().required("Nom de la mère est requis"),
+  motherPhoneNumber: yup.string().required("Contact de la mère est requis"),
+  address: yup.string().required("Adresse est requis"),
+
 });
 
 const UserViewLeft = () => {
@@ -120,10 +135,13 @@ const UserViewLeft = () => {
     // Ensure id is a number
     const parentId = parseInt(id as unknown as string, 10);
     const partialUpdateParentDto: Partial<UpdateParentDto> = {};
-    if (data.firstName) partialUpdateParentDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateParentDto.lastName = data.lastName;
-    if (data.phoneNumber) partialUpdateParentDto.phoneNumber = data.phoneNumber;
-
+    if (data.fatherFirstName) partialUpdateParentDto.fatherFirstName = data.fatherFirstName;
+    if (data.fatherLastName) partialUpdateParentDto.fatherLastName = data.fatherLastName;
+    if (data.fatherPhoneNumber) partialUpdateParentDto.fatherPhoneNumber = data.fatherPhoneNumber;
+    if (data.motherFirstName) partialUpdateParentDto.motherFirstName = data.motherFirstName;
+    if (data.motherLastName) partialUpdateParentDto.motherLastName = data.motherLastName;
+    if (data.motherPhoneNumber) partialUpdateParentDto.motherPhoneNumber = data.motherPhoneNumber;
+    if (data.address) partialUpdateParentDto.address = data.address;
     dispatch(updateParent({ id: parentId, updateParentDto: data }))
       .then(() => {
         reset();
@@ -218,37 +236,18 @@ const UserViewLeft = () => {
                 onMouseLeave={handleLeave}
                 style={{ position: "relative" }}
               >
-                {userData.userId ? (
-                  <>
-                    <Avatar
-                      alt={`Profile Image of ${userData.firstName} ${userData.lastName}`}
-                      src={`${HOST}/uploads/${userIdData?.profileImage}`}
-                      sx={{ width: 80, height: 80 }}
-                    />
-                    {isHovered && (
-                      <IconButton
-                        onClick={handleEditClick}
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          right: 0,
-                          backgroundColor: "rgba(244, 245, 250, 0.8)",
-                          padding: "4px",
-                        }}
-                      >
-                        <EditIcon sx={{ fontSize: 18 }} />
-                      </IconButton>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <Avatar
-                      alt="John Doe"
-                      sx={{ width: 80, height: 80 }}
-                      src="/images/avatars/1.png"
-                    />
-                  </>
-                )}
+                <CustomAvatar
+                  skin="light"
+                  color={"primary"}
+                  sx={{
+                    width: 80,
+                    height: 80,
+                    fontSize: "1.9rem",
+                    marginRight: "10px",
+                  }}
+                >
+                  {getInitials(`${userData.fatherFirstName} ${userData.motherFirstName}`)}
+                </CustomAvatar>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -257,7 +256,7 @@ const UserViewLeft = () => {
                 />
               </div>
               <Typography variant="h6" sx={{ mb: 4 }}>
-                {userData.firstName} {userData.lastName}
+                {userData.fatherFirstName} {userData.fatherLastName} {userData.motherFirstName} {userData.motherLastName}
               </Typography>
               <CustomChip skin="light" size="small" label="Parent" />
             </CardContent>
@@ -271,28 +270,69 @@ const UserViewLeft = () => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
-                    Prénom:
+                    Prénom du père:
                   </Typography>
-                  <Typography variant="body2">{userData.firstName}</Typography>
+                  <Typography variant="body2">{userData.fatherFirstName}</Typography>
                 </Box>{" "}
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
-                    Nom:
+                    Nom du père:
                   </Typography>
-                  <Typography variant="body2">{userData.lastName}</Typography>
+                  <Typography variant="body2">{userData.fatherLastName}</Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Telephone du père:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.fatherPhoneNumber}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Prénom de la mère:
+                  </Typography>
+                  <Typography variant="body2">{userData.motherFirstName}</Typography>
+                </Box>
+
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Nom de la mère:
+                  </Typography>
+                  <Typography variant="body2">{userData.motherLastName}</Typography>
+
                 </Box>
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
-                    Contact:
+                    Telephone de la mère:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.phoneNumber}
+                    {userData.motherPhoneNumber}
                   </Typography>
                 </Box>
+
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Adresse:
+                  </Typography>
+                  <Typography variant="body2">{userData.address}</Typography>
+                </Box>
+
+
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -346,15 +386,15 @@ const UserViewLeft = () => {
                       {/* <TextField fullWidth label='First Name' defaultValue={userData.firstName} /> */}
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name="firstName"
+                          name="fatherFirstName"
                           control={control}
-                          defaultValue={userData.firstName}
+                          defaultValue={userData.fatherFirstName}
                           rules={{ required: "Prénom est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label="Prénom"
+                                label="Prénom du père"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -366,15 +406,15 @@ const UserViewLeft = () => {
                     <Grid item xs={12} sm={6}>
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name="lastName"
+                          name="fatherLastName"
                           control={control}
-                          defaultValue={userData.lastName}
+                          defaultValue={userData.fatherLastName}
                           rules={{ required: "Nom est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label="Nom"
+                                label="Nom du père" 
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -386,15 +426,15 @@ const UserViewLeft = () => {
                     <Grid item xs={12}>
                       <FormControl fullWidth sx={{ mb: 6 }}>
                         <Controller
-                          name="phoneNumber"
+                          name="fatherPhoneNumber"
                           control={control}
-                          defaultValue={userData.phoneNumber}
+                          defaultValue={userData.fatherPhoneNumber}
                           rules={{ required: "Contact est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label="Contact"
+                                label="Telephone du père"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -403,6 +443,90 @@ const UserViewLeft = () => {
                         />
                       </FormControl>
                     </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="motherFirstName"
+                          control={control}
+                          defaultValue={userData.motherFirstName}
+                          rules={{ required: "Prénom est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Prénom de la mère"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="motherLastName"
+                          control={control}
+                          defaultValue={userData.motherLastName}
+                          rules={{ required: "Nom est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Nom du mère"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="motherPhoneNumber"
+                          control={control}
+                          defaultValue={userData.motherPhoneNumber}
+                          rules={{ required: "Contact est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Telephone du mère"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="address"
+                          control={control}
+                          defaultValue={userData.address}
+                          rules={{ required: "Adresse est requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Adresse"
+                                multiline
+                                rows={4}
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                                sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
+
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                      </Grid>
                   </Grid>
                 </form>
               </DialogContent>

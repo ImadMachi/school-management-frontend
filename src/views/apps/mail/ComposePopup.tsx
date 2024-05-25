@@ -360,7 +360,49 @@ const ComposePopup = (props: MailComposeType) => {
     array: ToUserType[],
     setState: (val: ToUserType[]) => void
   ) => {
-    if (option.isActive == true){
+    if (option.isActive == true) {
+      return (
+        <ListItem
+          key={option.id}
+          sx={{ cursor: "pointer" }}
+          onClick={() => setState([...array, option])}
+        >
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {option.profileImage ? (
+              <Avatar
+                alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
+                src={`${HOST}/uploads/${option.profileImage}`}
+                sx={{ width: 30, height: 30, marginRight: "10px" }}
+              />
+            ) : (
+              <CustomAvatar
+                skin="light"
+                color="primary"
+                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+              >
+                {getInitials(
+                  `${option.userData?.firstName} ${option.userData?.lastName}`
+                )}
+              </CustomAvatar>
+            )}
+
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.userData.firstName} {option.userData.lastName}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
+    };
+  }
+
+  const renderParentListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ToUserType,
+    array: ToUserType[],
+    setState: (val: ToUserType[]) => void
+  ) => {
+    const fullName = `${option.userData.fatherFirstName} ${option.userData.fatherLastName} / ${option.userData.motherFirstName} ${option.userData.motherLastName}`;
+
     return (
       <ListItem
         key={option.id}
@@ -368,32 +410,21 @@ const ComposePopup = (props: MailComposeType) => {
         onClick={() => setState([...array, option])}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {option.profileImage ? (
-            <Avatar
-              alt={`Profile Image of ${option.userData?.firstName} ${option.userData?.lastName}`}
-              src={`${HOST}/uploads/${option.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color="primary"
-              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-            >
-              {getInitials(
-                `${option.userData?.firstName} ${option.userData?.lastName}`
-              )}
-            </CustomAvatar>
-          )}
-
-          <Typography sx={{ fontSize: "0.875rem" }}>
-            {option.userData.firstName} {option.userData.lastName}
-          </Typography>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(
+              `${option.userData?.fatherFirstName} ${option.userData?.motherFirstName}`
+            )}
+          </CustomAvatar>
+          <Typography sx={{ fontSize: "0.875rem" }}>{fullName}</Typography>
         </Box>
       </ListItem>
     );
   };
-}
+
 
   const renderClassListItem = (
     props: HTMLAttributes<HTMLLIElement>,
@@ -634,8 +665,7 @@ const ComposePopup = (props: MailComposeType) => {
             ListboxComponent={List}
             filterOptions={addNewOption}
             getOptionLabel={(option) =>
-              `${(option as ToUserType).userData.firstName} ${
-                (option as ToUserType).userData.lastName
+              `${(option as ToUserType).userData.firstName} ${(option as ToUserType).userData.lastName
               }`
             }
             renderOption={(props, option) =>
@@ -698,8 +728,7 @@ const ComposePopup = (props: MailComposeType) => {
             ListboxComponent={List}
             filterOptions={addNewOption}
             getOptionLabel={(option) =>
-              `${(option as ToUserType).userData.firstName} ${
-                (option as ToUserType).userData.lastName
+              `${(option as ToUserType).userData.firstName} ${(option as ToUserType).userData.lastName
               }`
             }
             renderOption={(props, option) =>
@@ -762,12 +791,12 @@ const ComposePopup = (props: MailComposeType) => {
             ListboxComponent={List}
             filterOptions={addNewOption}
             getOptionLabel={(option) =>
-              `${(option as ToUserType).userData.firstName} ${
-                (option as ToUserType).userData.lastName
-              }`
+              `${(option as ToUserType).userData.fatherFirstName} ${(option as ToUserType).userData.fatherLastName}
+                ${(option as ToUserType).userData.motherFirstName} ${(option as ToUserType).userData.motherLastName}`
+
             }
             renderOption={(props, option) =>
-              renderListItem(props, option, emailToParents, setEmailToParents)
+              renderParentListItem(props, option, emailToParents, setEmailToParents)
             }
             renderTags={(array: ToUserType[], getTagProps) =>
               renderCustomChips(
@@ -962,8 +991,7 @@ const ComposePopup = (props: MailComposeType) => {
             ListboxComponent={List}
             filterOptions={addNewOption}
             getOptionLabel={(option) =>
-              `${(option as ToUserType).userData.firstName} ${
-                (option as ToUserType).userData.lastName
+              `${(option as ToUserType).userData.firstName} ${(option as ToUserType).userData.lastName
               }`
             }
             renderOption={(props, option) =>

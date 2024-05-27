@@ -44,6 +44,7 @@ import { fetchData as fetchAdministrators } from "src/store/apps/administrator";
 import { fetchData as fetchTeachers } from "src/store/apps/teachers";
 import { fetchData as fetchStudents } from "src/store/apps/students";
 import { fetchData as fetchLevels } from "src/store/apps/levels";
+import { fetchData as fetchClasses } from "src/store/apps/classes";
 
 import { getInitials } from "src/@core/utils/get-initials";
 import { addClass, deleteClass, editClass } from "src/store/apps/classes";
@@ -55,6 +56,7 @@ import { LevelType } from "src/types/apps/levelTypes";
 import { UserType } from "src/types/apps/UserType";
 import { t } from "i18next";
 import { HOST } from "src/store/constants/hostname";
+import toast from "react-hot-toast";
 
 interface SidebarAddClassType {
   open: boolean;
@@ -137,6 +139,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
 
   const userData = useSelector((state: RootState) => state.users.data);
 
+  const classes = useSelector((state: RootState) => state.classes.data);
+
   const findUserDataById = (userId: number) => {
     return userData.find((user) => user.id === userId);
   };
@@ -172,9 +176,18 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     dispatch(fetchTeachers() as any);
     dispatch(fetchStudents() as any);
     dispatch(fetchLevels() as any);
+    dispatch(fetchClasses() as any);  
+
   }, []);
 
   const onSubmit = (data: any) => {
+
+    if (classes.find((c) => c.name === data.name)) {
+      toast.error("Classe existe déjà");
+      toggle();
+      reset();
+      return;
+    }
     const payload = {
       ...data,
       administrator: { id: data.administrator },

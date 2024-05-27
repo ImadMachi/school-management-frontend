@@ -10,7 +10,7 @@ export type ClassType = {
   schoolYear: string;
   students: StudentsType[];
   teachers: TeachersType[];
-  administrator: AdministratorType;
+  administrators: AdministratorType[];
   level: LevelType;
   subjects: SubjectType[];
 };

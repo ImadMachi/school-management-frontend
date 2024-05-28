@@ -136,9 +136,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   const teacherStore = useSelector((state: RootState) => state.teachers);
   const studentStore = useSelector((state: RootState) => state.students);
   const levelStore = useSelector((state: RootState) => state.levels);
-
   const userData = useSelector((state: RootState) => state.users.data);
-
+  
   const classes = useSelector((state: RootState) => state.classes.data);
 
   const findUserDataById = (userId: number) => {

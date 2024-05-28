@@ -71,6 +71,8 @@ export const deleteAbsence = createAsyncThunk(
 );
 
 interface AppAbsencesState {
+  find(arg0: (i: any) => boolean): unknown;
+  some(arg0: (absence: { status: string; }) => boolean): unknown;
   absences: AbsenceType[];
   data: AbsenceType[];
   total: number;

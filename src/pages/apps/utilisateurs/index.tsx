@@ -351,7 +351,7 @@ export const mapRoleToFrench = (role: string) => {
     case UserRole.Teacher:
       return "Enseignant";
     case UserRole.Student:
-      return "Elève";
+      return "Eleve";
     case UserRole.Parent:
       return "Parent";
     case UserRole.Agent:
@@ -460,7 +460,7 @@ const columns = [
             noWrap
             sx={{ color: "text.secondary", textTransform: "capitalize" }}
           >
-            {mapRoleToFrench(row.role)}
+            {mapRoleToFrench(row.role)}            
           </Typography>
         </Box>
       );

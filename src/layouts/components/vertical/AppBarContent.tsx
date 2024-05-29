@@ -19,7 +19,8 @@ import UserDropdown from 'src/@core/layouts/components/shared-components/UserDro
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from 'src/store'  // Adjust the import according to your store file structure
 import { useEffect } from 'react'
-import { fetchData as fetchAbsences} from 'src/store/apps/absences'
+import { fetchData as fetchAbsences } from 'src/store/apps/absences'
+import { useRouter } from 'next/router'
 
 // ** Absence Type Import
 
@@ -32,6 +33,8 @@ interface Props {
 
 const AppBarContent: React.FC<Props> = (props: Props) => {
 
+  const router = useRouter();
+
   const dispatch = useDispatch<AppDispatch>();
 
   // ** Props
@@ -43,10 +46,16 @@ const AppBarContent: React.FC<Props> = (props: Props) => {
   // ** Check if absences is an array and has untreated absences
   const absence = absenceStore.data.find((abs) => abs.status === 'not treated');
 
+  const handleDropdownClose = (url?: string) => {
+    if (url) {
+      router.push(url);
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchAbsences() as any)
-  },[])
-    
+  }, [])
+
 
   return (
     <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -54,12 +63,14 @@ const AppBarContent: React.FC<Props> = (props: Props) => {
         <Snackbar
           open={true}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          onClick={() => handleDropdownClose("/apps/absences")}
+          sx={{ cursor: 'pointer' }}
         >
           <SnackbarContent
             message={
               <span>
                 <strong>Absences non traitées :</strong> {' '}
-                <Link href='/apps/absences/' style={{ color: '#fff' }}>Cliquez ici pour les voir</Link>
+                Cliquez ici pour les voir
               </span>
             }
             sx={{ backgroundColor: '#f57579' }}

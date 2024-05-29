@@ -181,6 +181,7 @@ interface InitialStateProps {
   filter: FetchMailParamsType;
   currentMail: MailType | null;
   selectedMails: number[];
+  newRecipientCount: number; 
 }
 
 const initialState: InitialStateProps = {
@@ -194,6 +195,7 @@ const initialState: InitialStateProps = {
   },
   currentMail: null,
   selectedMails: [],
+  newRecipientCount: 0,
 };
 
 export const appEmailSlice = createSlice({
@@ -221,9 +223,18 @@ export const appEmailSlice = createSlice({
       }
       state.selectedMails = selectAllMails as any;
     },
+    resetNewRecipientCount: (state) => {  // Add this reducer
+      state.newRecipientCount = 0;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchMails.fulfilled, (state, action) => {
+      const newRecipients = action.payload.mails.filter((mail: { id: any; }) => 
+        !state.mails.some(existingMail => existingMail.id === mail.id)
+      ).length;
+
+      state.newRecipientCount += newRecipients;
+      
       const mails = action.payload.mails.map((mail: any) => {
         if (mail.sender.director) {
           mail.sender.senderData = mail.sender.director;
@@ -392,6 +403,6 @@ export const appEmailSlice = createSlice({
   },
 });
 
-export const { handleSelectMail, handleSelectAllMail } = appEmailSlice.actions;
+export const { handleSelectMail, handleSelectAllMail, resetNewRecipientCount } = appEmailSlice.actions;
 
 export default appEmailSlice.reducer;

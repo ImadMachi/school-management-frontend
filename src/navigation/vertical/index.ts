@@ -1,7 +1,25 @@
 // ** Type import
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { VerticalNavItemsType } from "src/@core/layouts/types";
+import { RootState } from "src/store";
+import { fetchMails } from "src/store/apps/mail";
 
 const navigation = (): VerticalNavItemsType => {
+  const dispatch = useDispatch();
+
+  const newRecipientCount = useSelector((state: RootState) => state.mail.newRecipientCount);
+
+  useEffect(() => {
+    dispatch(fetchMails({
+      q: "",
+      folder: "inbox",
+      selectedCategory: 0,
+      selectedGroup: 0,
+    }) as any);
+  }, [dispatch]);
+
+
   return [
     {
       action: "manage",
@@ -89,6 +107,8 @@ const navigation = (): VerticalNavItemsType => {
       icon: "mdi:email",
       action: "read",
       subject: "mail",
+      badgeContent: newRecipientCount > 0 ? newRecipientCount.toString() : undefined,
+      badgeColor: 'error',
     },
     {
       path: "/apps/mail-parametres",

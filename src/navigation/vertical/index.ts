@@ -2,21 +2,20 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { VerticalNavItemsType } from "src/@core/layouts/types";
+import { useAuth } from "src/hooks/useAuth";
 import { RootState } from "src/store";
-import { fetchMails } from "src/store/apps/mail";
+import { fetchMails, fetchUnreadMessagesCount } from "src/store/apps/mail";
 
 const navigation = (): VerticalNavItemsType => {
   const dispatch = useDispatch();
 
-  const newRecipientCount = useSelector((state: RootState) => state.mail.newRecipientCount);
+  const newRecipientCount = useSelector((state: RootState) => state.mail.unreadCount);
+  const auth = useAuth();
+
 
   useEffect(() => {
-    dispatch(fetchMails({
-      q: "",
-      folder: "inbox",
-      selectedCategory: 0,
-      selectedGroup: 0,
-    }) as any);
+    dispatch(fetchUnreadMessagesCount(Number(auth.user?.id)) as any)
+    console.log('fetching unread messages count' + newRecipientCount)
   }, [dispatch]);
 
 

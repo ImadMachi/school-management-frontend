@@ -175,13 +175,23 @@ export const paginateMail = createAsyncThunk(
   }
 );
 
+export const fetchUnreadMessagesCount = createAsyncThunk(
+  "appEmail/fetchUnreadMessagesCount",
+  async (userId: number) => {
+    const response = await axios.get(`${HOST}/messages/unread-count/${userId}`);
+    console.log('test '+response.data);
+    return response.data; 
+
+  }
+);
+
 interface InitialStateProps {
   mails: MailType[];
   mailMeta: any;
   filter: FetchMailParamsType;
   currentMail: MailType | null;
   selectedMails: number[];
-  newRecipientCount: number; 
+  unreadCount: number;
 }
 
 const initialState: InitialStateProps = {
@@ -195,7 +205,7 @@ const initialState: InitialStateProps = {
   },
   currentMail: null,
   selectedMails: [],
-  newRecipientCount: 0,
+  unreadCount: 0,
 };
 
 export const appEmailSlice = createSlice({
@@ -223,18 +233,9 @@ export const appEmailSlice = createSlice({
       }
       state.selectedMails = selectAllMails as any;
     },
-    resetNewRecipientCount: (state) => {  // Add this reducer
-      state.newRecipientCount = 0;
-    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchMails.fulfilled, (state, action) => {
-      const newRecipients = action.payload.mails.filter((mail: { id: any; }) => 
-        !state.mails.some(existingMail => existingMail.id === mail.id)
-      ).length;
-
-      state.newRecipientCount += newRecipients;
-      
       const mails = action.payload.mails.map((mail: any) => {
         if (mail.sender.director) {
           mail.sender.senderData = mail.sender.director;
@@ -400,9 +401,17 @@ export const appEmailSlice = createSlice({
         );
       }
     });
+
+    builder.addCase(fetchUnreadMessagesCount.fulfilled, (state, action) => {
+      state.unreadCount = action.payload;
+    });
+    
+    builder.addCase(fetchUnreadMessagesCount.rejected, (state, action) => {
+      toast.error("Error fetching unread messages count");
+    });
   },
 });
 
-export const { handleSelectMail, handleSelectAllMail, resetNewRecipientCount } = appEmailSlice.actions;
+export const { handleSelectMail, handleSelectAllMail } = appEmailSlice.actions;
 
 export default appEmailSlice.reducer;

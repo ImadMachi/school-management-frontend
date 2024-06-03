@@ -9,6 +9,9 @@ export type ParentsType = {
   motherLastName: string;
   motherPhoneNumber: string;
   address: string;
+  disabled: boolean;
+  students: StudentsType[];
+  userId: number;
 
   user: {
     disabled: boolean;

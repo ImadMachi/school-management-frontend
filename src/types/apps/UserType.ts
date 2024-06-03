@@ -3,6 +3,7 @@ export type UserType = {
   email: string;
   password?: string;
   disabled: boolean;
+  lastLogin?: string;
   isActive: boolean;
   role: string;
   profileImage?: string;

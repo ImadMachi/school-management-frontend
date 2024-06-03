@@ -93,6 +93,11 @@ export const appCategoriesSlice = createSlice({
       state.data = state.data.filter(
         (category) => category.id !== action.payload
       );
+      toast.success("Catégorie supprimée avec succès.");
+    });
+
+    builder.addCase(deleteCategory.rejected, (state, action) => {
+      toast.error("Erreur lors de la suppression de la catégorie.");
     });
 
     builder.addCase(editCategory.fulfilled, (state, action) => {

@@ -469,6 +469,19 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 120,
+    headerName: "Dernière connexion",
+    field: "lastLogin",
+    renderCell: ({ row }: CellType) => {
+      return (
+        <Typography noWrap>
+          {row.lastLogin ? new Date(row.lastLogin).toLocaleString() : "-"}
+        </Typography>
+      );
+    },
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
     headerName: "Active",
     field: "userId",
     renderCell: ({ row }: CellType) => {

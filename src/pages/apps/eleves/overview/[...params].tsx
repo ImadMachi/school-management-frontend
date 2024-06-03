@@ -71,6 +71,7 @@ export interface UpdateStudentDto {
   parent: {
     id: number;
   };
+
 }
 
 const schema = yup.object().shape({
@@ -133,24 +134,17 @@ const UserViewLeft = () => {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            {option.userId ? (
-              <Avatar
-                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-                src={`${HOST}/uploads/${user?.profileImage}`}
-                sx={{ width: 30, height: 30, marginRight: "10px" }}
-              />
-            ) : (
+
               <CustomAvatar
                 skin="light"
                 color="primary"
                 sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
               >
-                {getInitials(`${option.firstName} ${option.lastName}`)}
+                {getInitials(`${option.fatherFirstName} ${option.motherFirstName}`)}
               </CustomAvatar>
-            )}
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.firstName} {option.lastName}
+              {option.fatherFirstName} {option.fatherLastName} {option.motherFirstName} {option.motherLastName}
             </Typography>
           </Box>
         </ListItem>
@@ -366,10 +360,20 @@ const UserViewLeft = () => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
-                    Parent:
+                    Père:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.parent?.firstName} {userData.parent?.lastName}
+                    {userData.parent?.fatherFirstName} {userData.parent?.fatherLastName}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Mère:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.parent?.motherFirstName} {userData.parent?.motherLastName}
                   </Typography>
                 </Box>
               </Box>
@@ -522,7 +526,7 @@ const UserViewLeft = () => {
                               options={parentStore.data}
                               defaultValue={userData.parent}
                               getOptionLabel={(option) =>
-                                `${option.firstName} ${option.lastName}`
+                                `${option.fatherFirstName} ${option.fatherLastName} ${option.motherFirstName} ${option.motherLastName}`
                               }
                               value={
                                 parentStore.data.find(

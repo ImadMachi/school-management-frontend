@@ -224,7 +224,7 @@ const SidebarAddParent = (props: SidebarUpdateParentType) => {
               </FormHelperText>
             )}
           </FormControl>
-          <FormControl
+          {/* <FormControl
             fullWidth
             sx={{
               mb: 6,
@@ -270,7 +270,7 @@ const SidebarAddParent = (props: SidebarUpdateParentType) => {
                 </>
               )}
             />
-          </FormControl>
+          </FormControl> */}
 
           <Box sx={{ display: "flex", alignItems: "center" }} mt={5}>
             <Button

@@ -198,24 +198,17 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            {option.userId ? (
-              <Avatar
-                alt={`Profile Image of ${option.firstName} ${option.lastName}`}
-                src={`${HOST}/uploads/${user?.profileImage}`}
-                sx={{ width: 30, height: 30, marginRight: "10px" }}
-              />
-            ) : (
+            
               <CustomAvatar
                 skin="light"
                 color="primary"
                 sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
               >
-                {getInitials(`${option.firstName} ${option.lastName}`)}
+                {getInitials(`${option.fatherFirstName} ${option.motherFirstName}`)}
               </CustomAvatar>
-            )}
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.firstName} {option.lastName}
+              {option.fatherFirstName} {option.fatherLastName} {option.motherFirstName} {option.motherLastName}
             </Typography>
           </Box>
         </ListItem>
@@ -379,7 +372,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   id="parent-user-autocomplete"
                   options={parentStore.data}
                   getOptionLabel={(option) =>
-                    `${option.firstName} ${option.lastName}`
+                    `${option.fatherFirstName} ${option.fatherLastName} ${option.motherFirstName} ${option.motherLastName}`
                   }
                   value={
                     parentStore.data.find(
@@ -393,7 +386,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Parent"
+                      label="Pére"
                       error={Boolean(errors.parent)}
                       helperText={errors.parent ? errors.parent.message : ""}
                     />
@@ -405,7 +398,6 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
               )}
             />
           </FormControl>
-
           <FormControlLabel
             control={
               <Controller
@@ -455,7 +447,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.password)}
+                      error={Boolean(errors.createUserDto?.password)}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">

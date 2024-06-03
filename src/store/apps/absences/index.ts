@@ -71,6 +71,8 @@ export const deleteAbsence = createAsyncThunk(
 );
 
 interface AppAbsencesState {
+  find(arg0: (i: any) => boolean): unknown;
+  some(arg0: (absence: { status: string; }) => boolean): unknown;
   absences: AbsenceType[];
   data: AbsenceType[];
   total: number;
@@ -103,7 +105,8 @@ export const appAbsencesSlice = createSlice({
             .includes(filterValue) ||
           absences.startDate.toString().toLowerCase().includes(filterValue) ||
           absences.endDate.toString().toLowerCase().includes(filterValue) ||
-          absences.absentUser.role.toLowerCase().includes(filterValue)
+          absences.absentUser.role.toLowerCase().includes(filterValue) ||
+          absences.absentUser.email.toLowerCase().includes(filterValue)
       );
     },
   },

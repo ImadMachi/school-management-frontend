@@ -44,6 +44,7 @@ import { fetchData as fetchAdministrators } from "src/store/apps/administrator";
 import { fetchData as fetchTeachers } from "src/store/apps/teachers";
 import { fetchData as fetchStudents } from "src/store/apps/students";
 import { fetchData as fetchLevels } from "src/store/apps/levels";
+import { fetchData as fetchClasses } from "src/store/apps/classes";
 
 import { getInitials } from "src/@core/utils/get-initials";
 import { addClass, deleteClass, editClass } from "src/store/apps/classes";
@@ -55,6 +56,7 @@ import { LevelType } from "src/types/apps/levelTypes";
 import { UserType } from "src/types/apps/UserType";
 import { t } from "i18next";
 import { HOST } from "src/store/constants/hostname";
+import toast from "react-hot-toast";
 
 interface SidebarAddClassType {
   open: boolean;
@@ -65,7 +67,6 @@ interface SidebarAddClassType {
 export interface CreateClassDto {
   name: string;
   schoolYear: string;
-  administrator: number;
   level: number;
 }
 
@@ -77,7 +78,7 @@ const defaultValues = {
   schoolYear: "",
   teachers: [] as TeachersType[],
   students: [] as StudentsType[],
-  administrator: "",
+  administrators: [] as AdministratorType[],
   level: "",
 };
 
@@ -110,12 +111,7 @@ const schema = yup.object().shape({
         return false;
       }
     ),
-  administrator: yup
-    .number()
-    .required("Administrateur est requis")
-    .positive("Administrateur est requis")
-    .integer("Administrateur est requis")
-    .typeError("Administrateur est requis"),
+  administrators: yup.array().min(1, "Au moins un administrateur est requis"),
   teachers: yup.array().min(1, "Au moins un enseignant est requis"),
   students: yup.array().min(1, "Au moins un élève est requis"),
   level: yup
@@ -140,8 +136,9 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   const teacherStore = useSelector((state: RootState) => state.teachers);
   const studentStore = useSelector((state: RootState) => state.students);
   const levelStore = useSelector((state: RootState) => state.levels);
-
   const userData = useSelector((state: RootState) => state.users.data);
+  
+  const classes = useSelector((state: RootState) => state.classes.data);
 
   const findUserDataById = (userId: number) => {
     return userData.find((user) => user.id === userId);
@@ -164,7 +161,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     if (props.classToEdit) {
       setValue("name", props.classToEdit.name);
       setValue("schoolYear", props.classToEdit.schoolYear);
-      setValue("administrator", `${props.classToEdit.administrator.id}`);
+      setValue("administrators", props.classToEdit.administrators);
       setValue("teachers", props.classToEdit.teachers);
       setValue("students", props.classToEdit.students);
       console.log(props.classToEdit);
@@ -178,9 +175,18 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     dispatch(fetchTeachers() as any);
     dispatch(fetchStudents() as any);
     dispatch(fetchLevels() as any);
+    dispatch(fetchClasses() as any);  
+
   }, []);
 
   const onSubmit = (data: any) => {
+
+    if (classes.find((c) => c.name === data.name)) {
+      toast.error("Classe existe déjà");
+      toggle();
+      reset();
+      return;
+    }
     const payload = {
       ...data,
       administrator: { id: data.administrator },
@@ -376,9 +382,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   value={value}
                   label="Année scolaire"
                   onChange={onChange}
-                  placeholder={`${new Date().getFullYear()}-${
-                    new Date().getFullYear() + 1
-                  }`}
+                  placeholder={`${new Date().getFullYear()}-${new Date().getFullYear() + 1
+                    }`}
                   error={Boolean(errors.schoolYear)}
                 />
               )}
@@ -389,9 +394,9 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
               </FormHelperText>
             )}
           </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
+          {/* <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="administrator"
+              name="administrators"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
@@ -404,8 +409,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   value={
                     value
                       ? administratorStore.data.find(
-                          (user) => user.id === Number(value)
-                        )
+                        (user) => user.id === Number(value)
+                      )
                       : null
                   }
                   onChange={(event, newValue) => {
@@ -417,16 +422,61 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Administrator"
-                      error={Boolean(errors.administrator)}
+                      label="Administrateur"
+                      error={Boolean(errors.administrators)}
                       helperText={
-                        errors.administrator ? errors.administrator.message : ""
+                        errors.administrators ? errors.administrators.message : ""
                       }
                     />
                   )}
                 />
               )}
             />
+          </FormControl> */}
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="administrators"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <Autocomplete
+                  multiple
+                  freeSolo
+                  value={value}
+                  clearIcon={false}
+                  id="administrator-select"
+                  filterSelectedOptions
+                  options={administratorStore.data}
+                  ListboxComponent={List}
+                  //@ts-ignore
+                  filterOptions={(options, params) =>
+                    filterOptions(options, params, value)
+                  }
+                  getOptionLabel={(option) =>
+                    `${(option as SelectType).firstName} ${(option as SelectType).lastName
+                    }`
+                  }
+                  renderOption={(props, option) =>
+                    renderUserListItem(props, option, value, onChange)
+                  }
+                  renderTags={(array: SelectType[], getTagProps) =>
+                    renderCustomChips(array, getTagProps, value, onChange)
+                  }
+                  sx={{
+                    "& .MuiOutlinedInput-root": { p: 2 },
+                    "& .MuiSelect-selectMenu": { minHeight: "auto" },
+                  }}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Administrateurs" />
+                  )}
+                />
+              )}
+            />
+            {errors.teachers && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.teachers.message}
+              </FormHelperText>
+            )}
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
@@ -448,8 +498,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as SelectType).firstName} ${
-                      (option as SelectType).lastName
+                    `${(option as SelectType).firstName} ${(option as SelectType).lastName
                     }`
                   }
                   renderOption={(props, option) =>
@@ -494,8 +543,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as StudentsType).firstName} ${
-                      (option as StudentsType).lastName
+                    `${(option as StudentsType).firstName} ${(option as StudentsType).lastName
                     }`
                   }
                   renderOption={(props, option) =>

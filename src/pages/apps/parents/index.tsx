@@ -33,7 +33,7 @@ import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
 import {
-  fetchData,
+  fetchData as fetchParents,
   deleteParent,
   filterData,
   setParentId,
@@ -84,7 +84,9 @@ const renderClient = (row: ParentsType) => {
       color={"primary"}
       sx={{ mr: 3, width: 30, height: 30, fontSize: ".875rem" }}
     >
-      {getInitials(`${row.firstName} ${row.lastName}`)}
+      {getInitials(
+        `${row.fatherFirstName} ${row.fatherLastName} ${row.motherFirstName} ${row.motherLastName}`
+      )}
     </CustomAvatar>
   );
 };
@@ -185,7 +187,12 @@ const columns = [
     headerName: "Utilisateur",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
-      const { firstName, lastName } = row;
+      const {
+        fatherFirstName,
+        fatherLastName,
+        motherFirstName,
+        motherLastName,
+      } = row;
       const dispatch = useDispatch<AppDispatch>();
       const user = useSelector((state: RootState) =>
         state.users.data.find((user) => user.id === row.userId)
@@ -202,28 +209,21 @@ const columns = [
           dispatch(fetchUserById(row.userId) as any);
         }
       }, [dispatch, row.userId]);
+
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {user?.profileImage ? (
-            <Avatar
-              alt={`Profile Image of ${row.firstName} ${row.lastName}`}
-              src={`${HOST}/uploads/${user.profileImage}`}
-              sx={{ width: 30, height: 30, marginRight: "10px" }}
-            />
-          ) : (
-            <CustomAvatar
-              skin="light"
-              color={"primary"}
-              sx={{
-                width: 30,
-                height: 30,
-                fontSize: ".875rem",
-                marginRight: "10px",
-              }}
-            >
-              {getInitials(`${row.firstName} ${row.lastName}`)}
-            </CustomAvatar>
-          )}
+          <CustomAvatar
+            skin="light"
+            color={"primary"}
+            sx={{
+              width: 30,
+              height: 30,
+              fontSize: ".875rem",
+              marginRight: "10px",
+            }}
+          >
+            {getInitials(`${row.fatherFirstName} ${row.motherFirstName}`)}
+          </CustomAvatar>
           <Box
             sx={{
               display: "flex",
@@ -238,7 +238,8 @@ const columns = [
                 dispatch(setParentUserId(row.userId));
               }}
             >
-              {firstName} {lastName}
+              {fatherFirstName} {fatherLastName}-{motherFirstName}{" "}
+              {motherLastName}
             </StyledLink>
           </Box>
         </Box>
@@ -277,14 +278,34 @@ const columns = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 120,
-    headerName: "Telephone",
-    field: "phoneNumber",
+    flex: 0.1,
+    minWidth: 90,
+    headerName: "Telephone Père",
+    field: "fatherPhoneNumber",
     renderCell: ({ row }: CellType) => {
-      return <Typography noWrap>{row.phoneNumber}</Typography>;
+      return <Typography noWrap>{row.fatherPhoneNumber}</Typography>;
     },
   },
+  {
+    flex: 0.1,
+    minWidth: 90,
+    headerName: "Telephone Mère",
+    field: "motherPhoneNumber",
+    renderCell: ({ row }: CellType) => {
+      return <Typography noWrap>{row.motherPhoneNumber}</Typography>;
+    },
+  },
+
+  {
+    flex: 0.15,
+    minWidth: 120,
+    headerName: "Adresse",
+    field: "adress",
+    renderCell: ({ row }: CellType) => {
+      return <Typography noWrap>{row.address}</Typography>;
+    },
+  },
+
   {
     flex: 0.15,
     minWidth: 120,
@@ -326,8 +347,8 @@ const UserList = () => {
   const parentStore = useSelector((state: RootState) => state.parents);
 
   useEffect(() => {
-    dispatch(fetchData() as any);
-  }, []);
+    dispatch(fetchParents() as any);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(filterData(value));

@@ -459,6 +459,36 @@ const ComposePopup = (props: MailComposeType) => {
     }
   };
 
+  const renderParentListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ToUserType,
+    array: ToUserType[],
+    setState: (val: ToUserType[]) => void
+  ) => {
+    const fullName = `${option.userData.fatherFirstName} ${option.userData.fatherLastName} / ${option.userData.motherFirstName} ${option.userData.motherLastName}`;
+
+    return (
+      <ListItem
+        key={option.id}
+        sx={{ cursor: "pointer" }}
+        onClick={() => setState([...array, option])}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(
+              `${option.userData?.fatherFirstName} ${option.userData?.motherFirstName}`
+            )}
+          </CustomAvatar>
+          <Typography sx={{ fontSize: "0.875rem" }}>{fullName}</Typography>
+        </Box>
+      </ListItem>
+    );
+  };
+
   const renderClassListItem = (
     props: HTMLAttributes<HTMLLIElement>,
     option: ClassType | GroupType | LevelType | CycleType,
@@ -883,12 +913,20 @@ const ComposePopup = (props: MailComposeType) => {
             ListboxComponent={List}
             filterOptions={addNewOption}
             getOptionLabel={(option) =>
-              `${(option as ToUserType).userData.firstName} ${
-                (option as ToUserType).userData.lastName
+              `${(option as ToUserType).userData.fatherFirstName} ${
+                (option as ToUserType).userData.fatherLastName
+              }
+                ${(option as ToUserType).userData.motherFirstName} ${
+                (option as ToUserType).userData.motherLastName
               }`
             }
             renderOption={(props, option) =>
-              renderListItem(props, option, emailToParents, setEmailToParents)
+              renderParentListItem(
+                props,
+                option,
+                emailToParents,
+                setEmailToParents
+              )
             }
             renderTags={(array: ToUserType[], getTagProps) =>
               renderCustomChips(

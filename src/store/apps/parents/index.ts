@@ -44,17 +44,18 @@ export const fetchParent = createAsyncThunk(
 );
 
 // ** Add User
-
 export const addParent = createAsyncThunk(
   "appParents/addParent",
   async (data: CreateParentDto) => {
     const formData = new FormData();
 
-    formData.append("firstName", data.firstName);
-
-    formData.append("lastName", data.lastName);
-
-    formData.append("phoneNumber", data.phoneNumber);
+    formData.append("fatherFirstName", data.fatherFirstName);
+    formData.append("fatherLastName", data.fatherLastName);
+    formData.append("fatherPhoneNumber", data.fatherPhoneNumber);
+    formData.append("motherFirstName", data.motherFirstName);
+    formData.append("motherLastName", data.motherLastName);
+    formData.append("motherPhoneNumber", data.motherPhoneNumber);
+    formData.append("address", data.address);
 
     formData.append("createAccount", data.createAccount.toString() || "");
 
@@ -171,10 +172,13 @@ export const appParentsSlice = createSlice({
       }
       state.data = state.allData.filter(
         (parents) =>
-          `${parents.firstName} ${parents.lastName}`
+          `${parents.fatherFirstName} ${parents.fatherLastName} ${parents.motherFirstName} ${parents.motherLastName}`
             .toLowerCase()
             .includes(filterValue) ||
-          parents.phoneNumber.toString().toLowerCase().includes(filterValue)
+          parents.fatherPhoneNumber.toString().toLowerCase().includes(filterValue)||
+          parents.motherPhoneNumber.toString().toLowerCase().includes(filterValue)||
+          parents.address.toString().toLowerCase().includes(filterValue)
+
       );
     },
     setParentId: (state, action: PayloadAction<number | null>) => {

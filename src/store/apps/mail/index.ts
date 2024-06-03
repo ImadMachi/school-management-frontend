@@ -187,12 +187,23 @@ export const paginateMail = createAsyncThunk(
   }
 );
 
+export const fetchUnreadMessagesCount = createAsyncThunk(
+  "appEmail/fetchUnreadMessagesCount",
+  async (userId: number) => {
+    const response = await axios.get(`${HOST}/messages/unread-count/${userId}`);
+    console.log('test '+response.data);
+    return response.data; 
+
+  }
+);
+
 interface InitialStateProps {
   mails: MailType[];
   mailMeta: any;
   filter: FetchMailParamsType;
   currentMail: MailType | null;
   selectedMails: number[];
+  unreadCount: number;
 }
 
 const initialState: InitialStateProps = {
@@ -206,6 +217,7 @@ const initialState: InitialStateProps = {
   },
   currentMail: null,
   selectedMails: [],
+  unreadCount: 0,
 };
 
 export const appEmailSlice = createSlice({
@@ -410,6 +422,14 @@ export const appEmailSlice = createSlice({
           (mail) => mail.id !== action.payload.id
         );
       }
+    });
+
+    builder.addCase(fetchUnreadMessagesCount.fulfilled, (state, action) => {
+      state.unreadCount = action.payload;
+    });
+    
+    builder.addCase(fetchUnreadMessagesCount.rejected, (state, action) => {
+      toast.error("Error fetching unread messages count");
     });
   },
 });

@@ -38,9 +38,13 @@ interface SidebarAddParentType {
 }
 
 export interface CreateParentDto {
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
+  fatherFirstName: string;
+  fatherLastName: string;
+  fatherPhoneNumber: string;
+  motherFirstName: string;
+  motherLastName: string;
+  motherPhoneNumber: string;
+  address: string;
   createAccount: boolean;
   createUserDto?: {
     email: string;
@@ -58,9 +62,13 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 }));
 
 const schema = yup.object().shape({
-  firstName: yup.string().min(3).required(),
-  lastName: yup.string().min(3).required(),
-  phoneNumber: yup.string().required(),
+  fatherFirstName: yup.string().min(3).required(),
+  fatherLastName: yup.string().min(3).required(),
+  fatherPhoneNumber: yup.string().required(),
+  motherFirstName: yup.string().min(3).required(),
+  motherLastName: yup.string().min(3).required(),
+  motherPhoneNumber: yup.string().required(),
+  address: yup.string().required(),
   createUserDto: yup.object().when("createAccount", {
     is: true,
     then: yup.object({
@@ -84,9 +92,13 @@ const schema = yup.object().shape({
 });
 
 const defaultValues = {
-  firstName: "",
-  lastName: "",
-  phoneNumber: "",
+  fatherFirstName: "",
+  fatherLastName: "",
+  fatherPhoneNumber: "",
+  motherFirstName: "",
+  motherLastName: "",
+  motherPhoneNumber: "",
+  address: "",
   createAccount: false,
   createUserDto: {
     email: "",
@@ -138,8 +150,8 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     reset();
   };
   useEffect(() => {
-    const firstName = watch("firstName");
-    const lastName = watch("lastName");
+    const firstName = watch("fatherFirstName");
+    const lastName = watch("fatherLastName");
 
     const email = `${firstName}.${lastName}@arganier.com`;
     setValue("createUserDto.email", email);
@@ -147,7 +159,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     if (!firstName && !lastName) {
       setValue("createUserDto.email", "");
     }
-  }, [watch("firstName"), watch("lastName")]);
+  }, [watch("fatherFirstName"), watch("fatherLastName")]);
 
   return (
     <Drawer
@@ -172,65 +184,156 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="firstName"
+              name="fatherFirstName"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label="Prénom"
+                  label="Prénom du père"
                   onChange={onChange}
                   placeholder="John"
-                  error={Boolean(errors.firstName)}
+                  error={Boolean(errors.fatherFirstName)}
                 />
               )}
             />
-            {errors.firstName && (
+            {errors.fatherFirstName && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.firstName.message}
+                {errors.fatherFirstName.message}
               </FormHelperText>
             )}
           </FormControl>
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="lastName"
+              name="fatherLastName"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label="Nom"
+                  label="Nom du père"
                   onChange={onChange}
                   placeholder="Doe"
-                  error={Boolean(errors.lastName)}
+                  error={Boolean(errors.fatherLastName)}
                 />
               )}
             />
-            {errors.lastName && (
+            {errors.fatherLastName && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.lastName.message}
+                {errors.fatherLastName.message}
               </FormHelperText>
             )}
           </FormControl>
 
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
-              name="phoneNumber"
+              name="fatherPhoneNumber"
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
                   value={value}
-                  label="Tel"
+                  label="Telephone du père"
                   onChange={onChange}
                   placeholder="+212 612-345678"
-                  error={Boolean(errors.phoneNumber)}
+                  error={Boolean(errors.fatherPhoneNumber)}
                 />
               )}
             />
-            {errors.phoneNumber && (
+            {errors.fatherPhoneNumber && (
               <FormHelperText sx={{ color: "error.main" }}>
-                {errors.phoneNumber.message}
+                {errors.fatherPhoneNumber.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="motherFirstName"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  value={value}
+                  label="Prénom de la mère"
+                  onChange={onChange}
+                  placeholder="Jane"
+                  error={Boolean(errors.motherFirstName)}
+                />
+              )}
+            />
+            {errors.motherFirstName && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.motherFirstName.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="motherLastName"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  value={value}
+                  label="Nom de la mère"
+                  onChange={onChange}
+                  placeholder="Doe"
+                  error={Boolean(errors.motherLastName)}
+                />
+              )}
+            />
+            {errors.motherLastName && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.motherLastName.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="motherPhoneNumber"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  value={value}
+                  label="Telephone de la mère"
+                  onChange={onChange}
+                  placeholder="+212 612-345678"
+                  error={Boolean(errors.motherPhoneNumber)}
+                />
+              )}
+            />
+            {errors.motherPhoneNumber && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.motherPhoneNumber.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="address"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
+                <TextField
+                  id="adress"
+                  label="Adresse"
+                  multiline
+                  rows={4}
+                  value={value}
+                  onChange={onChange}
+                  error={Boolean(errors.address)}
+                  helperText={errors.address ? errors.address.message : ""}
+                  sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
+                />
+              )}
+            />
+            {errors.address && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.address.message}
               </FormHelperText>
             )}
           </FormControl>
@@ -284,7 +387,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.password)}
+                      error={Boolean(errors.createUserDto?.password)}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
@@ -323,7 +426,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
                   alignItems: "center",
                 }}
               >
-                <Controller
+                {/* <Controller
                   name="profileImage"
                   control={control}
                   rules={{ required: true }}
@@ -359,7 +462,7 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
                       />
                     </>
                   )}
-                />
+                /> */}
               </FormControl>
             </>
           )}

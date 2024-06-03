@@ -1,7 +1,24 @@
 // ** Type import
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { VerticalNavItemsType } from "src/@core/layouts/types";
+import { useAuth } from "src/hooks/useAuth";
+import { RootState } from "src/store";
+import { fetchMails, fetchUnreadMessagesCount } from "src/store/apps/mail";
 
 const navigation = (): VerticalNavItemsType => {
+  const dispatch = useDispatch();
+
+  const newRecipientCount = useSelector((state: RootState) => state.mail.unreadCount);
+  const auth = useAuth();
+
+
+  useEffect(() => {
+    dispatch(fetchUnreadMessagesCount(Number(auth.user?.id)) as any)
+    console.log('fetching unread messages count' + newRecipientCount)
+  }, [dispatch]);
+
+
   return [
     {
       action: "manage",
@@ -89,6 +106,8 @@ const navigation = (): VerticalNavItemsType => {
       icon: "mdi:email",
       action: "read",
       subject: "mail",
+      badgeContent: newRecipientCount > 0 ? newRecipientCount.toString() : undefined,
+      badgeColor: 'error',
     },
     {
       path: "/apps/mail-parametres",

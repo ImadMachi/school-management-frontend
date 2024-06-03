@@ -2,12 +2,13 @@ import { StudentsType } from "./studentTypes";
 
 export type ParentsType = {
   id: number;
-  firstName: string;
-  lastName: string;
-  phoneNumber: string;
-  disabled: boolean;
-  students: StudentsType[];
-  userId: number;
+  fatherFirstName: string;
+  fatherLastName: string;
+  fatherPhoneNumber: string;
+  motherFirstName: string;
+  motherLastName: string;
+  motherPhoneNumber: string;
+  address: string;
 
   user: {
     disabled: boolean;

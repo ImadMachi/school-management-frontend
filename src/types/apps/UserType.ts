@@ -12,6 +12,10 @@ export type UserType = {
     firstName: string;
     lastName: string;
     phoneNumber?: string;
+    fatherFirstName?: string;
+    fatherLastName?: string;
+    motherFirstName?: string;
+    motherLastName?: string;
   };
 };
 

@@ -13,7 +13,7 @@ import { UpdateAgentDto } from "src/pages/apps/agents/overview/[...params]";
 import { HOST } from "src/store/constants/hostname";
 import { AgentsType } from "src/types/apps/agentTypes";
 import { CreateAgentAccountDto } from "src/views/apps/agents/list/AddAgentAccountDrawer";
-import { CreateParentDto } from "src/views/apps/parents/list/AddParentDrawer";
+import { CreateAgentDto } from "src/views/apps/agents/list/AddAgentDrawer";
 
 interface Params {
   q: string;
@@ -47,7 +47,7 @@ export const fetchAgent = createAsyncThunk(
 
 export const addAgent = createAsyncThunk(
   "appAgents/addAgent",
-  async (data: CreateParentDto) => {
+  async (data: CreateAgentDto) => {
     const formData = new FormData();
 
     formData.append("firstName", data.firstName);

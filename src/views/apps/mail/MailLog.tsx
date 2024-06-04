@@ -429,8 +429,8 @@ const MailLog = (props: MailLogType) => {
                                 routeParams.folder == "starred"
                                   ? "warning.main"
                                   : mail.isStarred
-                                  ? "warning.main"
-                                  : "text.secondary",
+                                    ? "warning.main"
+                                    : "text.secondary",
                               "& svg": {
                                 display: { xs: "none", sm: "block" },
                               },
@@ -465,8 +465,11 @@ const MailLog = (props: MailLogType) => {
                                   textOverflow: ["ellipsis", "unset"],
                                 }}
                               >
-                                {mail.sender.senderData?.firstName}{" "}
-                                {mail.sender.senderData?.lastName}
+                                {mail.sender.senderData.firstName === undefined ?
+                                  (mail.sender.senderData.fatherFirstName + " " + mail.sender.senderData.fatherLastName + " " + mail.sender.senderData.motherFirstName + " " + mail.sender.senderData.motherLastName) :
+                                  (mail.sender.senderData.firstName + " " + mail.sender.senderData.lastName)
+                                  }
+
                               </Typography>
                             )}
 
@@ -503,8 +506,8 @@ const MailLog = (props: MailLogType) => {
                           ) : null}
 
                           {routeParams &&
-                          authUser?.role === "Director" &&
-                          routeParams.folder !== "trash" ? (
+                            authUser?.role === "Director" &&
+                            routeParams.folder !== "trash" ? (
                             <Tooltip placement="top" title="Supprimer Message">
                               <IconButton
                                 onClick={(e) => {

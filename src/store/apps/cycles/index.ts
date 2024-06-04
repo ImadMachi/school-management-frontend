@@ -42,6 +42,24 @@ export const deleteCycle = createAsyncThunk(
   }
 );
 
+export const updateCycleStatus = createAsyncThunk(
+  "appLevels/updateLevelStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<CycleType>(
+        `${HOST}/cycles/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
+
 export const appCyclesSlice = createSlice({
   name: "appCycles",
   initialState,
@@ -80,6 +98,14 @@ export const appCyclesSlice = createSlice({
     builder.addCase(deleteCycle.rejected, (state, action) => {
       toast.error("Erreur supprimant le cycles");
     });
+    builder.addCase(updateCycleStatus.fulfilled, (state, action) => {
+      state.data = state.data.filter((item) => item.id !== action.payload.id);
+      toast.success("Le cycles été supprimée avec succès");
+    });
+    builder.addCase(updateCycleStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant le cycles");
+    });
+
   },
 });
 

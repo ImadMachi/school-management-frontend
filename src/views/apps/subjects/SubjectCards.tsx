@@ -74,9 +74,7 @@ const SubjectCards = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="body2">{`${item.classes.length} Classes`}</Typography>
               <Typography variant="body2">{`${item.teachers.length} Enseignants`}</Typography>
-
             </Box>
             <Box
               sx={{

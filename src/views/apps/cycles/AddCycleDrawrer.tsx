@@ -26,7 +26,7 @@ import { useDispatch } from "react-redux";
 // ** Types Imports
 import { AppDispatch } from "src/store";
 
-import { addCycle, deleteCycle, editCycle } from "src/store/apps/cycles";
+import { addCycle, deleteCycle, editCycle, updateCycleStatus } from "src/store/apps/cycles";
 import { CycleType } from "src/types/apps/cycleTypes";
 
 interface SidebarAddCycleType {
@@ -107,12 +107,12 @@ const SidebarAddCycle = (props: SidebarAddCycleType) => {
 
   const handleDeleteLevel = () => {
     if (props.cycleToEdit) {
-      dispatch(deleteCycle(props.cycleToEdit.id) as any);
+      dispatch(updateCycleStatus({ id: props.cycleToEdit.id, disabled: true }) as any);
       toggle();
       reset();
     }
   };
-
+  
   return (
     <Drawer
       open={open}

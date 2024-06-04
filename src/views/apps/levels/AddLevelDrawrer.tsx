@@ -30,7 +30,7 @@ import { Autocomplete, Chip, List, ListItem } from "@mui/material";
 import { useSelector } from "react-redux";
 import cycles, { fetchData as fetchCycles } from "src/store/apps/cycles";
 import { getInitials } from "src/@core/utils/get-initials";
-import { addLevel, deleteLevel, editLevel } from "src/store/apps/levels";
+import { addLevel, deleteLevel, editLevel, updateLevelStatus } from "src/store/apps/levels";
 import { LevelType } from "src/types/apps/levelTypes";
 import { ClassType } from "src/types/apps/classTypes";
 import { CycleType } from "src/types/apps/cycleTypes";
@@ -125,7 +125,8 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
 
   const handleDeleteLevel = () => {
     if (props.levelToEdit) {
-      dispatch(deleteLevel(props.levelToEdit.id) as any);
+      // dispatch(deleteLevel(props.levelToEdit.id) as any);
+      dispatch(updateLevelStatus({ id: props.levelToEdit.id, disabled: true }) as any);
       toggle();
       reset();
     }

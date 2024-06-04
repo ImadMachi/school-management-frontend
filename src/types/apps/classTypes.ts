@@ -8,9 +8,10 @@ export type ClassType = {
   id: number;
   name: string;
   schoolYear: string;
+  disabled: boolean;
   students: StudentsType[];
   teachers: TeachersType[];
   administrators: AdministratorType[];
   level: LevelType;
-  subjects: SubjectType[];
+  // subjects: SubjectType[];
 };

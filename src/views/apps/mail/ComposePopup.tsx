@@ -84,6 +84,7 @@ import haveSameKeys from "src/@core/utils/objects-have-same-keys";
 type ToUserType = UserType;
 
 type CheckedRecipientsType = {
+  director: boolean;
   student: boolean;
   teacher: boolean;
   parent: boolean;
@@ -95,6 +96,7 @@ type CheckedRecipientsType = {
 };
 
 const defualtCheckedRecipients = {
+  director: false,
   student: true,
   teacher: false,
   parent: false,
@@ -113,6 +115,7 @@ const ComposePopup = (props: MailComposeType) => {
   const [emailToStudents, setEmailToStudents] = useState<ToUserType[]>([]);
   const [emailToTeachers, setEmailToTeachers] = useState<ToUserType[]>([]);
   const [emailToParents, setEmailToParents] = useState<ToUserType[]>([]);
+  const [emailToDirectors, setEmailToDirectors] = useState<ToUserType[]>([]);
   const [emailToClasses, setEmailToClasses] = useState<ClassType[]>([]);
   const [emailToLevels, setEmailToLevels] = useState<LevelType[]>([]);
   const [emailToCycles, setEmailToCycles] = useState<CycleType[]>([]);
@@ -124,6 +127,7 @@ const ComposePopup = (props: MailComposeType) => {
   const [category, setCategory] = useState(-1);
   const [studentUsers, setStudentUsers] = useState<UserType[]>([]);
   const [parentUsers, setParentUsers] = useState<UserType[]>([]);
+  const [directorUsers, setDirectorUsers] = useState<UserType[]>([]);
   const [teacherUsers, setTeacherUsers] = useState<UserType[]>([]);
   const [agentUsers, setAgentUsers] = useState<UserType[]>([]);
   const [checkedRecipients, setCheckedRecipients] =
@@ -178,10 +182,16 @@ const ComposePopup = (props: MailComposeType) => {
       (user) => user.role === UserRole.Student
     );
     setStudentUsers(studentUsers);
+
     const parentUsers = userStore.data.filter(
       (user) => user.role === UserRole.Parent
     );
     setParentUsers(parentUsers);
+
+    const directorUsers = userStore.data.filter(
+      (user) => user.role === UserRole.Director
+    );
+    setDirectorUsers(directorUsers);
 
     const teacherUsers = userStore.data.filter(
       (user) => user.role === UserRole.Teacher
@@ -244,6 +254,7 @@ const ComposePopup = (props: MailComposeType) => {
     setCategoryError(false);
     const emailTo = emailToStudents
       .concat(emailToParents)
+      .concat(emailToDirectors)
       .concat(emailToTeachers)
       .concat(emailToAgents);
 
@@ -362,6 +373,8 @@ const ComposePopup = (props: MailComposeType) => {
     setEmailToStudents([]);
     setEmailToTeachers([]);
     setEmailToParents([]);
+    setEmailToAgents([]);
+    setEmailToDirectors([]);
     setEmailToClasses([]);
     setEmailToGroups([]);
     setSubjectValue("");
@@ -375,6 +388,7 @@ const ComposePopup = (props: MailComposeType) => {
     setEmailToTeachers(emailToTeachers);
     setEmailToAgents(emailToAgents);
     setEmailToParents(emailToParents);
+    setEmailToDirectors(emailToDirectors);
     setEmailToClasses(emailToClasses);
     setEmailToGroups(emailToGroups);
     setMessageValue(messageValue);
@@ -697,6 +711,19 @@ const ComposePopup = (props: MailComposeType) => {
             }
             label="Parents"
           />
+
+          {(user?.role == UserRole.Teacher ||
+            user?.role == UserRole.Administrator) && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={checkedRecipients.director}
+                  onChange={() => handleChangeCheckedRecipient("director")}
+                />
+              }
+              label="Directeur"
+            />
+          )}
           <FormControlLabel
             control={
               <Checkbox
@@ -934,6 +961,76 @@ const ComposePopup = (props: MailComposeType) => {
                 getTagProps,
                 emailToParents,
                 setEmailToParents
+              )
+            }
+            sx={{
+              width: "100%",
+              "& .MuiOutlinedInput-root": { p: 2 },
+              "& .MuiAutocomplete-endAdornment": { display: "none" },
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                autoComplete="new-password"
+                sx={{
+                  border: 0,
+                  "& fieldset": { border: "0 !important" },
+                  "& .MuiOutlinedInput-root": { p: "0 !important" },
+                }}
+              />
+            )}
+          />
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          py: 1,
+          px: 4,
+          display: checkedRecipients.director ? "flex" : "none",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Box sx={{ width: "100%", display: "flex", alignItems: "center" }}>
+          <div>
+            <InputLabel
+              sx={{ mr: 3, fontSize: "0.875rem" }}
+              htmlFor="email-to-select"
+            >
+              Au Directeur:
+            </InputLabel>
+          </div>
+          <Autocomplete
+            multiple
+            freeSolo
+            value={emailToDirectors}
+            clearIcon={false}
+            id="email-to-select"
+            filterSelectedOptions
+            options={directorUsers}
+            ListboxComponent={List}
+            filterOptions={addNewOption}
+            getOptionLabel={(option) =>
+              `${(option as ToUserType).userData.firstName} ${
+                (option as ToUserType).userData.lastName
+              }`
+            }
+            renderOption={(props, option) =>
+              renderListItem(
+                props,
+                option,
+                emailToDirectors,
+                setEmailToDirectors
+              )
+            }
+            renderTags={(array: ToUserType[], getTagProps) =>
+              renderCustomChips(
+                array,
+                getTagProps,
+                emailToDirectors,
+                setEmailToDirectors
               )
             }
             sx={{

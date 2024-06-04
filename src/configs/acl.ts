@@ -21,7 +21,10 @@ const defineRulesFor = (role: string, subject: string) => {
 
   if (role === "Director") {
     can("manage", "all");
-  } else if (role === "Teacher" || role === "Administrator") {
+  } else if (role === "Administrator") {
+    can("manage", "absence");
+    can("read", "all");
+  } else if (role === "Teacher") {
     can("read", "all");
   }
   // else if (role === 'client') {

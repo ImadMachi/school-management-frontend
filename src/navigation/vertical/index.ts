@@ -9,15 +9,15 @@ import { fetchMails, fetchUnreadMessagesCount } from "src/store/apps/mail";
 const navigation = (): VerticalNavItemsType => {
   const dispatch = useDispatch();
 
-  const newRecipientCount = useSelector((state: RootState) => state.mail.unreadCount);
+  const newRecipientCount = useSelector(
+    (state: RootState) => state.mail.unreadCount
+  );
   const auth = useAuth();
 
-
   useEffect(() => {
-    dispatch(fetchUnreadMessagesCount(Number(auth.user?.id)) as any)
-    console.log('fetching unread messages count' + newRecipientCount)
+    dispatch(fetchUnreadMessagesCount(Number(auth.user?.id)) as any);
+    console.log("fetching unread messages count" + newRecipientCount);
   }, [dispatch]);
-
 
   return [
     {
@@ -106,8 +106,9 @@ const navigation = (): VerticalNavItemsType => {
       icon: "mdi:email",
       action: "read",
       subject: "mail",
-      badgeContent: newRecipientCount > 0 ? newRecipientCount.toString() : undefined,
-      badgeColor: 'error',
+      badgeContent:
+        newRecipientCount > 0 ? newRecipientCount.toString() : undefined,
+      badgeColor: "error",
     },
     {
       path: "/apps/mail-parametres",
@@ -118,6 +119,8 @@ const navigation = (): VerticalNavItemsType => {
       path: "/apps/absences",
       title: "Gestion des absences",
       icon: "mdi:calendar-remove",
+      action: "manage",
+      subject: "absence",
     },
   ];
 };

@@ -35,8 +35,6 @@ import AddAbsenceDrawer from "src/views/apps/absences/list/AddAbsenceDrawrer";
 import EditAbsenceModal from "src/views/apps/absences/list/EditAbsenceModal";
 import { HOST } from "src/store/constants/hostname";
 import { Avatar, Box } from "@mui/material";
-import CustomAvatar from "src/@core/components/mui/avatar";
-import { getInitials } from "src/@core/utils/get-initials";
 
 interface CellType {
   row: AbsenceType;
@@ -311,7 +309,7 @@ const AbsenceList = () => {
   useEffect(() => {
     dispatch(fetchData() as any);
   }, []);
-  
+
   useEffect(() => {
     dispatch(filterData(value));
   }, [dispatch, plan, value]);
@@ -364,6 +362,11 @@ const AbsenceList = () => {
       />
     </Grid>
   );
+};
+
+AbsenceList.acl = {
+  action: "manage",
+  subject: "absence",
 };
 
 export default AbsenceList;

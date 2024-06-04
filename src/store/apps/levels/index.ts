@@ -101,7 +101,7 @@ export const appLevelsSlice = createSlice({
     
     builder.addCase(updateLevelStatus.fulfilled, (state, action) => {
       state.data = state.data.filter((item) => item.id !== action.payload.id);
-      toast.success("Le niveau été supprimée avec succès");
+      // toast.success("Le niveau été supprimée avec succès");
     });
 
     builder.addCase(updateLevelStatus.rejected, (state, action) => {

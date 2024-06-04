@@ -100,7 +100,7 @@ export const appCyclesSlice = createSlice({
     });
     builder.addCase(updateCycleStatus.fulfilled, (state, action) => {
       state.data = state.data.filter((item) => item.id !== action.payload.id);
-      toast.success("Le cycles été supprimée avec succès");
+      // toast.success("Le cycles été supprimée avec succès");
     });
     builder.addCase(updateCycleStatus.rejected, (state, action) => {
       toast.error("Erreur supprimant le cycles");

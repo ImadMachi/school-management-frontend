@@ -34,6 +34,7 @@ import { addLevel, deleteLevel, editLevel, updateLevelStatus } from "src/store/a
 import { LevelType } from "src/types/apps/levelTypes";
 import { ClassType } from "src/types/apps/classTypes";
 import { CycleType } from "src/types/apps/cycleTypes";
+import toast from "react-hot-toast";
 
 interface SidebarAddLevelType {
   open: boolean;
@@ -127,6 +128,7 @@ const SidebarAddLevel = (props: SidebarAddLevelType) => {
     if (props.levelToEdit) {
       // dispatch(deleteLevel(props.levelToEdit.id) as any);
       dispatch(updateLevelStatus({ id: props.levelToEdit.id, disabled: true }) as any);
+      toast.success("Le niveau été supprimée avec succès");
       toggle();
       reset();
     }

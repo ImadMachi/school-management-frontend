@@ -213,6 +213,7 @@ const ComposePopup = (props: MailComposeType) => {
       }
     }
   }, []);
+
   useEffect(() => {
     setCategory(categoryStore.data[0]?.id);
   }, [categoryStore.data]);
@@ -550,7 +551,6 @@ const ComposePopup = (props: MailComposeType) => {
     // @ts-ignore
     return filteredOptions;
   };
-
 
   const addNewClassOption = (
     options: ClassType[],
@@ -999,7 +999,12 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: checkedRecipients.director ? "flex" : "none",
+          display:
+            checkedRecipients.director &&
+            (user?.role == UserRole.Teacher ||
+              user?.role == UserRole.Administrator)
+              ? "flex"
+              : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -1138,7 +1143,12 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: checkedRecipients.level ? "flex" : "none",
+          display:
+            checkedRecipients.level &&
+            (user?.role == UserRole.Director ||
+              user?.role == UserRole.Administrator)
+              ? "flex"
+              : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -1207,7 +1217,12 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: checkedRecipients.cycle ? "flex" : "none",
+          display:
+            checkedRecipients.cycle &&
+            (user?.role == UserRole.Director ||
+              user?.role == UserRole.Administrator)
+              ? "flex"
+              : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -1276,7 +1291,10 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: checkedRecipients.group ? "flex" : "none",
+          display:
+            checkedRecipients.group && user?.role != UserRole.Teacher
+              ? "flex"
+              : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
@@ -1344,7 +1362,10 @@ const ComposePopup = (props: MailComposeType) => {
         sx={{
           py: 1,
           px: 4,
-          display: checkedRecipients.agent ? "flex" : "none",
+          display:
+            checkedRecipients.agent && user?.role != UserRole.Teacher
+              ? "flex"
+              : "none",
           alignItems: "center",
           justifyContent: "space-between",
           borderBottom: (theme) => `1px solid ${theme.palette.divider}`,

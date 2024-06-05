@@ -262,11 +262,11 @@ export const appAdministratorsSlice = createSlice({
       if (index !== -1) {
         state.data[index] = updatedAdministrator;
         state.allData[index] = updatedAdministrator;
-        toast.success("L'administrateur a été modifié avec succès");
+        toast.success("L'administrateur a été supprimé avec succès");
       }
     });
     builder.addCase(updateAdministrator.rejected, (state, action) => {
-      toast.error("Erreur modifiant l'administrateur");
+      toast.error("Erreur supprimant l'administrateur");
     });
     builder.addCase(updateAdministratorStatus.fulfilled, (state, action) => {
       const deleteAdministratorId = action.payload.id;
@@ -279,7 +279,7 @@ export const appAdministratorsSlice = createSlice({
       toast.success("L'administrateur a été modifié avec succès");
     });
     builder.addCase(updateAdministratorStatus.rejected, (state, action) => {
-      toast.error("Erreur modifiant l'administrateur");
+      toast.error("Erreur supprimant l'administrateur");
     });
   },
 });

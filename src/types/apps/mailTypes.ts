@@ -110,6 +110,10 @@ export type SenderType = {
     id: number;
     firstName: string;
     lastName: string;
+    fatherFirstName?: string;
+    fatherLastName?: string;
+    motherFirstName?: string;
+    motherLastName?: string;
   };
 };
 

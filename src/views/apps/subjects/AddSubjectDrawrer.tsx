@@ -46,6 +46,7 @@ import {
   addSubject,
   deleteSubject,
   editSubject,
+  updateSubjectStatus,
 } from "src/store/apps/subjects";
 import { SubjectType } from "src/types/apps/subjectTypes";
 import { ClassType } from "src/types/apps/classTypes";
@@ -85,7 +86,7 @@ const Header = styled(Box)<BoxProps>(({ theme }) => ({
 const schema = yup.object().shape({
   id: yup.number(),
   name: yup.string().required("Nom de matère est requis"),
-  classes: yup.array().min(1, "Au moins un classe est requis"),
+  // classes: yup.array().min(1, "Au moins un classe est requis"),
   teachers: yup.array().min(1, "Au moins un enseignant est requis"),
 });
 
@@ -123,13 +124,16 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
   useEffect(() => {
     if (props.subjectToEdit) {
       setValue("name", props.subjectToEdit.name);
-      setValue("classes", props.subjectToEdit.classes);
+      // setValue("classes", props.subjectToEdit.classes);
       setValue("teachers", props.subjectToEdit.teachers);
     }
-  }, [props.subjectToEdit]);
+    return () => {
+      reset();
+    };
+  }, [props.open]);
 
   useEffect(() => {
-    dispatch(fetchClasses() as any);
+    //dispatch(fetchClasses() as any);
     dispatch(fetchTeachers() as any);
     dispatch(fetchData() as any);
   }, []);
@@ -154,7 +158,8 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
 
   const handleDeleteSubject = () => {
     if (props.subjectToEdit) {
-      dispatch(deleteSubject(props.subjectToEdit.id) as any);
+     // dispatch(deleteSubject(props.subjectToEdit.id) as any);
+      dispatch(updateSubjectStatus({ id: props.subjectToEdit.id, disabled: true }) as any);
       toggle();
       reset();
     }
@@ -225,6 +230,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
       </ListItem>
     );
   };
+
   const renderTeacherListItem = (
     props: HTMLAttributes<HTMLLIElement>,
     option: TeachersType,
@@ -232,12 +238,16 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
     onChange: (...event: any[]) => void
   ) => {
     const user = findUserDataById(option.userId);
-
-    if (option?.userId) {
-      return (
-        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {option.userId ? (
+    return (
+      <ListItem
+        key={option.id}
+        sx={{ cursor: "pointer" }}
+        onClick={() => {
+          onChange({ target: { value: [...array, option] } });
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+        {option.userId ? (
               <Avatar
                 alt={`Profile Image of ${option.firstName} ${option.lastName}`}
                 src={`${HOST}/uploads/${user?.profileImage}`}
@@ -252,15 +262,47 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
                 {getInitials(`${option.firstName} ${option.lastName}`)}
               </CustomAvatar>
             )}
-
-            <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.firstName} {option.lastName}
-            </Typography>
-          </Box>
-        </ListItem>
-      );
-    }
+          <Typography sx={{ fontSize: "0.875rem" }}>{option.firstName} {option.lastName}</Typography>
+        </Box>
+      </ListItem>
+    );
   };
+  // const renderTeacherListItem = (
+  //   props: HTMLAttributes<HTMLLIElement>,
+  //   option: TeachersType,
+  //   array: TeachersType[],
+  //   onChange: (...event: any[]) => void
+  // ) => {
+  //   const user = findUserDataById(option.userId);
+
+  //   if (option?.userId) {
+  //     return (
+  //       <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+  //         <Box sx={{ display: "flex", alignItems: "center" }}>
+  //           {option.userId ? (
+  //             <Avatar
+  //               alt={`Profile Image of ${option.firstName} ${option.lastName}`}
+  //               src={`${HOST}/uploads/${user?.profileImage}`}
+  //               sx={{ width: 30, height: 30, marginRight: "10px" }}
+  //             />
+  //           ) : (
+  //             <CustomAvatar
+  //               skin="light"
+  //               color="primary"
+  //               sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+  //             >
+  //               {getInitials(`${option.firstName} ${option.lastName}`)}
+  //             </CustomAvatar>
+  //           )}
+
+  //           <Typography sx={{ fontSize: "0.875rem" }}>
+  //             {option.firstName} {option.lastName}
+  //           </Typography>
+  //         </Box>
+  //       </ListItem>
+  //     );
+  //   }
+  // };
 
   const renderCustomChips = (
     array: SelectType[],
@@ -371,7 +413,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
               </FormHelperText>
             )}
           </FormControl>
-          <FormControl fullWidth sx={{ mb: 6 }}>
+          {/* <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller
               name="classes"
               control={control}
@@ -418,7 +460,7 @@ const SidebarAddSubject = (props: SidebarAddSubjectType) => {
                 {errors.classes.message}
               </FormHelperText>
             )}
-          </FormControl>
+          </FormControl> */}
 
           <FormControl fullWidth sx={{ mb: 6 }}>
             <Controller

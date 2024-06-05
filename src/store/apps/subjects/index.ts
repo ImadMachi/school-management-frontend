@@ -42,6 +42,24 @@ export const deleteSubject = createAsyncThunk(
   }
 );
 
+export const updateSubjectStatus = createAsyncThunk(
+  "appSubjects/updateSubjectStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<SubjectType>(
+        `${HOST}/subjects/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
+
 export const appSubjectsSlice = createSlice({
   name: "appSubjects",
   initialState,
@@ -78,6 +96,13 @@ export const appSubjectsSlice = createSlice({
     });
 
     builder.addCase(deleteSubject.rejected, (state, action) => {
+      toast.error("Erreur supprimant la matière");
+    });
+    builder.addCase(updateSubjectStatus.fulfilled, (state, action) => {
+      state.data = state.data.filter((item) => item.id !== action.payload.id);
+      toast.success("La matière a été supprimée avec succès");
+    });
+    builder.addCase(updateSubjectStatus.rejected, (state, action) => {
       toast.error("Erreur supprimant la matière");
     });
   },

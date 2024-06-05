@@ -41,6 +41,22 @@ export const deleteClass = createAsyncThunk(
     return response.data;
   }
 );
+export const updateClasseStatus = createAsyncThunk(
+  "appClasses/updateClassesStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<ClassType>(
+        `${HOST}/classes/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
 
 export const appClassesSlice = createSlice({
   name: "appClasses",
@@ -80,6 +96,15 @@ export const appClassesSlice = createSlice({
     builder.addCase(deleteClass.rejected, (state, action) => {
       toast.error("Erreur supprimant la classe");
     });
+    builder.addCase(updateClasseStatus.fulfilled, (state, action) => {
+      state.data = state.data.filter((item) => item.id !== action.payload.id);
+      toast.success("La classe a été supprimée avec succès");
+    }
+    );
+    builder.addCase(updateClasseStatus.rejected, (state, action) => {
+      toast.error("Erreur supprimant la classe");
+    }
+    );
   },
 });
 

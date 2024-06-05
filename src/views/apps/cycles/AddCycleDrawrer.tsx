@@ -26,8 +26,9 @@ import { useDispatch } from "react-redux";
 // ** Types Imports
 import { AppDispatch } from "src/store";
 
-import { addCycle, deleteCycle, editCycle } from "src/store/apps/cycles";
+import { addCycle, deleteCycle, editCycle, updateCycleStatus } from "src/store/apps/cycles";
 import { CycleType } from "src/types/apps/cycleTypes";
+import toast from "react-hot-toast";
 
 interface SidebarAddCycleType {
   open: boolean;
@@ -35,7 +36,7 @@ interface SidebarAddCycleType {
   cycleToEdit: CycleType | null;
 }
 
-export interface CreateLevelDto {
+export interface CreateCycleDto {
   name: string;
 }
 
@@ -105,14 +106,15 @@ const SidebarAddCycle = (props: SidebarAddCycleType) => {
     reset();
   };
 
-  const handleDeleteLevel = () => {
+  const handleDeleteCycle = () => {
     if (props.cycleToEdit) {
-      dispatch(deleteCycle(props.cycleToEdit.id) as any);
+      dispatch(updateCycleStatus({ id: props.cycleToEdit.id, disabled: true }) as any);
+      toast.success("Le cycles été supprimée avec succès");
       toggle();
       reset();
     }
   };
-
+  
   return (
     <Drawer
       open={open}
@@ -171,7 +173,7 @@ const SidebarAddCycle = (props: SidebarAddCycleType) => {
                 size="large"
                 variant="outlined"
                 color="error"
-                onClick={handleDeleteLevel}
+                onClick={handleDeleteCycle}
                 sx={{ mr: 3 }}
               >
                 Supprimer

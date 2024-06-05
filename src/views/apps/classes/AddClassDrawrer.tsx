@@ -1,5 +1,5 @@
 // ** React Imports
-import { HTMLAttributes, useEffect, useState } from "react";
+import { HTMLAttributes, use, useEffect, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -44,7 +44,10 @@ import { fetchData as fetchAdministrators } from "src/store/apps/administrator";
 import { fetchData as fetchTeachers } from "src/store/apps/teachers";
 import { fetchData as fetchStudents } from "src/store/apps/students";
 import { fetchData as fetchLevels } from "src/store/apps/levels";
-import { fetchData as fetchClasses } from "src/store/apps/classes";
+import {
+  fetchData as fetchClasses,
+  updateClasseStatus,
+} from "src/store/apps/classes";
 
 import { getInitials } from "src/@core/utils/get-initials";
 import { addClass, deleteClass, editClass } from "src/store/apps/classes";
@@ -165,9 +168,12 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
       setValue("teachers", props.classToEdit.teachers);
       setValue("students", props.classToEdit.students);
 
-      setValue("level", `${props.classToEdit.level.id}`);
+      setValue("level", `${props.classToEdit.level?.id}`);
     }
-  }, [props.classToEdit]);
+    return () => {
+      reset();
+    };
+  }, [props.open]);
 
   useEffect(() => {
     dispatch(fetchAdministrators() as any);
@@ -177,13 +183,19 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     dispatch(fetchClasses() as any);
   }, []);
 
-  const onSubmit = (data: any) => {
-    if (classes.find((c) => c.name === data.name)) {
-      toast.error("Classe existe déjà");
+  const handleDeleteClass = () => {
+    if (props.classToEdit) {
+      // dispatch(deleteClass(props.classToEdit.id) as any);
+      dispatch(
+        updateClasseStatus({ id: props.classToEdit.id, disabled: true }) as any
+      );
       toggle();
       reset();
       return;
     }
+  };
+
+  const onSubmit = (data: any) => {
     const payload = {
       ...data,
       administrator: { id: data.administrator },
@@ -201,14 +213,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   const handleClose = () => {
     toggle();
     reset();
-  };
-
-  const handleDeleteClass = () => {
-    if (props.classToEdit) {
-      dispatch(deleteClass(props.classToEdit.id) as any);
-      toggle();
-      reset();
-    }
   };
 
   const renderUserListItem = (

@@ -540,6 +540,18 @@ const ComposePopup = (props: MailComposeType) => {
     return filteredOptions;
   };
 
+  const addNewOption2 = (options: ToUserType[], params: any): ToUserType[] => {
+    const { inputValue } = params;
+    const filteredOptions = options.filter((option) =>
+      `${option.userData.fatherFirstName} ${option.userData.fatherLastName} ${option.userData.motherFirstName} ${option.userData.motherLastName}`
+        .toLowerCase()
+        .includes(inputValue.toLowerCase())
+    );
+    // @ts-ignore
+    return filteredOptions;
+  };
+
+
   const addNewClassOption = (
     options: ClassType[],
     params: any
@@ -938,7 +950,7 @@ const ComposePopup = (props: MailComposeType) => {
             filterSelectedOptions
             options={parentUsers}
             ListboxComponent={List}
-            filterOptions={addNewOption}
+            filterOptions={addNewOption2}
             getOptionLabel={(option) =>
               `${(option as ToUserType).userData.fatherFirstName} ${
                 (option as ToUserType).userData.fatherLastName

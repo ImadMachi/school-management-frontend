@@ -42,6 +42,24 @@ export const deleteLevel = createAsyncThunk(
   }
 );
 
+export const updateLevelStatus = createAsyncThunk(
+  "appLevels/updateLevelStatus",
+  async ({ id, disabled }: { id: number; disabled: boolean }) => {
+    try {
+      const response = await axios.put<LevelType>(
+        `${HOST}/levels/${id}/status`,
+        {
+          disabled,
+        }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response.data.message;
+    }
+  }
+);
+
+
 export const appLevelsSlice = createSlice({
   name: "appLevels",
   initialState,
@@ -78,6 +96,15 @@ export const appLevelsSlice = createSlice({
     });
 
     builder.addCase(deleteLevel.rejected, (state, action) => {
+      toast.error("Erreur supprimant le niveau");
+    });
+    
+    builder.addCase(updateLevelStatus.fulfilled, (state, action) => {
+      state.data = state.data.filter((item) => item.id !== action.payload.id);
+      // toast.success("Le niveau été supprimée avec succès");
+    });
+
+    builder.addCase(updateLevelStatus.rejected, (state, action) => {
       toast.error("Erreur supprimant le niveau");
     });
   },

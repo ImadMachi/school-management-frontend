@@ -16,7 +16,6 @@ const navigation = (): VerticalNavItemsType => {
 
   useEffect(() => {
     dispatch(fetchUnreadMessagesCount(Number(auth.user?.id)) as any);
-    console.log("fetching unread messages count" + newRecipientCount);
   }, [dispatch]);
 
   return [

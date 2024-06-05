@@ -137,7 +137,7 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
   const studentStore = useSelector((state: RootState) => state.students);
   const levelStore = useSelector((state: RootState) => state.levels);
   const userData = useSelector((state: RootState) => state.users.data);
-  
+
   const classes = useSelector((state: RootState) => state.classes.data);
 
   const findUserDataById = (userId: number) => {
@@ -164,7 +164,6 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
       setValue("administrators", props.classToEdit.administrators);
       setValue("teachers", props.classToEdit.teachers);
       setValue("students", props.classToEdit.students);
-      console.log(props.classToEdit);
 
       setValue("level", `${props.classToEdit.level.id}`);
     }
@@ -175,12 +174,10 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
     dispatch(fetchTeachers() as any);
     dispatch(fetchStudents() as any);
     dispatch(fetchLevels() as any);
-    dispatch(fetchClasses() as any);  
-
+    dispatch(fetchClasses() as any);
   }, []);
 
   const onSubmit = (data: any) => {
-
     if (classes.find((c) => c.name === data.name)) {
       toast.error("Classe existe déjà");
       toggle();
@@ -382,8 +379,9 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                   value={value}
                   label="Année scolaire"
                   onChange={onChange}
-                  placeholder={`${new Date().getFullYear()}-${new Date().getFullYear() + 1
-                    }`}
+                  placeholder={`${new Date().getFullYear()}-${
+                    new Date().getFullYear() + 1
+                  }`}
                   error={Boolean(errors.schoolYear)}
                 />
               )}
@@ -453,7 +451,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as SelectType).firstName} ${(option as SelectType).lastName
+                    `${(option as SelectType).firstName} ${
+                      (option as SelectType).lastName
                     }`
                   }
                   renderOption={(props, option) =>
@@ -498,7 +497,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as SelectType).firstName} ${(option as SelectType).lastName
+                    `${(option as SelectType).firstName} ${
+                      (option as SelectType).lastName
                     }`
                   }
                   renderOption={(props, option) =>
@@ -543,7 +543,8 @@ const SidebarAddClass = (props: SidebarAddClassType) => {
                     filterOptions(options, params, value)
                   }
                   getOptionLabel={(option) =>
-                    `${(option as StudentsType).firstName} ${(option as StudentsType).lastName
+                    `${(option as StudentsType).firstName} ${
+                      (option as StudentsType).lastName
                     }`
                   }
                   renderOption={(props, option) =>

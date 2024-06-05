@@ -191,9 +191,7 @@ export const fetchUnreadMessagesCount = createAsyncThunk(
   "appEmail/fetchUnreadMessagesCount",
   async (userId: number) => {
     const response = await axios.get(`${HOST}/messages/unread-count/${userId}`);
-    console.log('test '+response.data);
-    return response.data; 
-
+    return response.data;
   }
 );
 
@@ -348,16 +346,18 @@ export const appEmailSlice = createSlice({
         delete mail.sender.parent;
       }
       state.mails.unshift(mail);
-      toast.success("Message envoyé avec succès");
+      toast.success("Message envoyé avec succès", {
+        position: "top-right",
+      });
     });
 
     builder.addCase(sendMail.rejected, (state, action) => {
-      toast.error("Erreur lors de l'envoi du message");
+      toast.error("Erreur lors de l'envoi du message", {
+        position: "top-right",
+      });
     });
 
     builder.addCase(forwardMail.fulfilled, (state, action) => {
-      console.log(action.payload);
-
       toast.success("Message transféré avec succès");
     });
 
@@ -427,7 +427,7 @@ export const appEmailSlice = createSlice({
     builder.addCase(fetchUnreadMessagesCount.fulfilled, (state, action) => {
       state.unreadCount = action.payload;
     });
-    
+
     builder.addCase(fetchUnreadMessagesCount.rejected, (state, action) => {
       toast.error("Error fetching unread messages count");
     });

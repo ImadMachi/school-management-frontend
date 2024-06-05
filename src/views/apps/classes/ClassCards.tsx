@@ -65,8 +65,6 @@ const ClassCards = () => {
   // ** Stores
   const classStore = useSelector((state: RootState) => state.classes);
 
-  console.log(classStore.data);
-
   useEffect(() => {
     dispatch(fetchData() as any);
   }, [dispatch]);

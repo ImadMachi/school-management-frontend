@@ -71,7 +71,6 @@ export interface UpdateStudentDto {
   parent: {
     id: number;
   };
-
 }
 
 const schema = yup.object().shape({
@@ -134,17 +133,19 @@ const UserViewLeft = () => {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-
-              <CustomAvatar
-                skin="light"
-                color="primary"
-                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-              >
-                {getInitials(`${option.fatherFirstName} ${option.motherFirstName}`)}
-              </CustomAvatar>
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(
+                `${option.fatherFirstName} ${option.motherFirstName}`
+              )}
+            </CustomAvatar>
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.fatherFirstName} {option.fatherLastName} {option.motherFirstName} {option.motherLastName}
+              {option.fatherFirstName} {option.fatherLastName}{" "}
+              {option.motherFirstName} {option.motherLastName}
             </Typography>
           </Box>
         </ListItem>
@@ -363,7 +364,8 @@ const UserViewLeft = () => {
                     Père:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.parent?.fatherFirstName} {userData.parent?.fatherLastName}
+                    {userData.parent?.fatherFirstName}{" "}
+                    {userData.parent?.fatherLastName}
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", mb: 2 }}>
@@ -373,7 +375,8 @@ const UserViewLeft = () => {
                     Mère:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.parent?.motherFirstName} {userData.parent?.motherLastName}
+                    {userData.parent?.motherFirstName}{" "}
+                    {userData.parent?.motherLastName}
                   </Typography>
                 </Box>
               </Box>
@@ -402,7 +405,7 @@ const UserViewLeft = () => {
                 id="user-view-edit"
                 sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
               >
-                Modifier les inforamtions du l’utilisateur
+                Modifier les informations du l’utilisateur
               </DialogTitle>
               <DialogContent>
                 <DialogContentText

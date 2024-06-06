@@ -313,7 +313,7 @@ const UserViewLeft = () => {
                 id="user-view-edit"
                 sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
               >
-                Modifier les inforamtions du l’utilisateur
+                Modifier les informations du l’utilisateur
               </DialogTitle>
               <DialogContent>
                 <DialogContentText

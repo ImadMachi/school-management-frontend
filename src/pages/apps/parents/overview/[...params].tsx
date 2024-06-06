@@ -88,7 +88,6 @@ const schema = yup.object().shape({
   motherLastName: yup.string().required("Nom de la mère est requis"),
   motherPhoneNumber: yup.string().required("Contact de la mère est requis"),
   address: yup.string().required("Adresse est requis"),
-
 });
 
 const UserViewLeft = () => {
@@ -135,12 +134,18 @@ const UserViewLeft = () => {
     // Ensure id is a number
     const parentId = parseInt(id as unknown as string, 10);
     const partialUpdateParentDto: Partial<UpdateParentDto> = {};
-    if (data.fatherFirstName) partialUpdateParentDto.fatherFirstName = data.fatherFirstName;
-    if (data.fatherLastName) partialUpdateParentDto.fatherLastName = data.fatherLastName;
-    if (data.fatherPhoneNumber) partialUpdateParentDto.fatherPhoneNumber = data.fatherPhoneNumber;
-    if (data.motherFirstName) partialUpdateParentDto.motherFirstName = data.motherFirstName;
-    if (data.motherLastName) partialUpdateParentDto.motherLastName = data.motherLastName;
-    if (data.motherPhoneNumber) partialUpdateParentDto.motherPhoneNumber = data.motherPhoneNumber;
+    if (data.fatherFirstName)
+      partialUpdateParentDto.fatherFirstName = data.fatherFirstName;
+    if (data.fatherLastName)
+      partialUpdateParentDto.fatherLastName = data.fatherLastName;
+    if (data.fatherPhoneNumber)
+      partialUpdateParentDto.fatherPhoneNumber = data.fatherPhoneNumber;
+    if (data.motherFirstName)
+      partialUpdateParentDto.motherFirstName = data.motherFirstName;
+    if (data.motherLastName)
+      partialUpdateParentDto.motherLastName = data.motherLastName;
+    if (data.motherPhoneNumber)
+      partialUpdateParentDto.motherPhoneNumber = data.motherPhoneNumber;
     if (data.address) partialUpdateParentDto.address = data.address;
     dispatch(updateParent({ id: parentId, updateParentDto: data }))
       .then(() => {
@@ -246,7 +251,9 @@ const UserViewLeft = () => {
                     marginRight: "10px",
                   }}
                 >
-                  {getInitials(`${userData.fatherFirstName} ${userData.motherFirstName}`)}
+                  {getInitials(
+                    `${userData.fatherFirstName} ${userData.motherFirstName}`
+                  )}
                 </CustomAvatar>
                 <input
                   type="file"
@@ -256,7 +263,8 @@ const UserViewLeft = () => {
                 />
               </div>
               <Typography variant="h6" sx={{ mb: 4 }}>
-                {userData.fatherFirstName} {userData.fatherLastName} {userData.motherFirstName} {userData.motherLastName}
+                {userData.fatherFirstName} {userData.fatherLastName}{" "}
+                {userData.motherFirstName} {userData.motherLastName}
               </Typography>
               <CustomChip skin="light" size="small" label="Parent" />
             </CardContent>
@@ -272,7 +280,9 @@ const UserViewLeft = () => {
                   >
                     Prénom du père:
                   </Typography>
-                  <Typography variant="body2">{userData.fatherFirstName}</Typography>
+                  <Typography variant="body2">
+                    {userData.fatherFirstName}
+                  </Typography>
                 </Box>{" "}
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
@@ -280,9 +290,10 @@ const UserViewLeft = () => {
                   >
                     Nom du père:
                   </Typography>
-                  <Typography variant="body2">{userData.fatherLastName}</Typography>
+                  <Typography variant="body2">
+                    {userData.fatherLastName}
+                  </Typography>
                 </Box>
-
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -293,24 +304,25 @@ const UserViewLeft = () => {
                     {userData.fatherPhoneNumber}
                   </Typography>
                 </Box>
-
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
                     Prénom de la mère:
                   </Typography>
-                  <Typography variant="body2">{userData.motherFirstName}</Typography>
+                  <Typography variant="body2">
+                    {userData.motherFirstName}
+                  </Typography>
                 </Box>
-
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
                   >
                     Nom de la mère:
                   </Typography>
-                  <Typography variant="body2">{userData.motherLastName}</Typography>
-
+                  <Typography variant="body2">
+                    {userData.motherLastName}
+                  </Typography>
                 </Box>
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
@@ -322,7 +334,6 @@ const UserViewLeft = () => {
                     {userData.motherPhoneNumber}
                   </Typography>
                 </Box>
-
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -331,8 +342,6 @@ const UserViewLeft = () => {
                   </Typography>
                   <Typography variant="body2">{userData.address}</Typography>
                 </Box>
-
-
                 <Box sx={{ display: "flex", mb: 2 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
@@ -372,7 +381,7 @@ const UserViewLeft = () => {
                 id="user-view-edit"
                 sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
               >
-                Modifier les inforamtions du l’utilisateur
+                Modifier les informations du l’utilisateur
               </DialogTitle>
               <DialogContent>
                 <DialogContentText
@@ -414,7 +423,7 @@ const UserViewLeft = () => {
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label="Nom du père" 
+                                label="Nom du père"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />
@@ -520,13 +529,12 @@ const UserViewLeft = () => {
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                                 sx={{ "& .MuiOutlinedInput-root": { p: 2 } }}
-
                               />
                             </FormControl>
                           )}
                         />
                       </FormControl>
-                      </Grid>
+                    </Grid>
                   </Grid>
                 </form>
               </DialogContent>

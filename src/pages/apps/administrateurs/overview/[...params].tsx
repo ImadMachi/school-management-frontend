@@ -187,7 +187,7 @@ const UserViewLeft = () => {
   }, [userId]);
 
   useEffect(() => {
-      return setUserIdData(user || null);
+    return setUserIdData(user || null);
   }, [user]);
 
   if (userData) {
@@ -242,7 +242,6 @@ const UserViewLeft = () => {
                       sx={{ width: 80, height: 80 }}
                       src="/images/avatars/1.png"
                     />
-
                   </>
                 )}
                 <input
@@ -319,7 +318,7 @@ const UserViewLeft = () => {
                 id="user-view-edit"
                 sx={{ textAlign: "center", fontSize: "1.5rem !important" }}
               >
-                Modifier les inforamtions du l’utilisateur
+                Modifier les informations du l’utilisateur
               </DialogTitle>
               <DialogContent>
                 <DialogContentText

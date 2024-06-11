@@ -150,7 +150,7 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant="h6">Ajouter Teacher</Typography>
+        <Typography variant="h6">Ajouter Enseignant</Typography>
         <IconButton
           size="small"
           onClick={handleClose}

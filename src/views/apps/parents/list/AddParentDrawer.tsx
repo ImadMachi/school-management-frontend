@@ -149,11 +149,15 @@ const SidebarAddParent = (props: SidebarAddParentType) => {
     toggle();
     reset();
   };
+
   useEffect(() => {
     const firstName = watch("fatherFirstName");
     const lastName = watch("fatherLastName");
 
-    const email = `${firstName}.${lastName}@arganier.com`;
+    const formattedFirstName = firstName?.replace(/\s+/g, '.');
+    const formattedLastName = lastName?.replace(/\s+/g, '.');
+
+    const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {

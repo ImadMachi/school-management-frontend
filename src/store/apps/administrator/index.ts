@@ -146,6 +146,7 @@ export const updateAdministratorStatus = createAsyncThunk(
 );
 
 interface AppAdministratorsState {
+  find(arg0: (admin: any) => boolean): unknown;
   data: AdministratorType[];
   total: number;
   params: Record<string, any>;

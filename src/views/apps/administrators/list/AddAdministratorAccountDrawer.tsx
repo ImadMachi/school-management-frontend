@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -24,11 +24,11 @@ import { useForm, Controller, useWatch } from "react-hook-form";
 import Icon from "src/@core/components/icon";
 
 // ** Store Imports
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // ** Actions Imports
 // ** Types Imports
-import { AppDispatch } from "src/store";
+import { AppDispatch, RootState } from "src/store";
 import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
 import { addAdministratorAccount } from "src/store/apps/administrator";
 
@@ -96,6 +96,7 @@ const SidebarAddAdministratorAccount = (
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -104,6 +105,10 @@ const SidebarAddAdministratorAccount = (
     resolver: yupResolver(schema),
   });
   const [isHovered, setIsHovered] = useState(false);
+
+  const administrator = useSelector((state: RootState) =>
+    state.administrator.data.find((a) => a.id === id)
+  );
 
   const onSubmit = async (data: CreateAdministratorAccountDto) => {
     const result = await dispatch(addAdministratorAccount({ id, data }) as any);
@@ -142,6 +147,17 @@ const SidebarAddAdministratorAccount = (
       prevFiles.filter((file) => file.name !== fileName)
     );
   };
+  
+  useEffect(() => {
+    if (administrator) {
+      const { firstName, lastName } = administrator;
+      const formattedFirstName = firstName.replace(/\s+/g, ".");
+      const formattedLastName = lastName.replace(/\s+/g, ".");
+      const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
+      setValue("email", email);
+    }
+  }, [administrator, setValue]);
+
 
   return (
     <Drawer
@@ -192,8 +208,8 @@ const SidebarAddAdministratorAccount = (
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <TextField
-                type={showPassword ? "text" : "password"}
-                value={value}
+                  type={showPassword ? "text" : "password"}
+                  value={value}
                   label="Mot de passe"
                   onChange={onChange}
                   placeholder="********"

@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -29,8 +29,9 @@ import { useDispatch } from "react-redux";
 // ** Actions Imports
 import { addAgentAccount } from "src/store/apps/agents";
 // ** Types Imports
-import { AppDispatch } from "src/store";
+import { AppDispatch, RootState } from "src/store";
 import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
+import { useSelector } from "react-redux";
 
 interface SidebarUpdateAgentType {
   id: number;
@@ -92,6 +93,7 @@ const SidebarAddAgentAccount = (props: SidebarUpdateAgentType) => {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -101,6 +103,8 @@ const SidebarAddAgentAccount = (props: SidebarUpdateAgentType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const agent = useSelector((state: RootState) => state.agents.data.find((a: any) => a.id === id));
 
   const onSubmit = async (data: CreateAgentAccountDto) => {
     const result = await dispatch(addAgentAccount({ id, data }) as any);
@@ -139,6 +143,15 @@ const SidebarAddAgentAccount = (props: SidebarUpdateAgentType) => {
       prevFiles.filter((file) => file.name !== fileName)
     );
   };
+  useEffect(() => {
+    if (agent) {
+      const { firstName, lastName } = agent;
+      const formattedFirstName = firstName.replace(/\s+/g, ".");
+      const formattedLastName = lastName.replace(/\s+/g, ".");
+      const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
+      setValue("email", email);
+    }
+  }, [agent, setValue]);
 
   return (
     <Drawer

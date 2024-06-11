@@ -178,7 +178,7 @@ const columns = [
   {
     flex: 0.1,
     minWidth: 230,
-    headerName: "Utilisateur",
+    headerName: "élève",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;

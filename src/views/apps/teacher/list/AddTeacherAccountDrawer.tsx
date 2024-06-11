@@ -151,7 +151,7 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
       const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
       setValue("email", email);
     }
-  }, [teacherf, setValue]);
+  }, [teacher, setValue]);
 
   return (
     <Drawer

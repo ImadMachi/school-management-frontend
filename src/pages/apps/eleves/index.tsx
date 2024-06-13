@@ -285,9 +285,22 @@ const columns = [
       </Typography>
     ),
   },
+
   {
-    flex: 0.1,
-    minWidth: 120,
+    flex: 0.08,
+    minWidth: 80,
+    sortable: false,
+    field: "classe",
+    headerName: "Classe",
+    renderCell: ({ row }: CellType) => (
+      <Typography noWrap>
+        {row.classe?.name || "-"} 
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.05,
+    minWidth: 90,
     headerName: "Compte",
     field: "userId",
     renderCell: ({ row }: CellType) => {

@@ -68,33 +68,31 @@ export const addTeacher = createAsyncThunk(
   async (data: CreateTeacherDto) => {
     const formData = new FormData();
 
-    // Append createAccount property explicitly
     formData.append("firstName", data.firstName);
-
     formData.append("lastName", data.lastName);
-
-    formData.append("dateOfBirth", data.dateOfBirth.toString());
-
-    formData.append("dateOfEmployment", data.dateOfEmployment.toString());
-
+    formData.append("dateOfBirth", data.dateOfBirth.toISOString());
+    formData.append("dateOfEmployment", data.dateOfEmployment.toISOString());
     formData.append("phoneNumber", data.phoneNumber);
-
     formData.append("sex", data.sex);
-
+    if (data.subjects) {
+      data.subjects.forEach((subject, index) => {
+        formData.append(`subjects[${index}][id]`, subject.id.toString());
+      });
+    }
     formData.append("createAccount", data.createAccount.toString());
-
     if (data.createAccount) {
       formData.append("createUserDto[email]", data.createUserDto?.email || "");
-      formData.append(
-        "createUserDto[password]",
-        data.createUserDto?.password || ""
-      );
-      formData.append("profile-images", data.profileImage || "");
+      formData.append("createUserDto[password]", data.createUserDto?.password || "");
+      if (data.profileImage) {
+        formData.append("profileImage", data.profileImage);
+      }
     }
+
     const response = await axios.post(
       `${HOST}/teachers?create-account=${data.createAccount}`,
       formData
     );
+
     return response.data;
   }
 );

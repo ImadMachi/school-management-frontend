@@ -252,8 +252,8 @@ const columns = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 120,
+    flex: 0.05,
+    minWidth: 90,
     headerName: "Compte",
     field: "userId",
     renderCell: ({ row }: CellType) => {

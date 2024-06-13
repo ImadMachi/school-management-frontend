@@ -47,12 +47,14 @@ import {
 } from "@mui/material";
 import { addStudent, fetchStudent } from "src/store/apps/students";
 import { fetchData as fetchStudents } from "src/store/apps/students";
+import { fetchData as fetchClasses } from "src/store/apps/classes";
 import { on } from "events";
 import { StudentsType } from "src/types/apps/studentTypes";
 import { fetchData } from "src/store/apps/parents";
 import { getInitials } from "src/@core/utils/get-initials";
 import { ParentsType } from "src/types/apps/parentTypes";
 import { HOST } from "src/store/constants/hostname";
+import { ClassType } from "src/types/apps/classTypes";
 
 interface SidebarAddStudentType {
   open: boolean;
@@ -66,6 +68,9 @@ export interface CreateStudentDto {
   dateOfBirth: Date;
   sex: string;
   parent: {
+    id: number;
+  };
+  classe: {
     id: number;
   };
   createAccount: boolean;
@@ -91,6 +96,9 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
   parent: yup.object().shape({
+    id: yup.number().required(),
+  }),
+  classe: yup.object().shape({
     id: yup.number().required(),
   }),
   createUserDto: yup.object().when("createAccount", {
@@ -122,6 +130,7 @@ const defaultValues = {
   dateOfBirth: new Date(),
   sex: "",
   parent: { id: "" },
+  classe: { id: "" },
   createAccount: false,
   createUserDto: {
     email: "",
@@ -161,6 +170,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const parentStore = useSelector((state: RootState) => state.parents);
+  const classStore = useSelector((state: RootState) => state.classes);
 
   const createAccount = useWatch({
     control,
@@ -170,6 +180,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
 
   useEffect(() => {
     dispatch(fetchData() as any);
+    dispatch(fetchClasses() as any);
   }, []);
 
   const onSubmit = async (data: CreateStudentDto) => {
@@ -214,6 +225,30 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
         </ListItem>
       );
     }
+  };
+
+  const renderListItemClass = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ClassType
+  ) => {
+      return (
+        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            
+              <CustomAvatar
+                skin="light"
+                color="primary"
+                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+              >
+                {getInitials(`${option.name}`)}
+              </CustomAvatar>
+
+            <Typography sx={{ fontSize: "0.875rem" }}>
+              {option.name}
+            </Typography>
+          </Box>
+        </ListItem>
+      );
   };
 
   useEffect(() => {
@@ -396,6 +431,42 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   )}
                   renderOption={(props, option) =>
                     renderListItem(props, option)
+                  }
+                />
+              )}
+            />
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="classe.id"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { onChange, value } }) => (
+                <Autocomplete
+                  id="classe-user-autocomplete"
+                  options={classStore.data}
+                  getOptionLabel={(option) =>
+                    `${option.name} `
+                  }
+                  value={
+                    classStore.data.find(
+                      (user) => user.id === Number(value)
+                    ) || null
+                  }
+                  onChange={(e, newValue) => {
+                    const newValueId = newValue ? newValue.id : null;
+                    onChange(newValueId);
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Classe"
+                      error={Boolean(errors.classe)}
+                      helperText={errors.classe ? errors.classe.message : ""}
+                    />
+                  )}
+                  renderOption={(props, option) =>
+                    renderListItemClass(props, option)
                   }
                 />
               )}

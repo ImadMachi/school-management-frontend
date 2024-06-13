@@ -54,6 +54,7 @@ import toast from "react-hot-toast";
 import { HOST } from "src/store/constants/hostname";
 
 import { fetchData as fetchUsers } from "src/store/apps/users";
+import { fetchData as fetchSubjects } from "src/store/apps/subjects";
 
 interface CellType {
   row: TeachersType;
@@ -320,8 +321,8 @@ const columns = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 120,
+    flex: 0.05,
+    minWidth: 90,
     headerName: "Compte",
     field: "userId",
     renderCell: ({ row }: CellType) => {
@@ -369,6 +370,7 @@ const UserList = () => {
 
   useEffect(() => {
     dispatch(fetchUsers() as any);
+    dispatch(fetchSubjects() as any);
   }, []);
 
   const handleFilter = useCallback((val: string) => {

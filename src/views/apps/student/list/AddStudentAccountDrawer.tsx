@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -29,8 +29,9 @@ import { useDispatch } from "react-redux";
 // ** Actions Imports
 import { addStudentAccount } from "src/store/apps/students";
 // ** Types Imports
-import { AppDispatch } from "src/store";
+import { AppDispatch, RootState } from "src/store";
 import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
+import { useSelector } from "react-redux";
 
 interface SidebarUpdateStudentType {
   id: number;
@@ -92,6 +93,7 @@ const SidebarAddStudentAccount = (props: SidebarUpdateStudentType) => {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -101,6 +103,7 @@ const SidebarAddStudentAccount = (props: SidebarUpdateStudentType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const student = useSelector((state: RootState) => state.students.data.find((a) => a.id === id));
 
   const onSubmit = async (data: CreateStudentAccountDto) => {
     const result = await dispatch(addStudentAccount({ id, data }) as any);
@@ -139,6 +142,15 @@ const SidebarAddStudentAccount = (props: SidebarUpdateStudentType) => {
       prevFiles.filter((file) => file.name !== fileName)
     );
   };
+  useEffect(() => {
+    if (student) {
+      const { firstName, lastName } = student;
+      const formattedFirstName = firstName.replace(/\s+/g, ".");
+      const formattedLastName = lastName.replace(/\s+/g, ".");
+      const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
+      setValue("email", email);
+    }
+  }, [student, setValue]);
 
   return (
     <Drawer

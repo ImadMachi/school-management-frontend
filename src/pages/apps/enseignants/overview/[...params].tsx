@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, HTMLAttributes, useRef, useState } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -49,12 +49,14 @@ import { AppDispatch, RootState } from "src/store";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { updateTeacher } from "src/store/apps/teachers";
 import { Controller, useForm } from "react-hook-form";
-import { FormHelperText, IconButton } from "@mui/material";
+import { Autocomplete, Chip, FormHelperText, IconButton, List, ListItem } from "@mui/material";
 import { formatDate } from "src/@core/utils/format";
 import { UserType } from "src/types/apps/UserType";
 import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { MailFolderType } from "src/types/apps/mailTypes";
 import { HOST } from "src/store/constants/hostname";
+import { fetchData as fetchSubjects } from "src/store/apps/subjects";
+import { SubjectType } from "src/types/apps/subjectTypes";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -67,6 +69,7 @@ export interface UpdateTeacherDto {
   dateOfBirth?: Date;
   dateOfEmployment?: Date;
   sex?: string;
+  subjects: { id: number }[];
 }
 
 const schema = yup.object().shape({
@@ -76,6 +79,11 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
+  subjects: yup.array().of(
+    yup.object().shape({
+      id: yup.number().required(),
+    })
+  ).required(),
 });
 
 const UserViewLeft = () => {
@@ -98,6 +106,8 @@ const UserViewLeft = () => {
   });
 
   const teacherStore = useSelector((state: RootState) => state.teachers);
+
+  const subjectsStore = useSelector((state: RootState) => state.subjects);
   const user = useSelector((state: RootState) =>
     state.users.data.find((user) => user.id === parseInt(userId as string, 10))
   );
@@ -173,6 +183,15 @@ const UserViewLeft = () => {
     }
   };
 
+  const handleSubjectDelete = (
+    value: number,
+    state: SubjectType[],
+    setState: (val: SubjectType[]) => void
+  ) => {
+    const updatedState = state.filter((item) => item.id !== value);
+    setState(updatedState);
+  };
+
   useEffect(() => {
     if (id && !isNaN(Number(id))) {
       dispatch(fetchTeacher(Number(id)) as any);
@@ -181,6 +200,10 @@ const UserViewLeft = () => {
       setUserData(null);
     };
   }, [id]);
+
+  useEffect(() => {
+    dispatch(fetchSubjects() as any);
+  }, [dispatch]);
 
   useEffect(() => {
     // Update state when the data is updated
@@ -204,6 +227,70 @@ const UserViewLeft = () => {
   useEffect(() => {
     return setUserIdData(user || null);
   }, [user]);
+
+  const filterOptions = (
+    options: SubjectType[],
+    params: any,
+    value: SubjectType[]
+  ): SubjectType[] => {
+    const { inputValue } = params;
+
+    const filteredOptions = options
+      .filter((option) =>
+        `${option.name}`
+          .toLowerCase()
+          .includes(inputValue.toLowerCase())
+      )
+      .filter((option) => !value.find((item) => item.id === option.id));
+
+    // @ts-ignore
+    return filteredOptions;
+  };
+
+  const renderSubjectsListItem = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: SubjectType,
+    array: SubjectType[],
+    setState: (val: SubjectType[]) => void
+  ) => {
+    return (
+      <ListItem
+        key={option.id}
+        sx={{ cursor: "pointer" }}
+        onClick={() => setState([...array, option])}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(`${option.name}`)}
+          </CustomAvatar>
+          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+        </Box>
+      </ListItem>
+    );
+  };
+
+
+  const renderCustomClassChips = (
+    array: SubjectType[],
+    getTagProps: ({ index }: { index: number }) => {},
+    state: SubjectType[],
+    setState: (val: SubjectType[]) => void
+  ) => {
+    return array.map((item, index) => (
+      <Chip
+        key={item.id}
+        label={`${item.name}`}
+        {...(getTagProps({ index }) as {})}
+        deleteIcon={<Icon icon="mdi:close" />}
+        onDelete={() => handleSubjectDelete(item.id, state, setState)}
+      />
+    ));
+  };
+
 
   if (userData) {
     return (
@@ -331,6 +418,16 @@ const UserViewLeft = () => {
                     Sexe:
                   </Typography>
                   <Typography variant="body2">{userData.sex}</Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 2 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                  >
+                    Matières:
+                  </Typography>
+                  <Typography variant="body2">
+                    {userData.subjects?.map((subject) => subject.name).join(", ")}
+                  </Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -492,6 +589,44 @@ const UserViewLeft = () => {
                           )}
                         />
                       </FormControl>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="subjects"
+                          control={control}
+                          defaultValue={userData.subjects || []}
+                          rules={{ required: true }}
+                          render={({ field: { value, onChange } }) => (
+                            <Autocomplete
+                              multiple
+                              value={value}
+                              clearIcon={false}
+                              id="subjects-select"
+                              filterSelectedOptions
+                              options={subjectsStore.data}
+                              ListboxComponent={List}
+                              filterOptions={(options, params) => filterOptions(options, params, value)}
+                              getOptionLabel={(option) => `${option.id}`}
+                              renderOption={(props, option) => renderSubjectsListItem(props, option, value, onChange)}
+                              onChange={(event, newValue) => {
+                                onChange(newValue);
+                              }}
+                              renderTags={(array, getTagProps) =>
+                                renderCustomClassChips(array, getTagProps, value, onChange)
+                              }
+                              renderInput={(params) => (
+                                <TextField {...params} label="Matières" />
+                              )}
+                            />
+                          )}
+                        />
+
+                        {errors.subjects && (
+                          <FormHelperText sx={{ color: "error.main" }}>
+                            {errors.subjects.message}
+                          </FormHelperText>
+                        )}
+                      </FormControl>
+
                     </Grid>
                     {/* <Grid item xs={12}>
                       <FormControlLabel

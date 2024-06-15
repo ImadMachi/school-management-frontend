@@ -94,12 +94,18 @@ const userRoleObj: UserRoleType = {
 
 export interface UpdateUserPasswordDto {
   password?: string;
+  confirmPassword?: string;
 }
+
 const schema = yup.object().shape({
   password: yup
     .string()
     .min(6, "Le mot de passe doit contenir au moins 6 caractères")
     .required("Le mot de passe est requis"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password'), null], 'Les mots de passe doivent correspondre')
+    .required("La confirmation du mot de passe est requise"),
 });
 
 const accountStatusObj: AccountStatusType = {
@@ -281,7 +287,7 @@ const RowOptions = ({ id }: { id: number }) => {
                   error={Boolean(errors.password)}
                   onChange={(e) => {
                     field.onChange(e.target.value);
-                    setPassword(e.target.value); // Step 2: Track Changes in Password Field
+                    setPassword(e.target.value); // Track Changes in Password Field
                   }}
                   InputProps={{
                     endAdornment: (
@@ -312,6 +318,53 @@ const RowOptions = ({ id }: { id: number }) => {
               </FormHelperText>
             )}
           </FormControl>
+
+          <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="confirmPassword"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  type={showPassword ? "text" : "password"}
+                  {...field}
+                  label="Confirmer le mot de passe"
+                  placeholder="********"
+                  error={Boolean(errors.confirmPassword)}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    setPassword(e.target.value); // Track Changes in Confirm Password Field
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          <Icon
+                            icon={
+                              showPassword
+                                ? "mdi:eye-outline"
+                                : "mdi:eye-off-outline"
+                            }
+                            fontSize={20}
+                          />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              )}
+            />
+            {errors.confirmPassword && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.confirmPassword.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button
@@ -453,7 +506,7 @@ const columns = [
             noWrap
             sx={{ color: "text.secondary", textTransform: "capitalize" }}
           >
-            {mapRoleToFrench(row.role)}            
+            {mapRoleToFrench(row.role)}
           </Typography>
         </Box>
       );

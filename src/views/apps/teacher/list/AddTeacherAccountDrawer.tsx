@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -29,8 +29,9 @@ import { useDispatch } from "react-redux";
 // ** Actions Imports
 import { addTeacherAccount } from "src/store/apps/teachers";
 // ** Types Imports
-import { AppDispatch } from "src/store";
+import { AppDispatch, RootState } from "src/store";
 import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
+import { useSelector } from "react-redux";
 
 interface SidebarUpdateTeacherType {
   id: number;
@@ -92,6 +93,7 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -101,6 +103,7 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const teacher = useSelector ((state: RootState) => state.teachers.data.find((teacher) => teacher.id === id));
 
   const onSubmit = async (data: CreateTeacherAccountDto) => {
     const result = await dispatch(addTeacherAccount({ id, data }) as any);
@@ -140,6 +143,16 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
     );
   };
 
+  useEffect(() => {
+    if (teacher) {
+      const { firstName, lastName } = teacher;
+      const formattedFirstName = firstName.replace(/\s+/g, ".");
+      const formattedLastName = lastName.replace(/\s+/g, ".");
+      const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
+      setValue("email", email);
+    }
+  }, [teacher, setValue]);
+
   return (
     <Drawer
       open={open}
@@ -150,7 +163,7 @@ const SidebarAddTeacherAccount = (props: SidebarUpdateTeacherType) => {
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <Header>
-        <Typography variant="h6">Ajouter Teacher</Typography>
+        <Typography variant="h6">Ajouter Enseignant</Typography>
         <IconButton
           size="small"
           onClick={handleClose}

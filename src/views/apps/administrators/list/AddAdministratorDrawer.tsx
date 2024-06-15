@@ -143,13 +143,17 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const email = `${firstName}.${lastName}@arganier.com`;
+    const formattedFirstName = firstName?.replace(/\s+/g, '.');
+    const formattedLastName = lastName?.replace(/\s+/g, '.');
+
+    const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {
       setValue("createUserDto.email", "");
     }
   }, [watch("firstName"), watch("lastName")]);
+
 
   return (
     <Drawer
@@ -285,7 +289,7 @@ const SidebarAddAdministrator = (props: SidebarAddAdministratorType) => {
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.password)}
+                      error={Boolean(errors.createUserDto?.password)}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">

@@ -11,7 +11,6 @@ export type TeachersType = {
   disabled: boolean;
   subjects: SubjectType[];
   userId: number;
-
   user: {
     disabled: boolean;
   };

@@ -56,7 +56,9 @@ import { MailFolderType } from "src/types/apps/mailTypes";
 import { ParentsType } from "src/types/apps/parentTypes";
 import { getInitials } from "src/@core/utils/get-initials";
 import { fetchData } from "src/store/apps/parents";
+import { fetchData as fetchClasses } from "src/store/apps/classes";
 import { HOST } from "src/store/constants/hostname";
+import { ClassType } from "src/types/apps/classTypes";
 
 interface ColorsType {
   [key: string]: ThemeColor;
@@ -71,6 +73,9 @@ export interface UpdateStudentDto {
   parent: {
     id: number;
   };
+  classe: {
+    id: number;
+  };
 }
 
 const schema = yup.object().shape({
@@ -80,6 +85,9 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   sex: yup.string().required(),
   parent: yup.object().shape({
+    id: yup.number().required(),
+  }),
+  classe: yup.object().shape({
     id: yup.number().required(),
   }),
 });
@@ -117,6 +125,7 @@ const UserViewLeft = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const parentStore = useSelector((state: RootState) => state.parents);
+  const classStore = useSelector((state: RootState) => state.classes);
 
   const userData2 = useSelector((state: RootState) => state.users.data);
 
@@ -151,6 +160,26 @@ const UserViewLeft = () => {
         </ListItem>
       );
     }
+  };
+  const renderListItemClass = (
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ClassType
+  ) => {
+    return (
+      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(`${option.name}`)}
+          </CustomAvatar>
+
+          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+        </Box>
+      </ListItem>
+    );
   };
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
@@ -380,6 +409,14 @@ const UserViewLeft = () => {
                   </Typography>
                 </Box>
               </Box>
+              <Box sx={{ display: "flex", mb: 2 }}>
+                <Typography
+                  sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
+                >
+                  Classe:
+                </Typography>
+                <Typography variant="body2">{userData.classe?.name}</Typography>
+              </Box>
             </CardContent>
 
             <CardActions sx={{ display: "flex", justifyContent: "center" }}>
@@ -554,6 +591,45 @@ const UserViewLeft = () => {
                               )}
                               renderOption={(props, option) =>
                                 renderListItem(props, option)
+                              }
+                            />
+                          )}
+                        />
+                      </FormControl>
+                      <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="classe.id"
+                          control={control}
+                          rules={{ required: true }}
+                          render={({ field: { onChange, value } }) => (
+                            <Autocomplete
+                              id="classe-user-autocomplete"
+                              options={classStore.data}
+                              defaultValue={userData.classe}
+                              getOptionLabel={(option) => `${option.name}`}
+                              value={
+                                classStore.data.find(
+                                  (user) => user.id === userData.classe?.id
+                                ) || null
+                              }
+                              onChange={(e, newValue) => {
+                                const newValueId = newValue
+                                  ? newValue.id
+                                  : null;
+                                onChange(newValueId);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  label="Classe"
+                                  error={Boolean(errors.classe)}
+                                  helperText={
+                                    errors.classe ? errors.classe.message : ""
+                                  }
+                                />
+                              )}
+                              renderOption={(props, option) =>
+                                renderListItemClass(props, option)
                               }
                             />
                           )}

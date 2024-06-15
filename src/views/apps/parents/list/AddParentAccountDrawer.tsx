@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -29,8 +29,10 @@ import { useDispatch } from "react-redux";
 // ** Actions Imports
 import { addParent, addParentAccount } from "src/store/apps/parents";
 // ** Types Imports
-import { AppDispatch } from "src/store";
+import { AppDispatch, RootState } from "src/store";
 import { Avatar, Checkbox, Chip, FormControlLabel, InputAdornment } from "@mui/material";
+import { useSelector } from "react-redux";
+import administrator from "src/store/apps/administrator";
 
 interface SidebarUpdateParentType {
   id: number;
@@ -92,6 +94,7 @@ const SidebarAddParent = (props: SidebarUpdateParentType) => {
     reset,
     control,
     getValues,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -101,6 +104,7 @@ const SidebarAddParent = (props: SidebarUpdateParentType) => {
   });
   const [isHovered, setIsHovered] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const parent = useSelector((state: RootState) => state.parents.data.find((a) => a.id === id));
 
   const onSubmit = async (data: CreateParentAccountDto) => {
     const result = await dispatch(addParentAccount({ id, data }) as any);
@@ -139,6 +143,16 @@ const SidebarAddParent = (props: SidebarUpdateParentType) => {
       prevFiles.filter((file) => file.name !== fileName)
     );
   };
+
+  useEffect(() => {
+    if (parent) {
+      const { fatherFirstName, fatherLastName } = parent;
+      const formattedFirstName = fatherFirstName.replace(/\s+/g, ".");
+      const formattedLastName = fatherLastName.replace(/\s+/g, ".");
+      const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
+      setValue("email", email);
+    }
+  }, [parent, setValue]);
 
   return (
     <Drawer

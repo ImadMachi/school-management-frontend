@@ -177,7 +177,7 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: "Utilisateur",
+    headerName: "agent",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const { firstName, lastName } = row;
@@ -250,8 +250,8 @@ const columns = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 120,
+    flex: 0.05,
+    minWidth: 90,
     headerName: "Compte",
     field: "userId",
     renderCell: ({ row }: CellType) => {

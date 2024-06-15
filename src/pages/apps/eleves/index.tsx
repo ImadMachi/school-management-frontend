@@ -176,7 +176,7 @@ const RowOptions = ({ id, userId }: { id: number; userId: number }) => {
 
 const columns = [
   {
-    flex: 0.1,
+    flex: 0.2,
     minWidth: 230,
     headerName: "Utilisateur",
     field: "Utilisateur",
@@ -281,7 +281,9 @@ const columns = [
     headerName: "Parent",
     renderCell: ({ row }: CellType) => (
       <Typography noWrap>
-        {row.parent?.fatherFirstName || "-"} {row.parent?.fatherLastName || "-"} - {row.parent?.motherFirstName || "-"} {row.parent?.motherLastName || "-"}
+        {row.parent?.fatherFirstName || "-"} {row.parent?.fatherLastName || "-"}{" "}
+        - {row.parent?.motherFirstName || "-"}{" "}
+        {row.parent?.motherLastName || "-"}
       </Typography>
     ),
   },

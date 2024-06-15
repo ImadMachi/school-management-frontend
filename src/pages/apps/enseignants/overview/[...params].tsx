@@ -459,12 +459,12 @@ const UserViewLeft = () => {
                           defaultValue={new Date(
                             userData.dateOfEmployment
                           ).toLocaleDateString()}
-                          rules={{ required: "Date employement est requis" }}
+                          rules={{ required: "Date d'embauche est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
                               <TextField
                                 {...field}
-                                label="Date employement"
+                                label="Date d'embauche"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />

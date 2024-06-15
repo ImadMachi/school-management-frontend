@@ -124,7 +124,8 @@ export const updateStudentStatus = createAsyncThunk(
     }
   }
 );
-// ** Delete addStudent
+
+// ** Delete Student
 interface DeleteProps {
   id: number;
   headers: Headers;
@@ -135,6 +136,17 @@ export const deleteStudent = createAsyncThunk(
   async (id: number, { getState, dispatch }: Redux) => {
     await axios.delete(`${HOST}/students/${id}`);
     return id;
+  }
+);
+
+// Import
+export const importStudents = createAsyncThunk(
+  "appStudents/importStudents",
+  async (file: File) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await axios.post(`${HOST}/students/import`, formData);
+    return response.data;
   }
 );
 
@@ -277,6 +289,15 @@ export const appStudentsSlice = createSlice({
     });
     builder.addCase(updateStudentStatus.rejected, (state, action) => {
       toast.error("Erreur supprimant l'élève");
+    });
+
+    builder.addCase(importStudents.fulfilled, (state, action) => {
+      state.data = action.payload;
+      state.allData = action.payload;
+      toast.success("Les élèves ont été importés avec succès");
+    });
+    builder.addCase(importStudents.rejected, (state, action) => {
+      toast.error("Erreur important les élèves");
     });
   },
 });

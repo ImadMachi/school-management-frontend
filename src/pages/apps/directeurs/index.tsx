@@ -177,7 +177,7 @@ const columns = [
   {
     flex: 0.2,
     minWidth: 230,
-    headerName: "direccteur",
+    headerName: "directeur",
     field: "Utilisateur",
     renderCell: ({ row }: CellType) => {
       const dispatch = useDispatch<AppDispatch>();

@@ -14,6 +14,9 @@ import { RootState } from 'src/store'
 import SchoolIcon from '@mui/icons-material/School'
 import ClassIcon from '@mui/icons-material/Class'
 import EventAvailableIcon from '@mui/icons-material/EventAvailable'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 
 const AnalyticsStatisticsCard = () => {
   const dispatch = useDispatch()
@@ -211,7 +214,7 @@ const AnalyticsStatisticsCard = () => {
 
         {/* Absence Statistics */}
         <Grid container spacing={[5, 0]}>
-          <Grid item xs={12} sm={3}>
+          <Grid item xs={12} sm={3} mb={3}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <CustomAvatar
                 variant='rounded'
@@ -227,8 +230,57 @@ const AnalyticsStatisticsCard = () => {
             </Box>
           </Grid>
         </Grid>
+        <Grid container spacing={[5, 0]}>
+
+          <Grid item xs={12} sm={3}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <CustomAvatar
+                variant='rounded'
+                color='success'
+                sx={{ mr: 3, boxShadow: 3, width: 44, height: 44 }}
+              >
+                <CheckCircleIcon fontSize="large" />
+              </CustomAvatar>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant='caption'>Absences Traitées</Typography>
+                <Typography variant='h6'>{statistics.absenceTraitedCount}</Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <CustomAvatar
+                variant='rounded'
+                color='error'
+                sx={{ mr: 3, boxShadow: 3, width: 44, height: 44 }}
+              >
+                <CancelIcon fontSize="large" />
+              </CustomAvatar>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant='caption'>Absences Non Traitées</Typography>
+                <Typography variant='h6'>{statistics.absenceNotTraitedCount}</Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <CustomAvatar
+                variant='rounded'
+                color='warning'
+                sx={{ mr: 3, boxShadow: 3, width: 44, height: 44 }}
+              >
+                <ScheduleIcon fontSize="large" />
+              </CustomAvatar>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Typography variant='caption'>Absences en cours de Traitement</Typography>
+                <Typography variant='h6'>{statistics.absenceTraitingCount}</Typography>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+
       </CardContent>
-    </Card>
+    </Card >
   )
 }
 

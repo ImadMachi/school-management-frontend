@@ -10,5 +10,8 @@ export type StatisticsType = {
     levelsCount: number;
     classesCount: number;
     absencesCount: number;
+    absenceTraitedCount : number;
+    absenceNotTraitedCount : number;
+    absenceTraitingCount : number;
 
 }

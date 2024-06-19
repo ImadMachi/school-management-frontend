@@ -13,6 +13,7 @@ import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 // ** Demo Components Imports
 
 import AnalyticsTransactionsCard from 'src/views/apps/dashboard/AnalyticsTransactionsCard'
+import TotalAbsencesPerDay from 'src/views/apps/dashboard/TotalAbsencePerDay'
 
 const AnalyticsDashboard = () => {
   return (
@@ -49,6 +50,9 @@ const AnalyticsDashboard = () => {
 
           </Grid>
         </Grid> */}
+         <Grid item xs={12} mt={8}>
+          <TotalAbsencesPerDay />
+        </Grid>
 
     </ApexChartWrapper>
   )

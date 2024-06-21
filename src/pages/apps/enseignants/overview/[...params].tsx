@@ -69,7 +69,8 @@ export interface UpdateTeacherDto {
   dateOfBirth?: Date;
   dateOfEmployment?: Date;
   sex?: string;
-  subjects: { id: number }[];
+  subjects?: string;
+  // subjects: { id: number }[];
 }
 
 const schema = yup.object().shape({
@@ -79,11 +80,12 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
-  subjects: yup.array().of(
-    yup.object().shape({
-      id: yup.number().required(),
-    })
-  ).required(),
+  subjects: yup.string().required(),
+  // subjects: yup.array().of(
+  //   yup.object().shape({
+  //     id: yup.number().required(),
+  //   })
+  // ).required(),
 });
 
 const UserViewLeft = () => {
@@ -142,8 +144,8 @@ const UserViewLeft = () => {
     if (data.dateOfEmployment)
       partialUpdateTeacherDto.dateOfEmployment = data.dateOfEmployment;
     if (data.sex) partialUpdateTeacherDto.sex = data.sex;
+    if (data.subjects) partialUpdateTeacherDto.subjects = data.subjects;
 
-    // Dispatch the action with both id and updateteacherDto properties
     dispatch(updateTeacher({ id: teacherId, updateTeacherDto: data }))
       .then(() => {
         reset();
@@ -151,6 +153,7 @@ const UserViewLeft = () => {
       .catch((error) => {
         console.error("Update teacher failed:", error);
       });
+    dispatch(fetchTeacher(teacherId) as any);
     handleEditClose();
     reset();
   };
@@ -202,11 +205,6 @@ const UserViewLeft = () => {
   }, [id]);
 
   useEffect(() => {
-    dispatch(fetchSubjects() as any);
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Update state when the data is updated
     if (teacherStore.data && teacherStore.data.length > 0) {
       setUserData(teacherStore.data[0]);
     }
@@ -228,68 +226,68 @@ const UserViewLeft = () => {
     return setUserIdData(user || null);
   }, [user]);
 
-  const filterOptions = (
-    options: SubjectType[],
-    params: any,
-    value: SubjectType[]
-  ): SubjectType[] => {
-    const { inputValue } = params;
+  // const filterOptions = (
+  //   options: SubjectType[],
+  //   params: any,
+  //   value: SubjectType[]
+  // ): SubjectType[] => {
+  //   const { inputValue } = params;
 
-    const filteredOptions = options
-      .filter((option) =>
-        `${option.name}`
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
-      )
-      .filter((option) => !value.find((item) => item.id === option.id));
+  //   const filteredOptions = options
+  //     .filter((option) =>
+  //       `${option.name}`
+  //         .toLowerCase()
+  //         .includes(inputValue.toLowerCase())
+  //     )
+  //     .filter((option) => !value.find((item) => item.id === option.id));
 
-    // @ts-ignore
-    return filteredOptions;
-  };
+  //   // @ts-ignore
+  //   return filteredOptions;
+  // };
 
-  const renderSubjectsListItem = (
-    props: HTMLAttributes<HTMLLIElement>,
-    option: SubjectType,
-    array: SubjectType[],
-    setState: (val: SubjectType[]) => void
-  ) => {
-    return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => setState([...array, option])}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(`${option.name}`)}
-          </CustomAvatar>
-          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
-        </Box>
-      </ListItem>
-    );
-  };
+  // const renderSubjectsListItem = (
+  //   props: HTMLAttributes<HTMLLIElement>,
+  //   option: SubjectType,
+  //   array: SubjectType[],
+  //   setState: (val: SubjectType[]) => void
+  // ) => {
+  //   return (
+  //     <ListItem
+  //       key={option.id}
+  //       sx={{ cursor: "pointer" }}
+  //       onClick={() => setState([...array, option])}
+  //     >
+  //       <Box sx={{ display: "flex", alignItems: "center" }}>
+  //         <CustomAvatar
+  //           skin="light"
+  //           color="primary"
+  //           sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+  //         >
+  //           {getInitials(`${option.name}`)}
+  //         </CustomAvatar>
+  //         <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+  //       </Box>
+  //     </ListItem>
+  //   );
+  // };
 
 
-  const renderCustomClassChips = (
-    array: SubjectType[],
-    getTagProps: ({ index }: { index: number }) => {},
-    state: SubjectType[],
-    setState: (val: SubjectType[]) => void
-  ) => {
-    return array.map((item, index) => (
-      <Chip
-        key={item.id}
-        label={`${item.name}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        onDelete={() => handleSubjectDelete(item.id, state, setState)}
-      />
-    ));
-  };
+  // const renderCustomClassChips = (
+  //   array: SubjectType[],
+  //   getTagProps: ({ index }: { index: number }) => {},
+  //   state: SubjectType[],
+  //   setState: (val: SubjectType[]) => void
+  // ) => {
+  //   return array.map((item, index) => (
+  //     <Chip
+  //       key={item.id}
+  //       label={`${item.name}`}
+  //       {...(getTagProps({ index }) as {})}
+  //       deleteIcon={<Icon icon="mdi:close" />}
+  //       onDelete={() => handleSubjectDelete(item.id, state, setState)}
+  //     />
+  //   ));
+  // };
 
 
   if (userData) {
@@ -426,7 +424,7 @@ const UserViewLeft = () => {
                     Matières:
                   </Typography>
                   <Typography variant="body2">
-                    {userData.subjects?.map((subject) => subject.name).join(", ")}
+                    {userData.subjects}
                   </Typography>
                 </Box>
               </Box>
@@ -593,6 +591,24 @@ const UserViewLeft = () => {
                         <Controller
                           name="subjects"
                           control={control}
+                          defaultValue={userData.subjects}
+                          rules={{ required: "Matières sont  requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Matières"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                      {/* <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="subjects"
+                          control={control}
                           defaultValue={userData.subjects || []}
                           rules={{ required: true }}
                           render={({ field: { value, onChange } }) => (
@@ -625,7 +641,7 @@ const UserViewLeft = () => {
                             {errors.subjects.message}
                           </FormHelperText>
                         )}
-                      </FormControl>
+                      </FormControl> */}
 
                     </Grid>
                     {/* <Grid item xs={12}>

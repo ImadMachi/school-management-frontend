@@ -9,7 +9,7 @@ export type TeachersType = {
   dateOfEmployment: Date;
   sex: string;
   disabled: boolean;
-  subjects: SubjectType[];
+  subjects: string;
   userId: number;
   user: {
     disabled: boolean;

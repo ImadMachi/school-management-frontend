@@ -74,11 +74,13 @@ export const addTeacher = createAsyncThunk(
     formData.append("dateOfEmployment", data.dateOfEmployment.toISOString());
     formData.append("phoneNumber", data.phoneNumber);
     formData.append("sex", data.sex);
-    if (data.subjects) {
-      data.subjects.forEach((subject, index) => {
-        formData.append(`subjects[${index}][id]`, subject.id.toString());
-      });
-    }
+    formData.append("subjects", data.subjects);
+    
+    // if (data.subjects) {
+    //   data.subjects.forEach((subject, index) => {
+    //     formData.append(`subjects[${index}][id]`, subject.id.toString());
+    //   });
+    // }
     formData.append("createAccount", data.createAccount.toString());
     if (data.createAccount) {
       formData.append("createUserDto[email]", data.createUserDto?.email || "");
@@ -179,7 +181,8 @@ export const appTeachersSlice = createSlice({
             .toString()
             .toLowerCase()
             .includes(filterValue) ||
-          teacher.sex.toLowerCase().includes(filterValue)
+          teacher.sex.toLowerCase().includes(filterValue)||
+          teacher.subjects.toLowerCase().includes(filterValue)
       );
     },
     setTeacherId: (state, action: PayloadAction<number | null>) => {
@@ -281,7 +284,7 @@ export const appTeachersSlice = createSlice({
     });
 
     builder.addCase(updateTeacherStatus.rejected, (state, action) => {
-      toast.error("Erreur supprimant l'enseignant");
+      toast.error("Erreur   supprimant l'enseignant");
     });
   },
 });

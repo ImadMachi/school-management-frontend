@@ -190,6 +190,16 @@ const UserViewLeft = () => {
       return setUserIdData(user || null);
   }, [user]);
 
+  useEffect(() => {
+    if (userData) {
+      reset({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phoneNumber: userData.phoneNumber
+      });
+    }
+  }, [userData, reset]);  
+
   if (userData) {
     return (
       <Grid container spacing={3}>

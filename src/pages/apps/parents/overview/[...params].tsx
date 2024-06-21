@@ -213,6 +213,20 @@ const UserViewLeft = () => {
     return setUserIdData(user || null);
   }, [user]);
 
+  useEffect(() => {
+    if (userData) {
+      reset({
+        fatherFirstName: userData.fatherFirstName,
+        fatherLastName: userData.fatherLastName,
+        fatherPhoneNumber: userData.fatherPhoneNumber,
+        motherFirstName: userData.motherFirstName,
+        motherLastName: userData.motherLastName,
+        motherPhoneNumber: userData.motherPhoneNumber,
+        address: userData.address,
+      });
+    }
+  }, [userData, reset]);  
+
   if (userData) {
     return (
       <Grid container spacing={3}>

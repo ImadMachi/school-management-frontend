@@ -192,19 +192,50 @@ const UserViewLeft = () => {
     fileInputRef.current?.click();
   };
 
-  const handleEditSubmit = (data: UpdateStudentDto) => {
-    // Ensure id is a number
-    const studentId = parseInt(id as unknown as string, 10);
-    const partialUpdateStudentDto: Partial<UpdateStudentDto> = {};
-    if (data.firstName) partialUpdateStudentDto.firstName = data.firstName;
-    if (data.lastName) partialUpdateStudentDto.lastName = data.lastName;
-    if (data.identification)
-      partialUpdateStudentDto.identification = data.identification;
-    if (data.dateOfBirth)
-      partialUpdateStudentDto.dateOfBirth = data.dateOfBirth;
-    if (data.sex) partialUpdateStudentDto.sex = data.sex;
+  // const handleEditSubmit = (data: UpdateStudentDto) => {
+  //   // Ensure id is a number
+  //   const studentId = parseInt(id as unknown as string, 10);
+  //   const partialUpdateStudentDto: Partial<UpdateStudentDto> = {};
+  //   if (data.firstName) partialUpdateStudentDto.firstName = data.firstName;
+  //   if (data.lastName) partialUpdateStudentDto.lastName = data.lastName;
+  //   if (data.identification)
+  //     partialUpdateStudentDto.identification = data.identification;
+  //   if (data.dateOfBirth)
+  //     partialUpdateStudentDto.dateOfBirth = data.dateOfBirth;
+  //   if (data.sex) partialUpdateStudentDto.sex = data.sex;
 
-    dispatch(updateStudent({ id: studentId, updateStudentDto: data }))
+  //   dispatch(updateStudent({ id: studentId, updateStudentDto: data }))
+  //     .then(() => {
+  //       reset();
+  //     })
+  //     .catch((error) => {
+  //       console.error("Update Student failed:", error);
+  //     });
+  //   handleEditClose();
+  //   reset();
+  // };
+
+  const handleEditSubmit = (data: UpdateStudentDto) => {
+    const studentId = parseInt(id as unknown as string, 10);
+
+    const updateStudentDto: UpdateStudentDto = {
+      firstName: data.firstName ?? userData?.firstName,
+      lastName: data.lastName ?? userData?.lastName,
+      identification: data.identification ?? userData?.identification,
+      dateOfBirth: data.dateOfBirth ?? userData?.dateOfBirth,
+      sex: data.sex ?? userData?.sex,
+      parent: {
+        id: data.parent.id ?? userData?.parent.id, // Update parent ID
+      },
+      classe: {
+        id: data.classe.id ?? userData?.classe.id, // Update class ID
+      },
+    };
+
+    console.log("Submitting updateStudentDto:", updateStudentDto);
+
+
+    dispatch(updateStudent({ id: studentId, updateStudentDto }))
       .then(() => {
         reset();
       })
@@ -214,6 +245,7 @@ const UserViewLeft = () => {
     handleEditClose();
     reset();
   };
+
 
   const handleHover = () => {
     setIsHovered(true);
@@ -272,6 +304,25 @@ const UserViewLeft = () => {
   useEffect(() => {
     return setUserIdData(user || null);
   }, [user]);
+
+  useEffect(() => {
+    if (userData) {
+      reset({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        identification: userData.identification,
+        dateOfBirth: new Date(userData.dateOfBirth).toLocaleDateString() as any,
+        sex: userData.sex,
+        parent: {
+          id: userData.parent?.id,
+        },
+        classe: {
+          id: userData.classe?.id,
+        },
+
+      });
+    }
+  }, [userData, reset]);
 
   if (userData) {
     return (
@@ -522,7 +573,7 @@ const UserViewLeft = () => {
                         <Controller
                           name="dateOfBirth"
                           control={control}
-                          defaultValue={new Date(userData.dateOfBirth)}
+                          defaultValue={new Date(userData.dateOfBirth).toLocaleDateString() as any}
                           rules={{ required: "Date de naissance est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
@@ -566,35 +617,28 @@ const UserViewLeft = () => {
                           render={({ field: { onChange, value } }) => (
                             <Autocomplete
                               id="parent-user-autocomplete"
-                              options={parentStore.data}
-                              defaultValue={userData.parent}
-                              getOptionLabel={(option) =>
-                                `${option.fatherFirstName} ${option.fatherLastName} ${option.motherFirstName} ${option.motherLastName}`
-                              }
-                              value={
-                                parentStore.data.find(
-                                  (user) => user.id === userData.parent?.id
-                                ) || null
-                              }
+                              options={parentStore.data.map(parent => parent.id)}
+                              defaultValue={userData.parent?.id ?? undefined}
+                              getOptionLabel={(optionId) => {
+                                const option = parentStore.data.find(parent => parent.id === optionId);
+                                return option ? `${option.fatherFirstName} ${option.fatherLastName} ${option.motherFirstName} ${option.motherLastName}` : '';
+                              }}
+                              value={value}
                               onChange={(e, newValue) => {
-                                const newValueId = newValue
-                                  ? newValue.id
-                                  : null;
-                                onChange(newValueId);
+                                onChange(newValue ?? null);
                               }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label="Parent"
                                   error={Boolean(errors.parent)}
-                                  helperText={
-                                    errors.parent ? errors.parent.message : ""
-                                  }
+                                  helperText={errors.parent ? errors.parent.message : ""}
                                 />
                               )}
-                              renderOption={(props, option) =>
-                                renderListItem(props, option)
-                              }
+                              renderOption={(props, optionId) => {
+                                const option = parentStore.data.find(parent => parent.id === optionId);
+                                return option ? renderListItem(props, option) : null;
+                              }}
                             />
                           )}
                         />
@@ -607,35 +651,28 @@ const UserViewLeft = () => {
                           render={({ field: { onChange, value } }) => (
                             <Autocomplete
                               id="classe-user-autocomplete"
-                              options={classStore.data}
-                              defaultValue={userData.classe}
-                              getOptionLabel={(option) =>
-                                `${option.name}`
-                              }
-                              value={
-                                classStore.data.find(
-                                  (user) => user.id === userData.classe?.id
-                                ) || null
-                              }
+                              options={classStore.data.map(classe => classe.id)}
+                              defaultValue={userData.classe?.id ?? undefined}
+                              getOptionLabel={(optionId) => {
+                                const option = classStore.data.find(classe => classe.id === optionId);
+                                return option ? option.name : '';
+                              }}
+                              value={value}
                               onChange={(e, newValue) => {
-                                const newValueId = newValue
-                                  ? newValue.id
-                                  : null;
-                                onChange(newValueId);
+                                onChange(newValue ?? null);
                               }}
                               renderInput={(params) => (
                                 <TextField
                                   {...params}
                                   label="Classe"
                                   error={Boolean(errors.classe)}
-                                  helperText={
-                                    errors.classe ? errors.classe.message : ""
-                                  }
+                                  helperText={errors.classe ? errors.classe.message : ""}
                                 />
                               )}
-                              renderOption={(props, option) =>
-                                renderListItemClass(props, option)
-                              }
+                              renderOption={(props, optionId) => {
+                                const option = classStore.data.find(classe => classe.id === optionId);
+                                return option ? renderListItemClass(props, option) : null;
+                              }}
                             />
                           )}
                         />

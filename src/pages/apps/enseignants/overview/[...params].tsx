@@ -55,7 +55,7 @@ import { UserType } from "src/types/apps/UserType";
 import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { MailFolderType } from "src/types/apps/mailTypes";
 import { HOST } from "src/store/constants/hostname";
-import { fetchData as fetchSubjects } from "src/store/apps/subjects";
+import subjects, { fetchData as fetchSubjects } from "src/store/apps/subjects";
 import { SubjectType } from "src/types/apps/subjectTypes";
 
 interface ColorsType {
@@ -225,6 +225,20 @@ const UserViewLeft = () => {
   useEffect(() => {
     return setUserIdData(user || null);
   }, [user]);
+
+  useEffect(() => {
+    if (userData) {
+      reset({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phoneNumber: userData.phoneNumber,
+        dateOfBirth: new Date(userData.dateOfBirth).toLocaleDateString() as any,
+        dateOfEmployment: new Date(userData.dateOfEmployment).toLocaleDateString() as any,
+        sex: userData.sex,
+        subjects: userData.subjects
+      });
+    }
+  }, [userData, reset]);
 
   // const filterOptions = (
   //   options: SubjectType[],
@@ -531,7 +545,7 @@ const UserViewLeft = () => {
                           control={control}
                           defaultValue={new Date(
                             userData.dateOfBirth
-                          ).toLocaleDateString()}
+                          ).toLocaleDateString() as any}
                           rules={{ required: "date de naissance est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
@@ -553,7 +567,7 @@ const UserViewLeft = () => {
                           control={control}
                           defaultValue={new Date(
                             userData.dateOfEmployment
-                          ).toLocaleDateString()}
+                          ).toLocaleDateString() as any}
                           rules={{ required: "Date employement est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>

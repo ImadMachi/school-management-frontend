@@ -1,19 +1,13 @@
-// ** MUI Imports
+import React, { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import { useTheme } from '@mui/material/styles';
 import CardHeader from '@mui/material/CardHeader';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
-
-// ** Redux Imports
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTotalAbsencesPerDay } from 'src/store/apps/absences';
-// ** Custom Components Imports
 import ReactApexcharts from 'src/@core/components/react-apexcharts';
-
-// ** Util Import
-import { useEffect } from 'react';
 import { RootState } from 'src/store';
 import { ApexOptions } from 'apexcharts';
 import { hexToRGBA } from 'src/@core/utils/hex-to-rgba';
@@ -29,22 +23,18 @@ const TotalAbsencesPerDay = () => {
   const dispatch = useDispatch();
 
   const totalAbsencesPerDay = useSelector((state: RootState) => state.absences.totalAbsencesPerDay as AbsenceData[]);
-  const statistics = useSelector((state: RootState) => state.statistics.data)
+  const statistics = useSelector((state: RootState) => state.statistics.data);
 
+  const [hoveredData, setHoveredData] = useState<{ date: string; count: number; x: number; y: number } | null>(null);
 
-  // Fetch total absences per day when component mounts
   useEffect(() => {
     dispatch(fetchTotalAbsencesPerDay() as any);
-    dispatch(fetchStatistics() as any)
-
+    dispatch(fetchStatistics() as any);
   }, [dispatch]);
 
-  // Extract dates and counts for the chart
   const dates = totalAbsencesPerDay.map(item => item.date);
   const counts = totalAbsencesPerDay.map(item => item.count);
 
-
-  // Find the day with maximum absences
   const maxAbsences = Math.max(...counts);
   const maxAbsenceDay = totalAbsencesPerDay.find(day => day.count === maxAbsences);
 
@@ -56,23 +46,35 @@ const TotalAbsencesPerDay = () => {
         enabled: true,
         easing: 'easeinout',
         speed: 800
+      },
+      events: {
+        dataPointMouseEnter: (event, chartContext, config) => {
+          const { dataPointIndex } = config;
+          const date = dates[dataPointIndex];
+          const count = counts[dataPointIndex];
+          const { clientX: x, clientY: y } = event;
+          setHoveredData({ date, count, x, y });
+        },
+        dataPointMouseLeave: () => {
+          setHoveredData(null);
+        }
       }
     },
     grid: {
       show: false,
       padding: {
         top: 10,
-        left: 30, // More left padding to prevent bars from sticking to Y-axis
+        left: 30,
         right: 10,
         bottom: 10
       }
     },
     plotOptions: {
       bar: {
-        borderRadius: 10, // Rounded edges
+        borderRadius: 10,
         distributed: true,
-        columnWidth: '60%', // Adjust column width for balanced appearance
-        endingShape: 'rounded', // Rounded ends for bars
+        columnWidth: '60%',
+        endingShape: 'rounded',
         startingShape: 'rounded'
       }
     },
@@ -99,7 +101,7 @@ const TotalAbsencesPerDay = () => {
           fontSize: '12px',
           colors: theme.palette.text.disabled
         },
-        offsetY: 5 // Add space to prevent overlap with X-axis
+        offsetY: 5
       }
     },
     yaxis: {
@@ -113,16 +115,12 @@ const TotalAbsencesPerDay = () => {
       }
     },
     tooltip: {
-      enabled: true,
-      theme: 'dark',
-      y: {
-        formatter: (value) => `${value} absences`
-      }
+      enabled: false
     }
   };
 
   return (
-    <Card sx={{ boxShadow: 3 }}>
+    <Card sx={{ boxShadow: 3, position: 'relative' }}>
       <CardHeader
         title='Absences Annuelles'
         subheader='Total des Absences par Jour'
@@ -131,13 +129,13 @@ const TotalAbsencesPerDay = () => {
       <CardContent sx={{ pt: `${theme.spacing(3)} !important` }}>
         <ReactApexcharts
           type='bar'
-          height={350} // Increased height for taller bars
+          height={350}
           options={options}
           series={[{ data: counts }]}
         />
         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h6">
-            Total des Absences: {statistics?.absencesCount  }
+            Total des Absences: {statistics?.absencesCount}
           </Typography>
           {maxAbsenceDay && (
             <Typography variant="body2" color="error">
@@ -146,6 +144,31 @@ const TotalAbsencesPerDay = () => {
           )}
         </Box>
       </CardContent>
+
+      {hoveredData && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: hoveredData.y - 20, 
+            left: hoveredData.x - 10, 
+            transform: 'translate(-150%, -350%)',
+            backgroundColor: theme.palette.background.paper,
+            padding: '4px 8px',
+            boxShadow: 9,
+            zIndex: 1000,
+            pointerEvents: 'none',
+            borderRadius: '4px', 
+            fontSize: '10px' 
+          }}
+        >
+          <Typography variant="body2" color="textSecondary">
+            {hoveredData.date}
+          </Typography>
+          <Typography variant="h6" color="textPrimary">
+            {hoveredData.count} Absences
+          </Typography>
+        </Box>
+      )}
     </Card>
   );
 };

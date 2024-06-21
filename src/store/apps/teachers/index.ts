@@ -256,18 +256,13 @@ export const appTeachersSlice = createSlice({
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
+  
     builder.addCase(updateTeacher.fulfilled, (state, action) => {
-      const updateTeacher = action.payload;
-      const index = state.allData.findIndex(
-        (teacher) => teacher.id === updateTeacher.id
+      const index = state.data.findIndex(
+        (item) => item.id === action.payload.id
       );
-
-      if (index !== -1) {
-        // If the teacher is found, update the data in both data and allData arrays
-        state.data[index] = updateTeacher;
-        state.allData[index] = updateTeacher;
-        toast.success("L'enseignant a été modifié avec succès");
-      }
+      state.data[index] = action.payload;
+      toast.success("L'enseignant a été modifiée avec succès");
     });
     builder.addCase(updateTeacher.rejected, (state, action) => {
       toast.error("Erreur modifiant l'enseignant");

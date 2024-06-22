@@ -51,7 +51,8 @@ export interface CreateTeacherDto {
   dateOfBirth: Date;
   dateOfEmployment: Date;
   sex: string;
-  subjects: { id: number }[];
+  subjects: string;
+  // subjects: { id: number }[];
   createAccount: boolean;
   createUserDto?: {
     email: string;
@@ -85,11 +86,12 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
-  subjects: yup.array().of(
-    yup.object().shape({
-      id: yup.number().required(),
-    })
-  ).required(),
+  subjects: yup.string().required(),
+  // subjects: yup.array().of(
+  //   yup.object().shape({
+  //     id: yup.number().required(),
+  //   })
+  // ).required(),
   createUserDto: yup.object().when("createAccount", {
     is: true,
     then: yup.object({
@@ -119,7 +121,8 @@ const defaultValues = {
   dateOfBirth: new Date(),
   dateOfEmployment: new Date(),
   sex: "",
-  subjects: [],
+  subjects: "",
+  // subjects: [],
   createAccount: false,
   createUserDto: {
     email: "",
@@ -159,7 +162,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
     name: "createAccount",
     defaultValue: false,
   });
-  
+
   useEffect(() => {
     dispatch(fetchSubjects() as any);
   }, [dispatch]);
@@ -183,7 +186,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
 
   const handleSubjectDelete = (
     value: number,
-    state: ( SubjectType)[],
+    state: (SubjectType)[],
     setState: (val: (SubjectType)[]) => void
   ) => {
     const arr = state;
@@ -193,69 +196,69 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
   };
 
 
-  const filterOptions = (
-    options: SubjectType[],
-    params: any,
-    value: SubjectType[]
-  ): SubjectType[] => {
-    const { inputValue } = params;
+  // const filterOptions = (
+  //   options: SubjectType[],
+  //   params: any,
+  //   value: SubjectType[]
+  // ): SubjectType[] => {
+  //   const { inputValue } = params;
 
-    const filteredOptions = options
-      .filter((option) =>
-        `${option.name}`
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
-      )
-      .filter((option) => !value.find((item) => item.id === option.id));
+  //   const filteredOptions = options
+  //     .filter((option) =>
+  //       `${option.name}`
+  //         .toLowerCase()
+  //         .includes(inputValue.toLowerCase())
+  //     )
+  //     .filter((option) => !value.find((item) => item.id === option.id));
 
-    // @ts-ignore
-    return filteredOptions;
-  };
+  //   // @ts-ignore
+  //   return filteredOptions;
+  // };
 
-  const renderClassListItem = (
-    props: HTMLAttributes<HTMLLIElement>,
-    option: SubjectType,
-    array: (SubjectType)[],
-    setState: (val: (SubjectType)[]) => void
-  ) => {
-    return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => setState([...array, option])}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(`${option.name}`)}
-          </CustomAvatar>
-          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
-        </Box>
-      </ListItem>
-    );
-  };
+  // const renderClassListItem = (
+  //   props: HTMLAttributes<HTMLLIElement>,
+  //   option: SubjectType,
+  //   array: (SubjectType)[],
+  //   setState: (val: (SubjectType)[]) => void
+  // ) => {
+  //   return (
+  //     <ListItem
+  //       key={option.id}
+  //       sx={{ cursor: "pointer" }}
+  //       onClick={() => setState([...array, option])}
+  //     >
+  //       <Box sx={{ display: "flex", alignItems: "center" }}>
+  //         <CustomAvatar
+  //           skin="light"
+  //           color="primary"
+  //           sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+  //         >
+  //           {getInitials(`${option.name}`)}
+  //         </CustomAvatar>
+  //         <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+  //       </Box>
+  //     </ListItem>
+  //   );
+  // };
 
-  const renderCustomClassChips = (
-    array: (SubjectType)[],
-    getTagProps: ({ index }: { index: number }) => {},
-    state: (SubjectType)[],
-    setState: (val: (SubjectType)[]) => void
-  ) => {
-    return array.map((item, index) => (
-      <Chip
-        size="small"
-        key={item.id}
-        label={`${item.name}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        //@ts-ignore
-        onDelete={() => handleSubjectDelete(item.id, state, setState)}
-      />
-    ));
-  };
+  // const renderCustomClassChips = (
+  //   array: (SubjectType)[],
+  //   getTagProps: ({ index }: { index: number }) => {},
+  //   state: (SubjectType)[],
+  //   setState: (val: (SubjectType)[]) => void
+  // ) => {
+  //   return array.map((item, index) => (
+  //     <Chip
+  //       size="small"
+  //       key={item.id}
+  //       label={`${item.name}`}
+  //       {...(getTagProps({ index }) as {})}
+  //       deleteIcon={<Icon icon="mdi:close" />}
+  //       //@ts-ignore
+  //       onDelete={() => handleSubjectDelete(item.id, state, setState)}
+  //     />
+  //   ));
+  // };
 
 
   useEffect(() => {
@@ -440,6 +443,28 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
               control={control}
               rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
+                <TextField
+                  value={value}
+                  label="Matières"
+                  onChange={onChange}
+                  placeholder="Français, Mathématiques, Physique, ..."
+                  error={Boolean(errors.subjects)}
+                />
+              )}
+            />
+            {errors.subjects && (
+              <FormHelperText sx={{ color: "error.main" }}>
+                {errors.subjects.message}
+              </FormHelperText>
+            )}
+          </FormControl>
+
+          {/* <FormControl fullWidth sx={{ mb: 6 }}>
+            <Controller
+              name="subjects"
+              control={control}
+              rules={{ required: true }}
+              render={({ field: { value, onChange } }) => (
                 <Autocomplete
                   multiple
                   value={value}
@@ -476,7 +501,7 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
                 {errors.subjects.message}
               </FormHelperText>
             )}
-          </FormControl>
+          </FormControl> */}
 
 
           <FormControlLabel

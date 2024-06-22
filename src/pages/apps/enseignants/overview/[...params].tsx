@@ -49,13 +49,20 @@ import { AppDispatch, RootState } from "src/store";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
 import { updateTeacher } from "src/store/apps/teachers";
 import { Controller, useForm } from "react-hook-form";
-import { Autocomplete, Chip, FormHelperText, IconButton, List, ListItem } from "@mui/material";
+import {
+  Autocomplete,
+  Chip,
+  FormHelperText,
+  IconButton,
+  List,
+  ListItem,
+} from "@mui/material";
 import { formatDate } from "src/@core/utils/format";
 import { UserType } from "src/types/apps/UserType";
 import { fetchUserById, uploadProfileImage } from "src/store/apps/users";
 import { MailFolderType } from "src/types/apps/mailTypes";
 import { HOST } from "src/store/constants/hostname";
-import { fetchData as fetchSubjects } from "src/store/apps/subjects";
+import subjects, { fetchData as fetchSubjects } from "src/store/apps/subjects";
 import { SubjectType } from "src/types/apps/subjectTypes";
 
 interface ColorsType {
@@ -69,7 +76,8 @@ export interface UpdateTeacherDto {
   dateOfBirth?: Date;
   dateOfEmployment?: Date;
   sex?: string;
-  subjects: { id: number }[];
+  subjects?: string;
+  // subjects: { id: number }[];
 }
 
 const schema = yup.object().shape({
@@ -79,11 +87,12 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
-  subjects: yup.array().of(
-    yup.object().shape({
-      id: yup.number().required(),
-    })
-  ).required(),
+  subjects: yup.string().required(),
+  // subjects: yup.array().of(
+  //   yup.object().shape({
+  //     id: yup.number().required(),
+  //   })
+  // ).required(),
 });
 
 const UserViewLeft = () => {
@@ -142,8 +151,8 @@ const UserViewLeft = () => {
     if (data.dateOfEmployment)
       partialUpdateTeacherDto.dateOfEmployment = data.dateOfEmployment;
     if (data.sex) partialUpdateTeacherDto.sex = data.sex;
+    if (data.subjects) partialUpdateTeacherDto.subjects = data.subjects;
 
-    // Dispatch the action with both id and updateteacherDto properties
     dispatch(updateTeacher({ id: teacherId, updateTeacherDto: data }))
       .then(() => {
         reset();
@@ -151,6 +160,7 @@ const UserViewLeft = () => {
       .catch((error) => {
         console.error("Update teacher failed:", error);
       });
+    dispatch(fetchTeacher(teacherId) as any);
     handleEditClose();
     reset();
   };
@@ -202,11 +212,6 @@ const UserViewLeft = () => {
   }, [id]);
 
   useEffect(() => {
-    dispatch(fetchSubjects() as any);
-  }, [dispatch]);
-
-  useEffect(() => {
-    // Update state when the data is updated
     if (teacherStore.data && teacherStore.data.length > 0) {
       setUserData(teacherStore.data[0]);
     }
@@ -228,69 +233,83 @@ const UserViewLeft = () => {
     return setUserIdData(user || null);
   }, [user]);
 
-  const filterOptions = (
-    options: SubjectType[],
-    params: any,
-    value: SubjectType[]
-  ): SubjectType[] => {
-    const { inputValue } = params;
+  useEffect(() => {
+    if (userData) {
+      reset({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phoneNumber: userData.phoneNumber,
+        dateOfBirth: new Date(userData.dateOfBirth).toLocaleDateString() as any,
+        dateOfEmployment: new Date(
+          userData.dateOfEmployment
+        ).toLocaleDateString() as any,
+        sex: userData.sex,
+        subjects: userData.subjects,
+      });
+    }
+  }, [userData, reset]);
 
-    const filteredOptions = options
-      .filter((option) =>
-        `${option.name}`
-          .toLowerCase()
-          .includes(inputValue.toLowerCase())
-      )
-      .filter((option) => !value.find((item) => item.id === option.id));
+  // const filterOptions = (
+  //   options: SubjectType[],
+  //   params: any,
+  //   value: SubjectType[]
+  // ): SubjectType[] => {
+  //   const { inputValue } = params;
 
-    // @ts-ignore
-    return filteredOptions;
-  };
+  //   const filteredOptions = options
+  //     .filter((option) =>
+  //       `${option.name}`
+  //         .toLowerCase()
+  //         .includes(inputValue.toLowerCase())
+  //     )
+  //     .filter((option) => !value.find((item) => item.id === option.id));
 
-  const renderSubjectsListItem = (
-    props: HTMLAttributes<HTMLLIElement>,
-    option: SubjectType,
-    array: SubjectType[],
-    setState: (val: SubjectType[]) => void
-  ) => {
-    return (
-      <ListItem
-        key={option.id}
-        sx={{ cursor: "pointer" }}
-        onClick={() => setState([...array, option])}
-      >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CustomAvatar
-            skin="light"
-            color="primary"
-            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-          >
-            {getInitials(`${option.name}`)}
-          </CustomAvatar>
-          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
-        </Box>
-      </ListItem>
-    );
-  };
+  //   // @ts-ignore
+  //   return filteredOptions;
+  // };
 
+  // const renderSubjectsListItem = (
+  //   props: HTMLAttributes<HTMLLIElement>,
+  //   option: SubjectType,
+  //   array: SubjectType[],
+  //   setState: (val: SubjectType[]) => void
+  // ) => {
+  //   return (
+  //     <ListItem
+  //       key={option.id}
+  //       sx={{ cursor: "pointer" }}
+  //       onClick={() => setState([...array, option])}
+  //     >
+  //       <Box sx={{ display: "flex", alignItems: "center" }}>
+  //         <CustomAvatar
+  //           skin="light"
+  //           color="primary"
+  //           sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+  //         >
+  //           {getInitials(`${option.name}`)}
+  //         </CustomAvatar>
+  //         <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+  //       </Box>
+  //     </ListItem>
+  //   );
+  // };
 
-  const renderCustomClassChips = (
-    array: SubjectType[],
-    getTagProps: ({ index }: { index: number }) => {},
-    state: SubjectType[],
-    setState: (val: SubjectType[]) => void
-  ) => {
-    return array.map((item, index) => (
-      <Chip
-        key={item.id}
-        label={`${item.name}`}
-        {...(getTagProps({ index }) as {})}
-        deleteIcon={<Icon icon="mdi:close" />}
-        onDelete={() => handleSubjectDelete(item.id, state, setState)}
-      />
-    ));
-  };
-
+  // const renderCustomClassChips = (
+  //   array: SubjectType[],
+  //   getTagProps: ({ index }: { index: number }) => {},
+  //   state: SubjectType[],
+  //   setState: (val: SubjectType[]) => void
+  // ) => {
+  //   return array.map((item, index) => (
+  //     <Chip
+  //       key={item.id}
+  //       label={`${item.name}`}
+  //       {...(getTagProps({ index }) as {})}
+  //       deleteIcon={<Icon icon="mdi:close" />}
+  //       onDelete={() => handleSubjectDelete(item.id, state, setState)}
+  //     />
+  //   ));
+  // };
 
   if (userData) {
     return (
@@ -425,9 +444,7 @@ const UserViewLeft = () => {
                   >
                     Matières:
                   </Typography>
-                  <Typography variant="body2">
-                    {userData.subjects?.map((subject) => subject.name).join(", ")}
-                  </Typography>
+                  <Typography variant="body2">{userData.subjects}</Typography>
                 </Box>
               </Box>
             </CardContent>
@@ -531,9 +548,11 @@ const UserViewLeft = () => {
                         <Controller
                           name="dateOfBirth"
                           control={control}
-                          defaultValue={new Date(
-                            userData.dateOfBirth
-                          ).toLocaleDateString()}
+                          defaultValue={
+                            new Date(
+                              userData.dateOfBirth
+                            ).toLocaleDateString() as any
+                          }
                           rules={{ required: "date de naissance est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
@@ -553,9 +572,7 @@ const UserViewLeft = () => {
                         <Controller
                           name="dateOfEmployment"
                           control={control}
-                          defaultValue={new Date(
-                            userData.dateOfEmployment
-                          ).toLocaleDateString()}
+                          defaultValue={new Date(userData.dateOfEmployment)}
                           rules={{ required: "Date d'embauche est requis" }}
                           render={({ field, fieldState }) => (
                             <FormControl fullWidth sx={{ mb: 6 }}>
@@ -593,6 +610,24 @@ const UserViewLeft = () => {
                         <Controller
                           name="subjects"
                           control={control}
+                          defaultValue={userData.subjects}
+                          rules={{ required: "Matières sont  requis" }}
+                          render={({ field, fieldState }) => (
+                            <FormControl fullWidth sx={{ mb: 6 }}>
+                              <TextField
+                                {...field}
+                                label="Matières"
+                                error={Boolean(fieldState.error)}
+                                helperText={fieldState.error?.message}
+                              />
+                            </FormControl>
+                          )}
+                        />
+                      </FormControl>
+                      {/* <FormControl fullWidth sx={{ mb: 6 }}>
+                        <Controller
+                          name="subjects"
+                          control={control}
                           defaultValue={userData.subjects || []}
                           rules={{ required: true }}
                           render={({ field: { value, onChange } }) => (
@@ -625,8 +660,7 @@ const UserViewLeft = () => {
                             {errors.subjects.message}
                           </FormHelperText>
                         )}
-                      </FormControl>
-
+                      </FormControl> */}
                     </Grid>
                     {/* <Grid item xs={12}>
                       <FormControlLabel

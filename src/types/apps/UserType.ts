@@ -7,6 +7,15 @@ export type UserType = {
   isActive: boolean;
   role: string;
   profileImage?: string;
+  // totalAbsences: number;
+  // justifiedAbsences: number;
+  // unjustifiedAbsences: number;
+  // totalDaysAbsent: number;
+  // totalSessionsAbsent: number;
+  // totalReplacements: number;
+  // uniqueReplacementDays: number;
+  // totalSessionsReplaced: number;
+
   userData: {
     id: number;
     firstName: string;

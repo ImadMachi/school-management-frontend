@@ -20,6 +20,13 @@ const navigation = (): VerticalNavItemsType => {
 
   return [
     {
+      path: "/apps/dashboard",
+      title: "Tableau de bord",
+      icon: "mdi:view-dashboard",
+      action: "manage",
+      subject: "dashboard",
+    },
+    {
       action: "manage",
       subject: "user",
       title: "Gestion des utilisateurs",
@@ -93,10 +100,10 @@ const navigation = (): VerticalNavItemsType => {
           path: "/apps/classes",
           title: "Les Classes",
         },
-        {
-          path: "/apps/matieres",
-          title: "Les Matières",
-        },
+        // {
+        //   path: "/apps/matieres",
+        //   title: "Les Matières",
+        // },
       ],
     },
     {

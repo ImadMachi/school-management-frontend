@@ -22,6 +22,11 @@ interface Redux {
   dispatch: Dispatch<any>;
 }
 
+interface TotalAbsencesPerDay {
+  date: string;
+  count: number;
+}
+
 // ** Fetch addAbsences
 export const fetchData = createAsyncThunk("appAbsences/fetchData", async () => {
   const response = await axios.get(`${HOST}/absences`);
@@ -70,14 +75,33 @@ export const deleteAbsence = createAsyncThunk(
   }
 );
 
+// ** Fetch User Absence Stats
+export const fetchUserAbsenceStats = createAsyncThunk(
+  "appAbsences/fetchUserAbsenceStats",
+  async (userId: number) => {
+    const response = await axios.get(`${HOST}/users/${userId}/stats`);
+    return { userId, stats: response.data };
+  }
+);
+
+export const fetchTotalAbsencesPerDay = createAsyncThunk(
+  "appAbsences/fetchTotalAbsencesPerDay",
+  async () => {
+    const response = await axios.get(`${HOST}/absences/stats/abs_day`);
+    return response.data as TotalAbsencesPerDay[];
+  }
+);
+
 interface AppAbsencesState {
-  find(arg0: (i: any) => boolean): unknown;
-  some(arg0: (absence: { status: string; }) => boolean): unknown;
+  // find(arg0: (i: any) => boolean): unknown;
+  // some(arg0: (absence: { status: string; }) => boolean): unknown;
   absences: AbsenceType[];
   data: AbsenceType[];
   total: number;
   params: Record<string, any>;
   allData: AbsenceType[];
+  totalAbsencesPerDay: TotalAbsencesPerDay[],
+
 }
 
 const initialState: AppAbsencesState = {
@@ -86,6 +110,7 @@ const initialState: AppAbsencesState = {
   total: 1,
   params: {},
   allData: [],
+  totalAbsencesPerDay: [],
 };
 
 export const appAbsencesSlice = createSlice({
@@ -206,6 +231,29 @@ export const appAbsencesSlice = createSlice({
     builder.addCase(updateAbsence.rejected, (state, action) => {
       toast.error("Erreur modifiant l'absence");
     });
+    // builder.addCase(fetchUserAbsenceStats.fulfilled, (state, action) => {
+    //   const { userId, stats } = action.payload;
+    //   const user = state.data.find((absence) => absence.absentUser.id === userId);
+
+    //   if (user) {
+    //     user.absentUser.totalAbsences = stats.totalAbsences;
+    //     user.absentUser.justifiedAbsences = stats.justifiedAbsences;
+    //     user.absentUser.unjustifiedAbsences = stats.unjustifiedAbsences;
+    //     user.absentUser.totalReplacements = stats.totalReplacements;
+    //     user.absentUser.totalSessionsAbsent = stats.totalSessionsAbsent;
+    //     user.absentUser.totalSessionsReplaced = stats.totalSessionsReplaced;
+    //     user.absentUser.uniqueReplacementDays = stats.uniqueReplacementDays;
+        
+    //   }
+    //}); 
+    builder.addCase(fetchTotalAbsencesPerDay.fulfilled, (state, action) => {
+      state.totalAbsencesPerDay = action.payload;
+    });
+
+    builder.addCase(fetchTotalAbsencesPerDay.rejected, (state, action) => {
+      toast.error("Erreur lors du chargement des statistiques d'absence par jour");
+    });
+
   },
 });
 

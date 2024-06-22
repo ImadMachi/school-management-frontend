@@ -1,5 +1,5 @@
 // ** React Imports
-import { ChangeEvent, HTMLAttributes, use, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 // ** MUI Imports
 import Drawer from "@mui/material/Drawer";
@@ -14,7 +14,6 @@ import Typography from "@mui/material/Typography";
 import Box, { BoxProps } from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
 import FormHelperText from "@mui/material/FormHelperText";
-import CustomAvatar from "src/@core/components/mui/avatar";
 
 // ** Third Party Imports
 import * as yup from "yup";
@@ -31,13 +30,14 @@ import { useDispatch } from "react-redux";
 import { addTeacher } from "src/store/apps/teachers";
 
 // ** Types Imports
-import { AppDispatch, RootState } from "src/store";
-import { Autocomplete, Avatar, Checkbox, Chip, FormControlLabel, InputAdornment, List, ListItem } from "@mui/material";
-import subjects from "src/store/apps/subjects";
-import { useSelector } from "react-redux";
-import { SubjectType } from "src/types/apps/subjectTypes";
-import { getInitials } from "src/@core/utils/get-initials";
-import { fetchData as fetchSubjects } from "src/store/apps/subjects";
+import { AppDispatch } from "src/store";
+import {
+  Avatar,
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  InputAdornment,
+} from "@mui/material";
 
 interface SidebarAddTeacherType {
   open: boolean;
@@ -51,8 +51,6 @@ export interface CreateTeacherDto {
   dateOfBirth: Date;
   dateOfEmployment: Date;
   sex: string;
-  subjects: string;
-  // subjects: { id: number }[];
   createAccount: boolean;
   createUserDto?: {
     email: string;
@@ -86,12 +84,6 @@ const schema = yup.object().shape({
   dateOfBirth: yup.date().required(),
   dateOfEmployment: yup.date().required(),
   sex: yup.string().required(),
-  subjects: yup.string().required(),
-  // subjects: yup.array().of(
-  //   yup.object().shape({
-  //     id: yup.number().required(),
-  //   })
-  // ).required(),
   createUserDto: yup.object().when("createAccount", {
     is: true,
     then: yup.object({
@@ -121,8 +113,6 @@ const defaultValues = {
   dateOfBirth: new Date(),
   dateOfEmployment: new Date(),
   sex: "",
-  subjects: "",
-  // subjects: [],
   createAccount: false,
   createUserDto: {
     email: "",
@@ -136,7 +126,6 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
   const { open, toggle } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-
   // ** Hooks
   const dispatch = useDispatch<AppDispatch>();
   const {
@@ -155,120 +144,28 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const subjectsStore = useSelector((state: RootState) => state.subjects);
-
   const createAccount = useWatch({
     control,
     name: "createAccount",
     defaultValue: false,
   });
 
-  useEffect(() => {
-    dispatch(fetchSubjects() as any);
-  }, [dispatch]);
-
-  const onSubmit = async (data: CreateTeacherDto) => {
-    const result = await dispatch(addTeacher(data) as any);
-    if (result.error) {
-      return;
-    }
-    dispatch(fetchSubjects() as any);
+  const onSubmit = (data: CreateTeacherDto) => {
+    dispatch(addTeacher(data) as any);
     toggle();
     reset();
   };
-
 
   const handleClose = () => {
     toggle();
     reset();
   };
 
-
-  const handleSubjectDelete = (
-    value: number,
-    state: (SubjectType)[],
-    setState: (val: (SubjectType)[]) => void
-  ) => {
-    const arr = state;
-    const index = arr.findIndex((i) => i.id === value);
-    arr.splice(index, 1);
-    setState([...arr]);
-  };
-
-
-  // const filterOptions = (
-  //   options: SubjectType[],
-  //   params: any,
-  //   value: SubjectType[]
-  // ): SubjectType[] => {
-  //   const { inputValue } = params;
-
-  //   const filteredOptions = options
-  //     .filter((option) =>
-  //       `${option.name}`
-  //         .toLowerCase()
-  //         .includes(inputValue.toLowerCase())
-  //     )
-  //     .filter((option) => !value.find((item) => item.id === option.id));
-
-  //   // @ts-ignore
-  //   return filteredOptions;
-  // };
-
-  // const renderClassListItem = (
-  //   props: HTMLAttributes<HTMLLIElement>,
-  //   option: SubjectType,
-  //   array: (SubjectType)[],
-  //   setState: (val: (SubjectType)[]) => void
-  // ) => {
-  //   return (
-  //     <ListItem
-  //       key={option.id}
-  //       sx={{ cursor: "pointer" }}
-  //       onClick={() => setState([...array, option])}
-  //     >
-  //       <Box sx={{ display: "flex", alignItems: "center" }}>
-  //         <CustomAvatar
-  //           skin="light"
-  //           color="primary"
-  //           sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-  //         >
-  //           {getInitials(`${option.name}`)}
-  //         </CustomAvatar>
-  //         <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
-  //       </Box>
-  //     </ListItem>
-  //   );
-  // };
-
-  // const renderCustomClassChips = (
-  //   array: (SubjectType)[],
-  //   getTagProps: ({ index }: { index: number }) => {},
-  //   state: (SubjectType)[],
-  //   setState: (val: (SubjectType)[]) => void
-  // ) => {
-  //   return array.map((item, index) => (
-  //     <Chip
-  //       size="small"
-  //       key={item.id}
-  //       label={`${item.name}`}
-  //       {...(getTagProps({ index }) as {})}
-  //       deleteIcon={<Icon icon="mdi:close" />}
-  //       //@ts-ignore
-  //       onDelete={() => handleSubjectDelete(item.id, state, setState)}
-  //     />
-  //   ));
-  // };
-
-
   useEffect(() => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const formattedFirstName = firstName?.replace(/\s+/g, '.');
-    const formattedLastName = lastName?.replace(/\s+/g, '.');
-
-    const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
+    const email = `${firstName}.${lastName}@gmail.com`;
     setValue("createUserDto.email", email);
 
     if (!firstName && !lastName) {
@@ -437,73 +334,6 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
             )}
           </FormControl>
 
-          <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="subjects"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <TextField
-                  value={value}
-                  label="Matières"
-                  onChange={onChange}
-                  placeholder="Français, Mathématiques, Physique, ..."
-                  error={Boolean(errors.subjects)}
-                />
-              )}
-            />
-            {errors.subjects && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.subjects.message}
-              </FormHelperText>
-            )}
-          </FormControl>
-
-          {/* <FormControl fullWidth sx={{ mb: 6 }}>
-            <Controller
-              name="subjects"
-              control={control}
-              rules={{ required: true }}
-              render={({ field: { value, onChange } }) => (
-                <Autocomplete
-                  multiple
-                  value={value}
-                  clearIcon={false}
-                  id="subjects-select"
-                  filterSelectedOptions
-                  options={subjectsStore.data}
-                  ListboxComponent={List}
-                  filterOptions={(options, params) =>
-                    filterOptions(options, params, value)
-                  }
-                  getOptionLabel={(option) => `${option.name}`}
-                  renderOption={(props, option) =>
-                    renderClassListItem(props, option, value, onChange)
-                  }
-                  renderTags={(array, getTagProps) =>
-                    renderCustomClassChips(array, getTagProps, value, onChange)
-                  }
-                  sx={{
-                    "& .MuiOutlinedInput-root": { p: 2 },
-                    "& .MuiSelect-selectMenu": { minHeight: "auto" },
-                  }}
-                  onChange={(event, newValue) => {
-                    onChange(newValue);
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Matières" />
-                  )}
-                />
-              )}
-            />
-            {errors.subjects && (
-              <FormHelperText sx={{ color: "error.main" }}>
-                {errors.subjects.message}
-              </FormHelperText>
-            )}
-          </FormControl> */}
-
-
           <FormControlLabel
             control={
               <Controller
@@ -553,7 +383,6 @@ const SidebarAddTeacher = (props: SidebarAddTeacherType) => {
                       label="Mot de passe"
                       onChange={onChange}
                       placeholder="********"
-                      error={Boolean(errors.createUserDto?.password)}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">

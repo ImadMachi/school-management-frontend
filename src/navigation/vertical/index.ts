@@ -100,10 +100,6 @@ const navigation = (): VerticalNavItemsType => {
           path: "/apps/classes",
           title: "Les Classes",
         },
-        // {
-        //   path: "/apps/matieres",
-        //   title: "Les Matières",
-        // },
       ],
     },
     {

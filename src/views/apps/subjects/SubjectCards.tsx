@@ -96,7 +96,7 @@ const SubjectCards = () => {
                     setAddUserOpen(true);
                   }}
                 >
-                  Modifier le Matière
+                  Modifier la Matière
                 </Typography>
               </Box>
               {/* <IconButton sx={{ color: "text.secondary" }}>

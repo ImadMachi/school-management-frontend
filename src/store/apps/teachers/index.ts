@@ -74,17 +74,14 @@ export const addTeacher = createAsyncThunk(
     formData.append("dateOfEmployment", data.dateOfEmployment.toISOString());
     formData.append("phoneNumber", data.phoneNumber);
     formData.append("sex", data.sex);
-    formData.append("subjects", data.subjects);
-    
-    // if (data.subjects) {
-    //   data.subjects.forEach((subject, index) => {
-    //     formData.append(`subjects[${index}][id]`, subject.id.toString());
-    //   });
-    // }
+
     formData.append("createAccount", data.createAccount.toString());
     if (data.createAccount) {
       formData.append("createUserDto[email]", data.createUserDto?.email || "");
-      formData.append("createUserDto[password]", data.createUserDto?.password || "");
+      formData.append(
+        "createUserDto[password]",
+        data.createUserDto?.password || ""
+      );
       if (data.profileImage) {
         formData.append("profileImage", data.profileImage);
       }
@@ -181,7 +178,7 @@ export const appTeachersSlice = createSlice({
             .toString()
             .toLowerCase()
             .includes(filterValue) ||
-          teacher.sex.toLowerCase().includes(filterValue)||
+          teacher.sex.toLowerCase().includes(filterValue) ||
           teacher.subjects.toLowerCase().includes(filterValue)
       );
     },
@@ -256,7 +253,7 @@ export const appTeachersSlice = createSlice({
       state.data.unshift(action.payload);
       state.allData.unshift(action.payload);
     });
-  
+
     builder.addCase(updateTeacher.fulfilled, (state, action) => {
       const index = state.data.findIndex(
         (item) => item.id === action.payload.id

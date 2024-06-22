@@ -438,14 +438,6 @@ const UserViewLeft = () => {
                   </Typography>
                   <Typography variant="body2">{userData.sex}</Typography>
                 </Box>
-                <Box sx={{ display: "flex", mb: 2 }}>
-                  <Typography
-                    sx={{ mr: 2, fontWeight: 500, fontSize: "0.875rem" }}
-                  >
-                    Matières:
-                  </Typography>
-                  <Typography variant="body2">{userData.subjects}</Typography>
-                </Box>
               </Box>
             </CardContent>
 
@@ -599,24 +591,6 @@ const UserViewLeft = () => {
                               <TextField
                                 {...field}
                                 label="Sexe"
-                                error={Boolean(fieldState.error)}
-                                helperText={fieldState.error?.message}
-                              />
-                            </FormControl>
-                          )}
-                        />
-                      </FormControl>
-                      <FormControl fullWidth sx={{ mb: 6 }}>
-                        <Controller
-                          name="subjects"
-                          control={control}
-                          defaultValue={userData.subjects}
-                          rules={{ required: "Matières sont  requis" }}
-                          render={({ field, fieldState }) => (
-                            <FormControl fullWidth sx={{ mb: 6 }}>
-                              <TextField
-                                {...field}
-                                label="Matières"
                                 error={Boolean(fieldState.error)}
                                 helperText={fieldState.error?.message}
                               />

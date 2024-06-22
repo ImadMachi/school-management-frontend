@@ -289,48 +289,6 @@ const columns = [
       <Typography noWrap>{row.sex || "-"}</Typography>
     ),
   },
-
-  {
-    flex: 0.1,
-    minWidth: 90,
-    sortable: false,
-    field: "matieres",
-    headerName: "Matieres",
-    renderCell: ({ row }: CellType) => (
-      <Typography noWrap>{row.subjects || "-"}</Typography>
-    ),
-  },
-  // {
-  //   flex: 0.17,
-  //   minWidth: 40,
-  //   headerName: "Matieres",
-  //   field: "matieres",
-  //   renderCell: ({ row }: CellType) => {
-  //     const subjects = row.subjects || [];
-  //     return (
-  //       <Box sx={{ display: "flex", alignItems: "center" }}>
-  //         <Box
-  //           sx={{
-  //             display: "flex",
-  //             alignItems: "flex-start",
-  //             flexDirection: "column",
-  //           }}
-  //         >
-  //           <Typography noWrap>
-  //             {subjects.length
-  //               ? subjects.map((sub, index) => (
-  //                   <span key={sub.id}>
-  //                     {sub.name ?? "non spécifié"}
-  //                     {index !== subjects.length - 1 && "-"}
-  //                   </span>
-  //                 ))
-  //               : "- -"}
-  //           </Typography>
-  //         </Box>
-  //       </Box>
-  //     );
-  //   },
-  // },
   {
     flex: 0.05,
     minWidth: 90,
@@ -387,19 +345,6 @@ const UserList = () => {
   const handleFilter = useCallback((val: string) => {
     setValue(val);
   }, []);
-
-  // const generateCSVData = () => {
-  //   return teacherStore.allData.map((item) => ({
-  //     Prénom: item.firstName,
-  //     Nom: item.lastName,
-  //     DateNaissance: item.dateOfBirth,
-  //     DateEmbauche: item.dateOfEmployment,
-  //     Tel: item.phoneNumber,
-  //     Sexe: item.sex || "-",
-
-  //     compte: !!item.userId ? "oui" : "non",
-  //   }));
-  // };
 
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
 

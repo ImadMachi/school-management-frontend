@@ -24,6 +24,7 @@ import { useAuth } from "src/hooks/useAuth";
 import { Settings } from "src/@core/context/settingsContext";
 import { mapRoleToFrench } from "src/pages/apps/utilisateurs";
 import { HOST } from "src/store/constants/hostname";
+import { UserRole } from "src/types/apps/UserType";
 
 interface Props {
   settings: Settings;
@@ -142,7 +143,9 @@ const UserDropdown = (props: Props) => {
               }}
             >
               <Typography sx={{ fontWeight: 600 }}>
-                {user?.userData?.firstName + " " + user?.userData?.lastName}
+                {user?.role != UserRole.Parent
+                  ? user?.userData?.firstName + " " + user?.userData?.lastName
+                  : "Parent"}
               </Typography>
               <Typography
                 variant="body2"

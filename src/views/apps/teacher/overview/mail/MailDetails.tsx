@@ -54,6 +54,7 @@ import {
 } from "src/store/apps/mail";
 import { useSelector } from "react-redux";
 import { RootState } from "src/store";
+import { UserRole } from "src/types/apps/UserType";
 
 const HiddenReplyBack = styled(Box)<BoxProps>(({ theme }) => ({
   height: 11,
@@ -309,18 +310,18 @@ const MailDetails = (props: MailDetailsType) => {
                       <Box sx={{ display: "flex", alignItems: "center" }}>
                         <Avatar
                           alt={
-                            mail.sender.senderData.firstName +
-                            " " +
-                            mail.sender.senderData.lastName
+                            mail.sender.role == UserRole.Parent
+                              ? `${mail.sender.senderData.fatherFirstName} ${mail.sender.senderData.fatherLastName} - ${mail.sender.senderData.motherFirstName} ${mail.sender.senderData.motherLastName}`
+                              : `${mail.sender.senderData.firstName} ${mail.sender.senderData.lastName}`
                           }
                           src={`${HOST}/uploads/${user?.profileImage}`}
                           sx={{ width: "2.375rem", height: "2.375rem", mr: 3 }}
                         />
                         <Box sx={{ display: "flex", flexDirection: "column" }}>
                           <Typography sx={{ fontWeight: 500 }}>
-                            {mail.sender.senderData.firstName +
-                              " " +
-                              mail.sender.senderData.lastName}
+                            {mail.sender.role == UserRole.Parent
+                              ? `${mail.sender.senderData.fatherFirstName} ${mail.sender.senderData.fatherLastName} - ${mail.sender.senderData.motherFirstName} ${mail.sender.senderData.motherLastName}`
+                              : `${mail.sender.senderData.firstName} ${mail.sender.senderData.lastName}`}
                           </Typography>
                           <Typography variant="body2">
                             {mail.sender.email}

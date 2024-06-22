@@ -106,6 +106,7 @@ export type MailMetaType = {
 export type SenderType = {
   id: number;
   email: string;
+  role: string;
   senderData: {
     id: number;
     firstName: string;

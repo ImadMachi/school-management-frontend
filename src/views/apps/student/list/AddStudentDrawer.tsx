@@ -209,17 +209,19 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
       return (
         <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            
-              <CustomAvatar
-                skin="light"
-                color="primary"
-                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-              >
-                {getInitials(`${option.fatherFirstName} ${option.motherFirstName}`)}
-              </CustomAvatar>
+            <CustomAvatar
+              skin="light"
+              color="primary"
+              sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+            >
+              {getInitials(
+                `${option.fatherFirstName} ${option.motherFirstName}`
+              )}
+            </CustomAvatar>
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.fatherFirstName} {option.fatherLastName} {option.motherFirstName} {option.motherLastName}
+              {option.fatherFirstName} {option.fatherLastName}{" "}
+              {option.motherFirstName} {option.motherLastName}
             </Typography>
           </Box>
         </ListItem>
@@ -231,32 +233,29 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
     props: HTMLAttributes<HTMLLIElement>,
     option: ClassType
   ) => {
-      return (
-        <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            
-              <CustomAvatar
-                skin="light"
-                color="primary"
-                sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
-              >
-                {getInitials(`${option.name}`)}
-              </CustomAvatar>
+    return (
+      <ListItem key={option.id} sx={{ cursor: "pointer" }} {...props}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <CustomAvatar
+            skin="light"
+            color="primary"
+            sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
+          >
+            {getInitials(`${option.name}`)}
+          </CustomAvatar>
 
-            <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.name}
-            </Typography>
-          </Box>
-        </ListItem>
-      );
+          <Typography sx={{ fontSize: "0.875rem" }}>{option.name}</Typography>
+        </Box>
+      </ListItem>
+    );
   };
 
   useEffect(() => {
     const firstName = watch("firstName");
     const lastName = watch("lastName");
 
-    const formattedFirstName = firstName?.replace(/\s+/g, '.');
-    const formattedLastName = lastName?.replace(/\s+/g, '.');
+    const formattedFirstName = firstName?.replace(/\s+/g, ".");
+    const formattedLastName = lastName?.replace(/\s+/g, ".");
 
     const email = `${formattedFirstName}.${formattedLastName}@arganier.com`;
     setValue("createUserDto.email", email);
@@ -424,7 +423,7 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Pére"
+                      label="Parent"
                       error={Boolean(errors.parent)}
                       helperText={errors.parent ? errors.parent.message : ""}
                     />
@@ -445,13 +444,10 @@ const SidebarAddStudent = (props: SidebarAddStudentType) => {
                 <Autocomplete
                   id="classe-user-autocomplete"
                   options={classStore.data}
-                  getOptionLabel={(option) =>
-                    `${option.name} `
-                  }
+                  getOptionLabel={(option) => `${option.name} `}
                   value={
-                    classStore.data.find(
-                      (user) => user.id === Number(value)
-                    ) || null
+                    classStore.data.find((user) => user.id === Number(value)) ||
+                    null
                   }
                   onChange={(e, newValue) => {
                     const newValueId = newValue ? newValue.id : null;

@@ -54,6 +54,7 @@ import {
 } from "src/store/apps/mail";
 import { useSelector } from "react-redux";
 import { RootState } from "src/store";
+import { UserRole } from "src/types/apps/UserType";
 
 const HiddenReplyBack = styled(Box)<BoxProps>(({ theme }) => ({
   height: 11,
@@ -163,7 +164,6 @@ const MailDetails = (props: MailDetailsType) => {
   };
   const user = findUserDataById(mail?.sender.id);
 
-
   return (
     <Sidebar
       hideBackdrop
@@ -244,7 +244,6 @@ const MailDetails = (props: MailDetailsType) => {
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <>
                   {mail.isDeleted ? (
-                    
                     <IconButton size="small" onClick={handleMoveFromTrash}>
                       <Icon
                         icon="material-symbols-light:restore-from-trash-outline-rounded"
@@ -320,9 +319,9 @@ const MailDetails = (props: MailDetailsType) => {
                         />
                         <Box sx={{ display: "flex", flexDirection: "column" }}>
                           <Typography sx={{ fontWeight: 500 }}>
-                            {mail.sender.senderData.firstName +
-                              " " +
-                              mail.sender.senderData.lastName}
+                            {mail.sender.role == UserRole.Parent
+                              ? `${mail.sender.senderData.fatherFirstName} ${mail.sender.senderData.fatherLastName} - ${mail.sender.senderData.motherFirstName} ${mail.sender.senderData.motherLastName}`
+                              : `${mail.sender.senderData.firstName} ${mail.sender.senderData.lastName}`}
                           </Typography>
                           <Typography variant="body2">
                             {mail.sender.email}

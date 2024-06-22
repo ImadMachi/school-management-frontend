@@ -109,16 +109,30 @@ export const appUsersSlice = createSlice({
         state.data = state.allData;
         return;
       }
-      state.data = state.allData.filter(
-        (User) =>
-          User.id.toString().toLowerCase().includes(filterValue) ||
-          User.role.toLowerCase().includes(filterValue) ||
-          User.isActive.toString().toLowerCase().includes(filterValue) ||
-          User.email.toLowerCase().includes(filterValue) ||
-          `${User.userData.firstName} ${User.userData.lastName}`
-            .toLowerCase()
-            .includes(filterValue)
-      );
+
+      state.data = state.allData.filter((user) => {
+        if (user.role === UserRole.Parent) {
+          return (
+            user.id.toString().toLowerCase().includes(filterValue) ||
+            user.role.toLowerCase().includes(filterValue) ||
+            user.isActive.toString().toLowerCase().includes(filterValue) ||
+            user.email.toLowerCase().includes(filterValue) ||
+            `${user.userData.fatherFirstName} ${user.userData.fatherLastName} - ${user.userData.motherFirstName} ${user.userData.motherLastName}`
+              .toLowerCase()
+              .includes(filterValue)
+          );
+        } else {
+          return (
+            user.id.toString().toLowerCase().includes(filterValue) ||
+            user.role.toLowerCase().includes(filterValue) ||
+            user.isActive.toString().toLowerCase().includes(filterValue) ||
+            user.email.toLowerCase().includes(filterValue) ||
+            `${user.userData.firstName} ${user.userData.lastName}`
+              .toLowerCase()
+              .includes(filterValue)
+          );
+        }
+      });
     },
     setSelectedId: (
       state,

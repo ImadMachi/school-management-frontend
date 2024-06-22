@@ -59,6 +59,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "src/store";
 import { HOST } from "src/store/constants/hostname";
 import { useRouter } from "next/router";
+import { UserRole } from "src/types/apps/UserType";
 
 const MailItem = styled(ListItem)<ListItemProps>(({ theme }) => ({
   cursor: "pointer",
@@ -472,8 +473,9 @@ const MailLog = (props: MailLogType) => {
                                   textOverflow: ["ellipsis", "unset"],
                                 }}
                               >
-                                {user?.userData?.firstName}{" "}
-                                {user?.userData?.lastName}
+                                {user?.role == UserRole.Parent
+                                  ? `${user?.userData?.fatherFirstName} ${user?.userData?.fatherLastName} - ${user?.userData?.motherFirstName} ${user?.userData?.motherLastName}`
+                                  : `${user?.userData?.firstName} ${user?.userData?.lastName}`}
                               </Typography>
                             )}
 

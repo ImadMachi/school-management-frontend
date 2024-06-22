@@ -295,9 +295,7 @@ const columns = [
     field: "classe",
     headerName: "Classe",
     renderCell: ({ row }: CellType) => (
-      <Typography noWrap>
-        {row.classe?.name || "-"} 
-      </Typography>
+      <Typography noWrap>{row.classe?.name || "-"}</Typography>
     ),
   },
   {
@@ -307,6 +305,7 @@ const columns = [
     field: "userId",
     renderCell: ({ row }: CellType) => {
       const status = row.user ? (row.user?.disabled ? "non" : "oui") : "non";
+
       return (
         <CustomChip
           skin="light"

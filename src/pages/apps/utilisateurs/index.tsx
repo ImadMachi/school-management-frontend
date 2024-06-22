@@ -104,7 +104,10 @@ const schema = yup.object().shape({
     .required("Le mot de passe est requis"),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password'), null], 'Les mots de passe doivent correspondre')
+    .oneOf(
+      [yup.ref("password"), null],
+      "Les mots de passe doivent correspondre"
+    )
     .required("La confirmation du mot de passe est requise"),
 });
 
@@ -364,7 +367,6 @@ const RowOptions = ({ id }: { id: number }) => {
               </FormHelperText>
             )}
           </FormControl>
-
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center" }}>
           <Button
@@ -417,9 +419,10 @@ const columns = [
       const dispatch = useDispatch<AppDispatch>();
 
       // Determine the name to display based on the role
-      const displayName = row.role === "Parent"
-        ? `${row.userData.fatherFirstName} ${row.userData.fatherLastName} et ${row.userData.motherFirstName} ${row.userData.motherLastName}`
-        : `${row.userData.firstName} ${row.userData.lastName}`;
+      const displayName =
+        row.role == UserRole.Parent
+          ? `${row.userData?.fatherFirstName} ${row.userData?.fatherLastName} - ${row.userData?.motherFirstName} ${row.userData?.motherLastName}`
+          : `${row.userData?.firstName} ${row.userData?.lastName}`;
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -453,8 +456,9 @@ const columns = [
             <StyledLink
               href={`/apps/${mapRoleToFrench(
                 row.role
-              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${row.userData?.id
-                }`}
+              ).toLocaleLowerCase()}s/overview/inbox/${row.id}/${
+                row.userData?.id
+              }`}
               onClick={() => {
                 if (row.role === "Administrator") {
                   dispatch(setAdministratorId(row.userData.id));
@@ -485,8 +489,7 @@ const columns = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 120,
+    flex: 0.1,
     headerName: "Role",
     field: "role",
     renderCell: ({ row }: CellType) => {

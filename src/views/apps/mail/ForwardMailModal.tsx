@@ -5,7 +5,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import { UserType } from "src/types/apps/UserType";
+import { UserRole, UserType } from "src/types/apps/UserType";
 import { HOST } from "src/store/constants/hostname";
 import {
   Autocomplete,
@@ -67,7 +67,10 @@ const ForwardMailPopup: React.FC<ForwardMailPopupProps> = ({
   const addNewOption = (options: UserType[], params: any): UserType[] => {
     const { inputValue } = params;
     const filteredOptions = options.filter((option) =>
-      `${option.userData.firstName} ${option.userData.lastName}`
+      (option?.role == UserRole.Parent
+        ? `${option?.userData?.fatherFirstName} ${option?.userData?.fatherLastName} - ${option?.userData?.motherFirstName} ${option?.userData?.motherLastName}`
+        : `${option?.userData?.firstName} ${option?.userData?.lastName}`
+      )
         .toLowerCase()
         .includes(inputValue.toLowerCase())
     );
@@ -102,18 +105,30 @@ const ForwardMailPopup: React.FC<ForwardMailPopupProps> = ({
                 sx={{ mr: 3, width: 22, height: 22, fontSize: ".75rem" }}
               >
                 {getInitials(
-                  `${option.userData?.firstName} ${option.userData?.lastName}`
+                  option?.role == UserRole.Parent
+                    ? `${option?.userData?.fatherFirstName} ${option?.userData?.fatherLastName} - ${option?.userData?.motherFirstName} ${option?.userData?.motherLastName}`
+                    : `${option?.userData?.firstName} ${option?.userData?.lastName}`
                 )}
               </CustomAvatar>
             )}
 
             <Typography sx={{ fontSize: "0.875rem" }}>
-              {option.userData.firstName} {option.userData.lastName}
+              {option?.role == UserRole.Parent
+                ? `${option?.userData?.fatherFirstName} ${option?.userData?.fatherLastName} - ${option?.userData?.motherFirstName} ${option?.userData?.motherLastName}`
+                : `${option?.userData?.firstName} ${option?.userData?.lastName}`}
             </Typography>
           </Box>
         </ListItem>
       );
     }
+  };
+
+  const handleMailDelete = (
+    id: number,
+    array: UserType[],
+    setState: (val: UserType[]) => void
+  ) => {
+    setState(array.filter((item) => item.id !== id));
   };
 
   const renderCustomChips = (
@@ -126,7 +141,11 @@ const ForwardMailPopup: React.FC<ForwardMailPopupProps> = ({
       <Chip
         size="small"
         key={item.id}
-        label={`${item.userData.firstName} ${item.userData.lastName}`}
+        label={
+          item?.role == UserRole.Parent
+            ? `${item?.userData?.fatherFirstName} ${item?.userData?.fatherLastName} - ${item?.userData?.motherFirstName} ${item?.userData?.motherLastName}`
+            : `${item?.userData?.firstName} ${item?.userData?.lastName}`
+        }
         {...(getTagProps({ index }) as {})}
         deleteIcon={<Icon icon="mdi:close" />}
         //@ts-ignore
@@ -173,9 +192,15 @@ const ForwardMailPopup: React.FC<ForwardMailPopupProps> = ({
             ListboxComponent={List}
             filterOptions={addNewOption}
             getOptionLabel={(option) =>
-              `${(option as UserType).userData.firstName} ${
-                (option as UserType).userData.lastName
-              }`
+              (option as UserType)?.role == UserRole.Parent
+                ? `${(option as UserType)?.userData?.fatherFirstName} ${
+                    (option as UserType)?.userData?.fatherLastName
+                  } - ${(option as UserType)?.userData?.motherFirstName} ${
+                    (option as UserType)?.userData?.motherLastName
+                  }`
+                : `${(option as UserType)?.userData?.firstName} ${
+                    (option as UserType)?.userData?.lastName
+                  }`
             }
             renderOption={(props, option) =>
               renderListItem(props, option, recipients, setRecipients)

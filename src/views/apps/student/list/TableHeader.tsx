@@ -43,6 +43,9 @@ const TableHeader = (props: TableHeaderProps) => {
       setIsLoading(true);
       await dispatch(importStudents(file) as any);
       setIsLoading(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } else {
       setErrorMessage("Veuillez importer un fichier CSV");
     }

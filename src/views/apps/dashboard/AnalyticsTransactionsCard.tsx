@@ -71,7 +71,7 @@ const AnalyticsStatisticsCard = () => {
                 <Icon icon={'mdi:account-cog'} />
               </CustomAvatar>
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='caption'>Administrators</Typography>
+                <Typography variant='caption'>Administrateurs</Typography>
                 <Typography variant='h6'>{statistics.administratorsCount}</Typography>
               </Box>
             </Box>
@@ -86,7 +86,7 @@ const AnalyticsStatisticsCard = () => {
                 <Icon icon={'mdi:account-tie'} />
               </CustomAvatar>
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='caption'>Directors</Typography>
+                <Typography variant='caption'>Directeurs</Typography>
                 <Typography variant='h6'>{statistics.directorsCount}</Typography>
               </Box>
             </Box>
@@ -101,7 +101,7 @@ const AnalyticsStatisticsCard = () => {
                 <Icon icon={'mdi:teacher'} />
               </CustomAvatar>
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='caption'>Teachers</Typography>
+                <Typography variant='caption'>Enseignants</Typography>
                 <Typography variant='h6'>{statistics.teachersCount}</Typography>
               </Box>
             </Box>
@@ -146,7 +146,7 @@ const AnalyticsStatisticsCard = () => {
                 <Icon icon={'mdi:school'} />
               </CustomAvatar>
               <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='caption'>Students</Typography>
+                <Typography variant='caption'>élèves</Typography>
                 <Typography variant='h6'>{statistics.studentsCount}</Typography>
               </Box>
             </Box>
